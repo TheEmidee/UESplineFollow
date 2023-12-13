@@ -1,0 +1,21 @@
+{
+  "FileVersion": 3,
+  "Version": 1.0,
+  "VersionName": "1.0",
+  "FriendlyName": "Spline Follow",
+  "Description": "Tools to make an actor follow a spline and execute actions while doing it",
+  "Category": "Core",
+  "CreatedBy": "Michael Delva",
+  "CreatedByURL": "http://www.emidee.net",
+  "EnabledByDefault": false,
+  "CanContainContent": false,
+
+  "Modules": [
+    {
+      "Name": "SplineFollow",
+      "Type": "Runtime",
+      "LoadingPhase": "Default"
+    }
+  ],
+  "Plugins": []
+}
