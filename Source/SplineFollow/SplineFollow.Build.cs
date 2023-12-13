@@ -7,15 +7,15 @@ namespace UnrealBuildTool.Rules
 		{
 			PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
 
-			PrivateIncludePaths.Add("SplineFollow/Private");
-
 			PublicDependencyModuleNames.AddRange(
 				new string[]
 				{
 					"Core",
 					"CoreUObject",
 					"Engine",
-					"GameplayTags"
+					"GameplayTags",
+					"GameplayAbilities",
+					"GameplayTasks"
 				}
 			);
 		}
