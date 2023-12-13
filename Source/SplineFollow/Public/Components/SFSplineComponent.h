@@ -1,5 +1,7 @@
 #pragma once
 
+#include "SFSplineMarkers.h"
+
 #include <Components/SplineComponent.h>
 #include <CoreMinimal.h>
 
