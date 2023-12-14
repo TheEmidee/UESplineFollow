@@ -17,5 +17,10 @@
       "LoadingPhase": "Default"
     }
   ],
-  "Plugins": []
+  "Plugins": [
+    {
+      "Name": "GameplayAbilities",
+      "Enabled": true
+    }
+  ]
 }
