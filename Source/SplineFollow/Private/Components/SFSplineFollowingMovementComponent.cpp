@@ -101,7 +101,7 @@ USFSplineFollowingMovementComponent::USFSplineFollowingMovementComponent():
     LastProcessedMarkerIndex = INDEX_NONE;
     bStartsMovementDuringBeginPlay = true;
     bOrientRotationToMovement = false;
-    bLoops = true;
+    bLoops = false;
     bResetLoopCountWhenStopped = true;
     DistanceOnSpline = 0.0f;
     LoopCount = 0;
