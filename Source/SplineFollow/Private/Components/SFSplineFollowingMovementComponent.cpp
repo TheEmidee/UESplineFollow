@@ -200,9 +200,10 @@ void USFSplineFollowingMovementComponent::TickComponent( const float delta_time,
             const auto clamped_distance = CurrentSpeed > 0.0f ? spline_length : 0.0f;
             set_distance_on_spline( clamped_distance );
 
+            // Disable tick before broadcasting the event as the event may want to re-enable the movement in the same frame
+            SetComponentTickEnabled( false );
             OnSplineFollowingReachedEndDelegate.Broadcast( GetOwner() );
             // UAbilitySystemBlueprintLibrary::SendGameplayEventToActor( GetOwner(), SwarmsTag_Event_Gameplay_Spline_ReachedEnd, FGameplayEventData() );
-            SetComponentTickEnabled( false );
         }
         else
         {
