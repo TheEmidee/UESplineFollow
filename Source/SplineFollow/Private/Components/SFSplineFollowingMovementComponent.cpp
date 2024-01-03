@@ -37,26 +37,29 @@ FSWFollowSplineInfos::FSWFollowSplineInfos()
     SplineComponent = nullptr;
     NormalizedDistanceOnSpline = 0.0f;
     bEnableMovement = false;
+    bLoops = false;
     SpeedProviderClassOverride = nullptr;
     bAttachToSpline = true;
     bOverrideRotationSpeed = false;
     RotationSpeedOverride = 0.0f;
 }
 
-FSWFollowSplineInfos::FSWFollowSplineInfos( const AActor * actor, const float normalized_distance_on_spline, const bool it_enables_movement, TSubclassOf< USFSplineSpeedProvider > speed_provider_class_override, const bool it_attaches_to_spline, const bool it_overrides_rotation_speed, const float rotation_speed_override ) :
+FSWFollowSplineInfos::FSWFollowSplineInfos( const AActor * actor, const float normalized_distance_on_spline, const bool it_enables_movement, const bool loops, TSubclassOf< USFSplineSpeedProvider > speed_provider_class_override, const bool it_attaches_to_spline, const bool it_overrides_rotation_speed, const float rotation_speed_override ) :
     SplineComponent( actor->GetComponentByClass< USplineComponent >() ),
     NormalizedDistanceOnSpline( normalized_distance_on_spline ),
     bEnableMovement( it_enables_movement ),
+    bLoops( loops ),
     SpeedProviderClassOverride( speed_provider_class_override ),
     bAttachToSpline( it_attaches_to_spline ),
     bOverrideRotationSpeed( it_overrides_rotation_speed ),
     RotationSpeedOverride( rotation_speed_override )
 {}
 
-FSWFollowSplineInfos::FSWFollowSplineInfos( USplineComponent * const spline_component, const float normalized_distance_on_spline, const bool it_enables_movement, TSubclassOf< USFSplineSpeedProvider > speed_provider_class_override, const bool it_attaches_to_spline, const bool it_overrides_rotation_speed, const float rotation_speed_override ) :
+FSWFollowSplineInfos::FSWFollowSplineInfos( USplineComponent * const spline_component, const float normalized_distance_on_spline, const bool it_enables_movement, const bool loops, TSubclassOf< USFSplineSpeedProvider > speed_provider_class_override, const bool it_attaches_to_spline, const bool it_overrides_rotation_speed, const float rotation_speed_override ) :
     SplineComponent( spline_component ),
     NormalizedDistanceOnSpline( normalized_distance_on_spline ),
     bEnableMovement( it_enables_movement ),
+    bLoops( loops ),
     SpeedProviderClassOverride( speed_provider_class_override ),
     bAttachToSpline( it_attaches_to_spline ),
     bOverrideRotationSpeed( it_overrides_rotation_speed ),
@@ -85,7 +88,7 @@ bool FSWFollowSplineInfos::NetSerialize( FArchive & archive, UPackageMap * /* pa
     return true;
 }
 
-USFSplineFollowingMovementComponent::USFSplineFollowingMovementComponent():
+USFSplineFollowingMovementComponent::USFSplineFollowingMovementComponent() :
     bForceSubStepping( true ),
     FollowedSplineComponent( nullptr ),
     NormalizedDistanceOnSpline( 0 )
@@ -198,7 +201,7 @@ void USFSplineFollowingMovementComponent::TickComponent( const float delta_time,
             set_distance_on_spline( clamped_distance );
 
             OnSplineFollowingReachedEndDelegate.Broadcast( GetOwner() );
-            //UAbilitySystemBlueprintLibrary::SendGameplayEventToActor( GetOwner(), SwarmsTag_Event_Gameplay_Spline_ReachedEnd, FGameplayEventData() );
+            // UAbilitySystemBlueprintLibrary::SendGameplayEventToActor( GetOwner(), SwarmsTag_Event_Gameplay_Spline_ReachedEnd, FGameplayEventData() );
             SetComponentTickEnabled( false );
         }
         else
@@ -293,6 +296,8 @@ bool USFSplineFollowingMovementComponent::FollowSpline( const FSWFollowSplineInf
     {
         GetOwner()->AttachToComponent( FollowedSplineComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale );
     }
+
+    bLoops = follow_spline_infos.bLoops;
 
     SetNormalizedDistanceOnSpline( follow_spline_infos.NormalizedDistanceOnSpline );
     ToggleSplineMovement( follow_spline_infos.bEnableMovement );
@@ -477,7 +482,7 @@ bool USFSplineFollowingMovementComponent::CheckStillInWorld()
              box.Min.Y < -HALF_WORLD_MAX || box.Max.Y > HALF_WORLD_MAX ||
              box.Min.Z < -HALF_WORLD_MAX || box.Max.Z > HALF_WORLD_MAX )
         {
-            //UE_LOG( LogTemp, Warning, TEXT( "%s is outside the world bounds!" ), *GetNameSafe( actor_owner ) );
+            // UE_LOG( LogTemp, Warning, TEXT( "%s is outside the world bounds!" ), *GetNameSafe( actor_owner ) );
             actor_owner->OutsideWorldBounds();
             // not safe to use physics or collision at this point
             actor_owner->SetActorEnableCollision( false );

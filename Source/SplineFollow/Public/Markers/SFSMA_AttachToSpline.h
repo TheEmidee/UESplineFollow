@@ -45,6 +45,9 @@ private:
     uint8 bEnableMovement : 1;
 
     UPROPERTY( EditAnywhere )
+    uint8 bLoops: 1;
+
+    UPROPERTY( EditAnywhere )
     TSubclassOf< USFSplineSpeedProvider > SpeedProviderClassOverride;
 
     UPROPERTY( EditAnywhere )

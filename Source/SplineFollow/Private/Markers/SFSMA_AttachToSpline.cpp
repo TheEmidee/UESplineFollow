@@ -7,6 +7,7 @@ USFSMA_AttachToSpline::USFSMA_AttachToSpline()
 {
     NormalizedDistanceOnSpline = 0.0f;
     bEnableMovement = true;
+    bLoops = false;
     bAttachToSpline = true;
 }
 
@@ -75,6 +76,7 @@ void USFSMA_AttachToSpline::FollowNewSplineInternal( AActor * actor, const FSWSp
             Actor.Get(),
             NormalizedDistanceOnSpline,
             static_cast< bool >( bEnableMovement ),
+            static_cast< bool >( bLoops ),
             SpeedProviderClassOverride,
             static_cast< bool >( bAttachToSpline ),
             it_overrides_rotation_speed,

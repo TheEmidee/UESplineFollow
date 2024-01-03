@@ -51,8 +51,8 @@ struct SPLINEFOLLOW_API FSWFollowSplineInfos
     GENERATED_BODY()
 
     FSWFollowSplineInfos();
-    FSWFollowSplineInfos( const AActor * actor, float normalized_distance_on_spline, bool it_enables_movement, TSubclassOf< USFSplineSpeedProvider > speed_provider_class_override, bool it_attaches_to_spline, bool it_overrides_rotation_speed, float rotation_speed_override );
-    FSWFollowSplineInfos( USplineComponent * spline_component, float normalized_distance_on_spline, bool it_enables_movement, TSubclassOf< USFSplineSpeedProvider > speed_provider_class_override, bool it_attaches_to_spline, bool it_overrides_rotation_speed, float rotation_speed_override );
+    FSWFollowSplineInfos( const AActor * actor, float normalized_distance_on_spline, bool it_enables_movement, bool loops, TSubclassOf< USFSplineSpeedProvider > speed_provider_class_override, bool it_attaches_to_spline, bool it_overrides_rotation_speed, float rotation_speed_override );
+    FSWFollowSplineInfos( USplineComponent * spline_component, float normalized_distance_on_spline, bool it_enables_movement, bool loops, TSubclassOf< USFSplineSpeedProvider > speed_provider_class_override, bool it_attaches_to_spline, bool it_overrides_rotation_speed, float rotation_speed_override );
 
     bool NetSerialize( FArchive & archive, UPackageMap * package_map, bool & success );
 
@@ -64,6 +64,9 @@ struct SPLINEFOLLOW_API FSWFollowSplineInfos
 
     UPROPERTY( EditAnywhere, BlueprintReadWrite )
     uint8 bEnableMovement : 1;
+
+    UPROPERTY( EditAnywhere, BlueprintReadWrite )
+    uint8 bLoops : 1;
 
     UPROPERTY( EditAnywhere, BlueprintReadWrite )
     TSubclassOf< USFSplineSpeedProvider > SpeedProviderClassOverride;
