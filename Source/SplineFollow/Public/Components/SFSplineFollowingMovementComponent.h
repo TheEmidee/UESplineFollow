@@ -13,6 +13,9 @@ class USFSplineSpeedProvider : public UObject
     GENERATED_BODY()
 
 public:
+    UFUNCTION( BlueprintNativeEvent )
+    void Setup( USplineComponent * followed_spline_component );
+
     UFUNCTION( BlueprintNativeEvent, BlueprintPure )
     float GetSpeed( float normalized_position_on_spline, FVector world_position ) const;
 };
