@@ -29,7 +29,7 @@ public:
     void ExecuteStartWindowAction_Implementation( AActor * actor, const FSWSplineMarkerInfos & marker_infos ) const override;
 
 #if WITH_EDITOR
-    EDataValidationResult IsDataValid(FDataValidationContext & context) const override;
+    EDataValidationResult IsDataValid( FDataValidationContext & context ) const override;
 #endif
 
 private:
@@ -45,7 +45,7 @@ private:
     uint8 bEnableMovement : 1;
 
     UPROPERTY( EditAnywhere )
-    uint8 bLoops: 1;
+    uint8 bLoops : 1;
 
     UPROPERTY( EditAnywhere )
     TSubclassOf< USFSplineSpeedProvider > SpeedProviderClassOverride;
