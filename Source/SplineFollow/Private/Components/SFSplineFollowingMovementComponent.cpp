@@ -7,7 +7,7 @@
 // Minimum delta time considered when ticking. Delta times below this are not considered. This is a very small non-zero positive value to avoid potential divide-by-zero in simulation code.
 static constexpr float MinTickTime = 1e-6f;
 
-float USFSplineSpeedProvider::GetSpeed_Implementation( float normalized_position_on_spline ) const
+float USFSplineSpeedProvider::GetSpeed_Implementation( float normalized_position_on_spline, FVector world_position ) const
 {
     return 0.0f;
 }
@@ -17,12 +17,12 @@ USFSplineSpeedProvider_Constant::USFSplineSpeedProvider_Constant() :
 {
 }
 
-float USFSplineSpeedProvider_Constant::GetSpeed_Implementation( float /*normalized_position_on_spline*/ ) const
+float USFSplineSpeedProvider_Constant::GetSpeed_Implementation( float /*normalized_position_on_spline*/, FVector /*world_position*/ ) const
 {
     return Speed;
 }
 
-float USFSplineSpeedProvider_CurveFloat::GetSpeed_Implementation( const float normalized_position_on_spline ) const
+float USFSplineSpeedProvider_CurveFloat::GetSpeed_Implementation( const float normalized_position_on_spline, FVector /*world_position*/ ) const
 {
     if ( CurveFloat == nullptr )
     {

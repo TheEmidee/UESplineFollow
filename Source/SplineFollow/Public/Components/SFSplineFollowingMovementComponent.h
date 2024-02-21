@@ -14,7 +14,7 @@ class USFSplineSpeedProvider : public UObject
 
 public:
     UFUNCTION( BlueprintNativeEvent, BlueprintPure )
-    float GetSpeed( float normalized_position_on_spline ) const;
+    float GetSpeed( float normalized_position_on_spline, FVector world_position ) const;
 };
 
 UCLASS( Abstract )
@@ -25,7 +25,7 @@ class USFSplineSpeedProvider_Constant final : public USFSplineSpeedProvider
 public:
     USFSplineSpeedProvider_Constant();
 
-    float GetSpeed_Implementation( float normalized_position_on_spline ) const override;
+    float GetSpeed_Implementation( float normalized_position_on_spline, FVector world_position ) const override;
 
 private:
     UPROPERTY( EditAnywhere )
@@ -38,7 +38,7 @@ class USFSplineSpeedProvider_CurveFloat final : public USFSplineSpeedProvider
     GENERATED_BODY()
 
 public:
-    float GetSpeed_Implementation( float normalized_position_on_spline ) const override;
+    float GetSpeed_Implementation( float normalized_position_on_spline, FVector world_position ) const override;
 
 private:
     UPROPERTY( EditAnywhere )
