@@ -11,7 +11,7 @@ void USFSplineSpeedProvider::Setup_Implementation( USplineComponent * followed_s
 {
 }
 
-float USFSplineSpeedProvider::GetSpeed_Implementation( float normalized_position_on_spline, FVector world_position ) const
+float USFSplineSpeedProvider::GetSpeed_Implementation( float normalized_position_on_spline, FTransform world_transform, float delta_time )
 {
     return 0.0f;
 }
@@ -21,12 +21,12 @@ USFSplineSpeedProvider_Constant::USFSplineSpeedProvider_Constant() :
 {
 }
 
-float USFSplineSpeedProvider_Constant::GetSpeed_Implementation( float /*normalized_position_on_spline*/, FVector /*world_position*/ ) const
+float USFSplineSpeedProvider_Constant::GetSpeed_Implementation( float /*normalized_position_on_spline*/, FTransform /*world_transform*/, float /*delta_time*/ )
 {
     return Speed;
 }
 
-float USFSplineSpeedProvider_CurveFloat::GetSpeed_Implementation( const float normalized_position_on_spline, FVector /*world_position*/ ) const
+float USFSplineSpeedProvider_CurveFloat::GetSpeed_Implementation( const float normalized_position_on_spline, FTransform /*world_transform*/, float /*delta_time*/ )
 {
     if ( CurveFloat == nullptr )
     {
@@ -178,7 +178,7 @@ void USFSplineFollowingMovementComponent::TickComponent( const float delta_time,
                                    : remaining_time;
         remaining_time -= time_tick;
 
-        UpdateCurrentSpeed();
+        UpdateCurrentSpeed( delta_time );
 
         if ( bInvertSpeed )
         {
@@ -356,7 +356,7 @@ void USFSplineFollowingMovementComponent::SetDistanceOnSpline( const float dista
         const auto & spline_marker_proxies = spline_component->GetSplineMarkerProxies();
         const auto spline_length = spline_component->GetSplineLength();
 
-        UpdateCurrentSpeed();
+        UpdateCurrentSpeed( 0.0f );
 
         if ( CurrentSpeed > 0.0f )
         {
@@ -615,11 +615,11 @@ void USFSplineFollowingMovementComponent::RefreshComponents()
     }
 }
 
-void USFSplineFollowingMovementComponent::UpdateCurrentSpeed()
+void USFSplineFollowingMovementComponent::UpdateCurrentSpeed( float delta_time )
 {
     if ( SpeedProviderClass != nullptr )
     {
-        CurrentSpeed = FMath::Max( 0.0f, SpeedProviderClass->GetDefaultObject< USFSplineSpeedProvider >()->GetSpeed( GetNormalizedDistanceOnSpline(), FollowedSplineComponent->GetWorldLocationAtDistanceAlongSpline( DistanceOnSpline ) ) );
+        CurrentSpeed = FMath::Max( 0.0f, SpeedProviderClass->GetDefaultObject< USFSplineSpeedProvider >()->GetSpeed( GetNormalizedDistanceOnSpline(), FollowedSplineComponent->GetTransformAtDistanceAlongSpline( DistanceOnSpline, ESplineCoordinateSpace::World ), delta_time ) );
     }
     else
     {
