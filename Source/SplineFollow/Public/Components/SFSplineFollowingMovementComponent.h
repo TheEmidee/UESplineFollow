@@ -17,7 +17,7 @@ public:
     void Setup( USplineComponent * followed_spline_component );
 
     UFUNCTION( BlueprintNativeEvent, BlueprintPure )
-    float GetSpeed( float normalized_position_on_spline, FTransform world_transform, float delta_time );
+    float GetSpeed( float normalized_position_on_spline, USplineComponent * followed_spline_component, float delta_time );
 };
 
 UCLASS( Abstract )
@@ -28,7 +28,7 @@ class USFSplineSpeedProvider_Constant final : public USFSplineSpeedProvider
 public:
     USFSplineSpeedProvider_Constant();
 
-    float GetSpeed_Implementation( float normalized_position_on_spline, FTransform world_transform, float delta_time ) override;
+    float GetSpeed_Implementation( float normalized_position_on_spline, USplineComponent * followed_spline_component, float delta_time ) override;
 
 private:
     UPROPERTY( EditAnywhere )
@@ -41,7 +41,7 @@ class USFSplineSpeedProvider_CurveFloat final : public USFSplineSpeedProvider
     GENERATED_BODY()
 
 public:
-    float GetSpeed_Implementation( float normalized_position_on_spline, FTransform world_transform, float delta_time ) override;
+    float GetSpeed_Implementation( float normalized_position_on_spline, USplineComponent * followed_spline_component, float delta_time ) override;
 
 private:
     UPROPERTY( EditAnywhere )
