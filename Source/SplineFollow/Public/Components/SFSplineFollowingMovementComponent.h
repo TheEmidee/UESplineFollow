@@ -14,7 +14,7 @@ class USFSplineSpeedProvider : public UObject
 
 public:
     UFUNCTION( BlueprintNativeEvent )
-    void Setup( USplineComponent * followed_spline_component );
+    void Setup( USplineComponent * followed_spline_component, USFSplineFollowingMovementComponent * spline_following_movement_component );
 
     UFUNCTION( BlueprintNativeEvent, BlueprintPure )
     float GetSpeed( float normalized_position_on_spline, USplineComponent * followed_spline_component, float delta_time );

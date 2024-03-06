@@ -7,7 +7,7 @@
 // Minimum delta time considered when ticking. Delta times below this are not considered. This is a very small non-zero positive value to avoid potential divide-by-zero in simulation code.
 static constexpr float MinTickTime = 1e-6f;
 
-void USFSplineSpeedProvider::Setup_Implementation( USplineComponent * followed_spline_component )
+void USFSplineSpeedProvider::Setup_Implementation( USplineComponent * followed_spline_component, USFSplineFollowingMovementComponent * spline_following_movement_component )
 {
 }
 
@@ -310,7 +310,7 @@ bool USFSplineFollowingMovementComponent::FollowSpline( const FSWFollowSplineInf
     if ( follow_spline_infos.SpeedProviderClassOverride != nullptr )
     {
         SpeedProviderClass = follow_spline_infos.SpeedProviderClassOverride;
-        SpeedProviderClass->GetDefaultObject< USFSplineSpeedProvider >()->Setup( FollowedSplineComponent );
+        SpeedProviderClass->GetDefaultObject< USFSplineSpeedProvider >()->Setup( FollowedSplineComponent, this );
     }
 
     if ( follow_spline_infos.bOverrideRotationSpeed )
