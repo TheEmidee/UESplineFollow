@@ -80,16 +80,16 @@ struct SPLINEFOLLOW_API FSWSplineMarkerInfos
         WindowEndNormalizedSplineDistance( 0.5f )
     {}
 
-    UPROPERTY( EditAnywhere )
+    UPROPERTY( EditAnywhere, BlueprintReadOnly )
     ESWSplineMarkerType Type;
 
-    UPROPERTY( EditAnywhere, meta = ( UIMin = 0.0f, UIMax = 1.0f, ClampMin = 0.0f, ClampMax = 1.0f, EditCondition = "Type == ESWSplineMarkerType::Single" ) )
+    UPROPERTY( EditAnywhere, BlueprintReadOnly, meta = ( UIMin = 0.0f, UIMax = 1.0f, ClampMin = 0.0f, ClampMax = 1.0f, EditCondition = "Type == ESWSplineMarkerType::Single" ) )
     float SingleActionNormalizedSplineDistance;
 
-    UPROPERTY( EditAnywhere, meta = ( UIMin = 0.0f, UIMax = 1.0f, ClampMin = 0.0f, ClampMax = 1.0f, EditCondition = "Type == ESWSplineMarkerType::Window" ) )
+    UPROPERTY( EditAnywhere, BlueprintReadOnly, meta = ( UIMin = 0.0f, UIMax = 1.0f, ClampMin = 0.0f, ClampMax = 1.0f, EditCondition = "Type == ESWSplineMarkerType::Window" ) )
     float WindowStartNormalizedSplineDistance;
 
-    UPROPERTY( EditAnywhere, meta = ( UIMin = 0.0f, UIMax = 1.0f, ClampMin = 0.0f, ClampMax = 1.0f, EditCondition = "Type == ESWSplineMarkerType::Window" ) )
+    UPROPERTY( EditAnywhere, BlueprintReadOnly, meta = ( UIMin = 0.0f, UIMax = 1.0f, ClampMin = 0.0f, ClampMax = 1.0f, EditCondition = "Type == ESWSplineMarkerType::Window" ) )
     float WindowEndNormalizedSplineDistance;
 };
 
