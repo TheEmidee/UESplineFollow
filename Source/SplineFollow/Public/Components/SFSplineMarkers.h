@@ -219,7 +219,7 @@ struct SPLINEFOLLOW_API FSWSplineMarker_Data : public FSWSplineMarker
     UTexture2D * Sprite;
 
     UPROPERTY( EditAnywhere, BlueprintReadonly )
-    TObjectPtr< UObject > Data;
+    TSubclassOf< UObject > Data;
 };
 
 FORCEINLINE UTexture2D * FSWSplineMarker_Data::GetSprite() const
