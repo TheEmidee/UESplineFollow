@@ -13,8 +13,11 @@ class USFSplineSpeedProvider : public UObject
     GENERATED_BODY()
 
 public:
+    UFUNCTION( BlueprintNativeEvent )
+    void Setup( USplineComponent * followed_spline_component, USFSplineFollowingMovementComponent * spline_following_movement_component );
+
     UFUNCTION( BlueprintNativeEvent, BlueprintPure )
-    float GetSpeed( float normalized_position_on_spline ) const;
+    float GetSpeed( float normalized_position_on_spline, USplineComponent * followed_spline_component, float delta_time );
 };
 
 UCLASS( Abstract )
@@ -25,7 +28,7 @@ class USFSplineSpeedProvider_Constant final : public USFSplineSpeedProvider
 public:
     USFSplineSpeedProvider_Constant();
 
-    float GetSpeed_Implementation( float normalized_position_on_spline ) const override;
+    float GetSpeed_Implementation( float normalized_position_on_spline, USplineComponent * followed_spline_component, float delta_time ) override;
 
 private:
     UPROPERTY( EditAnywhere )
@@ -38,7 +41,7 @@ class USFSplineSpeedProvider_CurveFloat final : public USFSplineSpeedProvider
     GENERATED_BODY()
 
 public:
-    float GetSpeed_Implementation( float normalized_position_on_spline ) const override;
+    float GetSpeed_Implementation( float normalized_position_on_spline, USplineComponent * followed_spline_component, float delta_time ) override;
 
 private:
     UPROPERTY( EditAnywhere )
@@ -162,7 +165,7 @@ private:
     void ProcessSplineMarkers( float distance_on_spline );
     void SetDistanceOnSplineInternal( float distance_on_spline );
     void RefreshComponents();
-    void UpdateCurrentSpeed();
+    void UpdateCurrentSpeed( float delta_time );
     void ProcessPositionObservers( float distance_on_spline );
     void ResetPositionObservers();
 

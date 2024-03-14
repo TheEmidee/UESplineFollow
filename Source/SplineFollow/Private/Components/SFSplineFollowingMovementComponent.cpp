@@ -7,7 +7,11 @@
 // Minimum delta time considered when ticking. Delta times below this are not considered. This is a very small non-zero positive value to avoid potential divide-by-zero in simulation code.
 static constexpr float MinTickTime = 1e-6f;
 
-float USFSplineSpeedProvider::GetSpeed_Implementation( float normalized_position_on_spline ) const
+void USFSplineSpeedProvider::Setup_Implementation( USplineComponent * followed_spline_component, USFSplineFollowingMovementComponent * spline_following_movement_component )
+{
+}
+
+float USFSplineSpeedProvider::GetSpeed_Implementation( float normalized_position_on_spline, USplineComponent * followed_spline_component, float delta_time )
 {
     return 0.0f;
 }
@@ -17,12 +21,12 @@ USFSplineSpeedProvider_Constant::USFSplineSpeedProvider_Constant() :
 {
 }
 
-float USFSplineSpeedProvider_Constant::GetSpeed_Implementation( float /*normalized_position_on_spline*/ ) const
+float USFSplineSpeedProvider_Constant::GetSpeed_Implementation( float /*normalized_position_on_spline*/, USplineComponent * /*followed_spline_component*/, float /*delta_time*/ )
 {
     return Speed;
 }
 
-float USFSplineSpeedProvider_CurveFloat::GetSpeed_Implementation( const float normalized_position_on_spline ) const
+float USFSplineSpeedProvider_CurveFloat::GetSpeed_Implementation( const float normalized_position_on_spline, USplineComponent * /*followed_spline_component*/, float /*delta_time*/ )
 {
     if ( CurveFloat == nullptr )
     {
@@ -174,7 +178,7 @@ void USFSplineFollowingMovementComponent::TickComponent( const float delta_time,
                                    : remaining_time;
         remaining_time -= time_tick;
 
-        UpdateCurrentSpeed();
+        UpdateCurrentSpeed( delta_time );
 
         if ( bInvertSpeed )
         {
@@ -306,6 +310,7 @@ bool USFSplineFollowingMovementComponent::FollowSpline( const FSWFollowSplineInf
     if ( follow_spline_infos.SpeedProviderClassOverride != nullptr )
     {
         SpeedProviderClass = follow_spline_infos.SpeedProviderClassOverride;
+        SpeedProviderClass->GetDefaultObject< USFSplineSpeedProvider >()->Setup( FollowedSplineComponent, this );
     }
 
     if ( follow_spline_infos.bOverrideRotationSpeed )
@@ -351,7 +356,7 @@ void USFSplineFollowingMovementComponent::SetDistanceOnSpline( const float dista
         const auto & spline_marker_proxies = spline_component->GetSplineMarkerProxies();
         const auto spline_length = spline_component->GetSplineLength();
 
-        UpdateCurrentSpeed();
+        UpdateCurrentSpeed( 0.0f );
 
         if ( CurrentSpeed > 0.0f )
         {
@@ -610,11 +615,11 @@ void USFSplineFollowingMovementComponent::RefreshComponents()
     }
 }
 
-void USFSplineFollowingMovementComponent::UpdateCurrentSpeed()
+void USFSplineFollowingMovementComponent::UpdateCurrentSpeed( float delta_time )
 {
     if ( SpeedProviderClass != nullptr )
     {
-        CurrentSpeed = FMath::Max( 0.0f, SpeedProviderClass->GetDefaultObject< USFSplineSpeedProvider >()->GetSpeed( GetNormalizedDistanceOnSpline() ) );
+        CurrentSpeed = FMath::Max( 0.0f, SpeedProviderClass->GetDefaultObject< USFSplineSpeedProvider >()->GetSpeed( GetNormalizedDistanceOnSpline(), FollowedSplineComponent, delta_time ) );
     }
     else
     {
