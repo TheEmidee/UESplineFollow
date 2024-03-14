@@ -80,16 +80,16 @@ struct SPLINEFOLLOW_API FSWSplineMarkerInfos
         WindowEndNormalizedSplineDistance( 0.5f )
     {}
 
-    UPROPERTY( EditAnywhere )
+    UPROPERTY( EditAnywhere, BlueprintReadOnly )
     ESWSplineMarkerType Type;
 
-    UPROPERTY( EditAnywhere, meta = ( UIMin = 0.0f, UIMax = 1.0f, ClampMin = 0.0f, ClampMax = 1.0f, EditCondition = "Type == ESWSplineMarkerType::Single" ) )
+    UPROPERTY( EditAnywhere, BlueprintReadOnly, meta = ( UIMin = 0.0f, UIMax = 1.0f, ClampMin = 0.0f, ClampMax = 1.0f, EditCondition = "Type == ESWSplineMarkerType::Single" ) )
     float SingleActionNormalizedSplineDistance;
 
-    UPROPERTY( EditAnywhere, meta = ( UIMin = 0.0f, UIMax = 1.0f, ClampMin = 0.0f, ClampMax = 1.0f, EditCondition = "Type == ESWSplineMarkerType::Window" ) )
+    UPROPERTY( EditAnywhere, BlueprintReadOnly, meta = ( UIMin = 0.0f, UIMax = 1.0f, ClampMin = 0.0f, ClampMax = 1.0f, EditCondition = "Type == ESWSplineMarkerType::Window" ) )
     float WindowStartNormalizedSplineDistance;
 
-    UPROPERTY( EditAnywhere, meta = ( UIMin = 0.0f, UIMax = 1.0f, ClampMin = 0.0f, ClampMax = 1.0f, EditCondition = "Type == ESWSplineMarkerType::Window" ) )
+    UPROPERTY( EditAnywhere, BlueprintReadOnly, meta = ( UIMin = 0.0f, UIMax = 1.0f, ClampMin = 0.0f, ClampMax = 1.0f, EditCondition = "Type == ESWSplineMarkerType::Window" ) )
     float WindowEndNormalizedSplineDistance;
 };
 
@@ -158,7 +158,7 @@ FORCEINLINE UTexture2D * ASWSplineMarkerLevelActor::GetSprite() const
     return Sprite;
 }
 
-USTRUCT()
+USTRUCT( BlueprintType )
 struct SPLINEFOLLOW_API FSWSplineMarker
 {
     GENERATED_BODY()
@@ -176,7 +176,7 @@ struct SPLINEFOLLOW_API FSWSplineMarker
     UPROPERTY( EditAnywhere )
     uint8 ItIsEnabled : 1;
 
-    UPROPERTY( EditAnywhere )
+    UPROPERTY( EditAnywhere, BlueprintReadonly )
     FSWSplineMarkerInfos Infos;
 };
 
@@ -207,3 +207,22 @@ struct SPLINEFOLLOW_API FSWSplineMarker_LevelActor : public FSWSplineMarker
     UPROPERTY( EditAnywhere )
     ASWSplineMarkerLevelActor * LevelActor;
 };
+
+USTRUCT( Blueprintable, BlueprintType )
+struct SPLINEFOLLOW_API FSWSplineMarker_Data : public FSWSplineMarker
+{
+    GENERATED_BODY()
+
+    UTexture2D * GetSprite() const override;
+
+    UPROPERTY( EditAnywhere )
+    UTexture2D * Sprite;
+
+    UPROPERTY( EditAnywhere, BlueprintReadonly )
+    TSubclassOf< UObject > Data;
+};
+
+FORCEINLINE UTexture2D * FSWSplineMarker_Data::GetSprite() const
+{
+    return Sprite;
+}
