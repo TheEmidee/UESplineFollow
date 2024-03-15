@@ -14,12 +14,11 @@ class SPLINEFOLLOW_API USFSplineComponent final : public USplineComponent
 
 public:
 #if WITH_EDITOR
-    friend class FSWSplineMarkerComponentVisualizer;
+    friend class FSFSplineMarkerComponentVisualizer;
 #endif
 
-    const TArray< FSWSplineMarkerProxy > & GetSplineMarkerProxies() const;
-
-    const TArray< FSWSplineMarker_Data > & GetSplineDataMarker() const;
+    const TArray< FSFSplineMarkerProxy > & GetSplineMarkerProxies() const;
+    const TArray< FSFSplineMarker_Data > & GetSplineDataMarker() const;
 
     void OnRegister() override;
 
@@ -31,18 +30,23 @@ public:
 
 private:
     UPROPERTY( EditAnywhere )
-    TArray< FSWSplineMarker_Static > StaticActionMarkers;
+    TArray< FSFSplineMarker_Static > StaticActionMarkers;
 
     UPROPERTY( EditAnywhere )
-    TArray< FSWSplineMarker_LevelActor > LevelActorActionMarkers;
+    TArray< FSFSplineMarker_LevelActor > LevelActorActionMarkers;
 
     UPROPERTY( EditAnywhere, BlueprintReadOnly, meta = ( AllowPrivateAccess = true ) )
-    TArray< FSWSplineMarker_Data > DataMarkers;
+    TArray< FSFSplineMarker_Data > DataMarkers;
 
-    TArray< FSWSplineMarkerProxy > SplineMarkerProxies;
+    TArray< FSFSplineMarkerProxy > SplineMarkerProxies;
 };
 
-FORCEINLINE const TArray< FSWSplineMarkerProxy > & USFSplineComponent::GetSplineMarkerProxies() const
+FORCEINLINE const TArray< FSFSplineMarkerProxy > & USFSplineComponent::GetSplineMarkerProxies() const
 {
     return SplineMarkerProxies;
+}
+
+FORCEINLINE const TArray< FSFSplineMarker_Data > & USFSplineComponent::GetSplineDataMarker() const
+{
+    return DataMarkers;
 }

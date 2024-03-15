@@ -12,7 +12,7 @@ void USFSplineComponent::OnRegister()
 {
     Super::OnRegister();
 
-    const auto fill_proxies = []( TArray< FSWSplineMarkerProxy > & proxies, const auto & markers ) {
+    const auto fill_proxies = []( TArray< FSFSplineMarkerProxy > & proxies, const auto & markers ) {
         for ( const auto & marker : markers )
         {
             if ( marker.IsValid() )
@@ -88,7 +88,7 @@ void USFSplineComponent::CheckForErrors()
 
     for ( const auto & marker : StaticActionMarkers )
     {
-        if ( marker.Infos.Type == ESWSplineMarkerType::Single )
+        if ( marker.Infos.Type == ESFSplineMarkerType::Single )
         {
             continue;
         }
@@ -114,7 +114,7 @@ void USFSplineComponent::CheckForErrors()
             break;
         }
 
-        if ( marker.Infos.Type == ESWSplineMarkerType::Single )
+        if ( marker.Infos.Type == ESFSplineMarkerType::Single )
         {
             continue;
         }

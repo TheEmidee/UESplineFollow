@@ -36,7 +36,7 @@ float USFSplineSpeedProvider_CurveFloat::GetSpeed_Implementation( const float no
     return CurveFloat->GetFloatValue( normalized_position_on_spline );
 }
 
-FSWFollowSplineInfos::FSWFollowSplineInfos()
+FSFFollowSplineInfos::FSFFollowSplineInfos()
 {
     SplineComponent = nullptr;
     NormalizedDistanceOnSpline = 0.0f;
@@ -48,7 +48,7 @@ FSWFollowSplineInfos::FSWFollowSplineInfos()
     RotationSpeedOverride = 0.0f;
 }
 
-FSWFollowSplineInfos::FSWFollowSplineInfos( const AActor * actor, const float normalized_distance_on_spline, const bool it_enables_movement, const bool loops, TSubclassOf< USFSplineSpeedProvider > speed_provider_class_override, const bool it_attaches_to_spline, const bool it_overrides_rotation_speed, const float rotation_speed_override ) :
+FSFFollowSplineInfos::FSFFollowSplineInfos( const AActor * actor, const float normalized_distance_on_spline, const bool it_enables_movement, const bool loops, TSubclassOf< USFSplineSpeedProvider > speed_provider_class_override, const bool it_attaches_to_spline, const bool it_overrides_rotation_speed, const float rotation_speed_override ) :
     SplineComponent( actor->GetComponentByClass< USplineComponent >() ),
     NormalizedDistanceOnSpline( normalized_distance_on_spline ),
     bEnableMovement( it_enables_movement ),
@@ -59,7 +59,7 @@ FSWFollowSplineInfos::FSWFollowSplineInfos( const AActor * actor, const float no
     RotationSpeedOverride( rotation_speed_override )
 {}
 
-FSWFollowSplineInfos::FSWFollowSplineInfos( USplineComponent * const spline_component, const float normalized_distance_on_spline, const bool it_enables_movement, const bool loops, TSubclassOf< USFSplineSpeedProvider > speed_provider_class_override, const bool it_attaches_to_spline, const bool it_overrides_rotation_speed, const float rotation_speed_override ) :
+FSFFollowSplineInfos::FSFFollowSplineInfos( USplineComponent * const spline_component, const float normalized_distance_on_spline, const bool it_enables_movement, const bool loops, TSubclassOf< USFSplineSpeedProvider > speed_provider_class_override, const bool it_attaches_to_spline, const bool it_overrides_rotation_speed, const float rotation_speed_override ) :
     SplineComponent( spline_component ),
     NormalizedDistanceOnSpline( normalized_distance_on_spline ),
     bEnableMovement( it_enables_movement ),
@@ -70,7 +70,7 @@ FSWFollowSplineInfos::FSWFollowSplineInfos( USplineComponent * const spline_comp
     RotationSpeedOverride( rotation_speed_override )
 {}
 
-bool FSWFollowSplineInfos::NetSerialize( FArchive & archive, UPackageMap * /* package_map */, bool & success )
+bool FSFFollowSplineInfos::NetSerialize( FArchive & archive, UPackageMap * /* package_map */, bool & success )
 {
     archive << SplineComponent;
     archive << NormalizedDistanceOnSpline;
@@ -281,7 +281,7 @@ void USFSplineFollowingMovementComponent::OnRegister()
     RefreshComponents();
 }
 
-bool USFSplineFollowingMovementComponent::FollowSpline( const FSWFollowSplineInfos & follow_spline_infos )
+bool USFSplineFollowingMovementComponent::FollowSpline( const FSFFollowSplineInfos & follow_spline_infos )
 {
     if ( !ensureAlwaysMsgf( follow_spline_infos.SplineComponent != nullptr, TEXT( "Invalid spline to follow" ) ) )
     {

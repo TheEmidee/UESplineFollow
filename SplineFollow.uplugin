@@ -15,6 +15,11 @@
       "Name": "SplineFollow",
       "Type": "Runtime",
       "LoadingPhase": "Default"
+    },
+    {
+      "Name": "SplineFollowEditor",
+      "Type": "Editor",
+      "LoadingPhase": "Default"
     }
   ],
   "Plugins": [

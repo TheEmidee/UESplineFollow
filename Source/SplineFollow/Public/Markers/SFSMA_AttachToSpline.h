@@ -25,15 +25,15 @@ class SPLINEFOLLOW_API USFSMA_AttachToSpline final : public USFSplineMarkerActio
 public:
     USFSMA_AttachToSpline();
 
-    void ExecuteAction_Implementation( AActor * actor, const FSWSplineMarkerInfos & marker_infos ) const override;
-    void ExecuteStartWindowAction_Implementation( AActor * actor, const FSWSplineMarkerInfos & marker_infos ) const override;
+    void ExecuteAction_Implementation( AActor * actor, const FSFSplineMarkerInfos & marker_infos ) const override;
+    void ExecuteStartWindowAction_Implementation( AActor * actor, const FSFSplineMarkerInfos & marker_infos ) const override;
 
 #if WITH_EDITOR
     EDataValidationResult IsDataValid( FDataValidationContext & context ) const override;
 #endif
 
 private:
-    void FollowNewSplineInternal( AActor * actor, const FSWSplineMarkerInfos & marker_infos ) const;
+    void FollowNewSplineInternal( AActor * actor, const FSFSplineMarkerInfos & marker_infos ) const;
 
     UPROPERTY( EditAnywhere )
     TSoftObjectPtr< AActor > Actor;

@@ -11,12 +11,12 @@ USFSMA_AttachToSpline::USFSMA_AttachToSpline()
     bAttachToSpline = true;
 }
 
-void USFSMA_AttachToSpline::ExecuteAction_Implementation( AActor * actor, const FSWSplineMarkerInfos & marker_infos ) const
+void USFSMA_AttachToSpline::ExecuteAction_Implementation( AActor * actor, const FSFSplineMarkerInfos & marker_infos ) const
 {
     FollowNewSplineInternal( actor, marker_infos );
 }
 
-void USFSMA_AttachToSpline::ExecuteStartWindowAction_Implementation( AActor * actor, const FSWSplineMarkerInfos & marker_infos ) const
+void USFSMA_AttachToSpline::ExecuteStartWindowAction_Implementation( AActor * actor, const FSFSplineMarkerInfos & marker_infos ) const
 {
     FollowNewSplineInternal( actor, marker_infos );
 }
@@ -35,7 +35,7 @@ EDataValidationResult USFSMA_AttachToSpline::IsDataValid( FDataValidationContext
 }
 #endif
 
-void USFSMA_AttachToSpline::FollowNewSplineInternal( AActor * actor, const FSWSplineMarkerInfos & marker_infos ) const
+void USFSMA_AttachToSpline::FollowNewSplineInternal( AActor * actor, const FSFSplineMarkerInfos & marker_infos ) const
 {
     auto * spline_following_component = actor->FindComponentByClass< USFSplineFollowingMovementComponent >();
 
@@ -72,7 +72,7 @@ void USFSMA_AttachToSpline::FollowNewSplineInternal( AActor * actor, const FSWSp
     }
 
     spline_following_component->FollowSpline(
-        FSWFollowSplineInfos {
+        FSFFollowSplineInfos {
             Actor.Get(),
             NormalizedDistanceOnSpline,
             static_cast< bool >( bEnableMovement ),

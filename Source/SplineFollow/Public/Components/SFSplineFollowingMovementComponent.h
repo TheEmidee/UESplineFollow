@@ -3,8 +3,8 @@
 
 #include "SFSplineFollowingMovementComponent.generated.h"
 
+class USFSplineFollowingMovementComponent;
 class USplineComponent;
-class ASWSpline;
 class UCurveFloat;
 
 UCLASS( Abstract, HideDropdown, BlueprintType, Blueprintable )
@@ -49,13 +49,13 @@ private:
 };
 
 USTRUCT( BlueprintType )
-struct SPLINEFOLLOW_API FSWFollowSplineInfos
+struct SPLINEFOLLOW_API FSFFollowSplineInfos
 {
     GENERATED_BODY()
 
-    FSWFollowSplineInfos();
-    FSWFollowSplineInfos( const AActor * actor, float normalized_distance_on_spline, bool it_enables_movement, bool loops, TSubclassOf< USFSplineSpeedProvider > speed_provider_class_override, bool it_attaches_to_spline, bool it_overrides_rotation_speed, float rotation_speed_override );
-    FSWFollowSplineInfos( USplineComponent * spline_component, float normalized_distance_on_spline, bool it_enables_movement, bool loops, TSubclassOf< USFSplineSpeedProvider > speed_provider_class_override, bool it_attaches_to_spline, bool it_overrides_rotation_speed, float rotation_speed_override );
+    FSFFollowSplineInfos();
+    FSFFollowSplineInfos( const AActor * actor, float normalized_distance_on_spline, bool it_enables_movement, bool loops, TSubclassOf< USFSplineSpeedProvider > speed_provider_class_override, bool it_attaches_to_spline, bool it_overrides_rotation_speed, float rotation_speed_override );
+    FSFFollowSplineInfos( USplineComponent * spline_component, float normalized_distance_on_spline, bool it_enables_movement, bool loops, TSubclassOf< USFSplineSpeedProvider > speed_provider_class_override, bool it_attaches_to_spline, bool it_overrides_rotation_speed, float rotation_speed_override );
 
     bool NetSerialize( FArchive & archive, UPackageMap * package_map, bool & success );
 
@@ -108,7 +108,7 @@ public:
     void OnRegister() override;
 
     UFUNCTION( BlueprintCallable )
-    bool FollowSpline( const FSWFollowSplineInfos & follow_spline_infos );
+    bool FollowSpline( const FSFFollowSplineInfos & follow_spline_infos );
 
     UFUNCTION( BlueprintCallable )
     void ToggleSplineMovement( bool it_is_active );
