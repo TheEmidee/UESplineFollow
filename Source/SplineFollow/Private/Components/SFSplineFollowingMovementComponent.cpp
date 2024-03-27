@@ -599,6 +599,14 @@ void USFSplineFollowingMovementComponent::SetDistanceOnSplineInternal( const flo
     const auto spline_location_at_distance = FollowedSplineComponent->GetLocationAtDistanceAlongSpline( distance_on_spline, ESplineCoordinateSpace::World );
 
     UpdatedComponent->SetWorldLocation( spline_location_at_distance );
+
+    if ( bOrientRotationToMovement )
+    {
+        const auto spline_rotation_at_distance = FollowedSplineComponent->GetRotationAtDistanceAlongSpline( distance_on_spline, ESplineCoordinateSpace::World );
+
+        UpdatedComponent->SetWorldRotation( spline_rotation_at_distance );
+    }
+
     DistanceOnSpline = distance_on_spline;
     NormalizedDistanceOnSpline = DistanceOnSpline / FollowedSplineComponent->GetSplineLength();
 }
