@@ -11,7 +11,7 @@ void USFSplineSpeedProvider::Setup_Implementation( USplineComponent * followed_s
 {
 }
 
-float USFSplineSpeedProvider::GetSpeed_Implementation( float normalized_position_on_spline, USplineComponent * followed_spline_component, float delta_time )
+float USFSplineSpeedProvider::GetSpeed_Implementation( float normalized_position_on_spline, USplineComponent * followed_spline_component, USFSplineFollowingMovementComponent * /* spline_following_movement_component */, float delta_time )
 {
     return 0.0f;
 }
@@ -21,12 +21,12 @@ USFSplineSpeedProvider_Constant::USFSplineSpeedProvider_Constant() :
 {
 }
 
-float USFSplineSpeedProvider_Constant::GetSpeed_Implementation( float /*normalized_position_on_spline*/, USplineComponent * /*followed_spline_component*/, float /*delta_time*/ )
+float USFSplineSpeedProvider_Constant::GetSpeed_Implementation( float /*normalized_position_on_spline*/, USplineComponent * /*followed_spline_component*/, USFSplineFollowingMovementComponent * /* spline_following_movement_component */, float /*delta_time*/ )
 {
     return Speed;
 }
 
-float USFSplineSpeedProvider_CurveFloat::GetSpeed_Implementation( const float normalized_position_on_spline, USplineComponent * /*followed_spline_component*/, float /*delta_time*/ )
+float USFSplineSpeedProvider_CurveFloat::GetSpeed_Implementation( const float normalized_position_on_spline, USplineComponent * /*followed_spline_component*/, USFSplineFollowingMovementComponent * /* spline_following_movement_component */, float /*delta_time*/ )
 {
     if ( CurveFloat == nullptr )
     {
@@ -627,7 +627,7 @@ void USFSplineFollowingMovementComponent::UpdateCurrentSpeed( float delta_time )
 {
     if ( SpeedProviderClass != nullptr )
     {
-        CurrentSpeed = FMath::Max( 0.0f, SpeedProviderClass->GetDefaultObject< USFSplineSpeedProvider >()->GetSpeed( GetNormalizedDistanceOnSpline(), FollowedSplineComponent, delta_time ) );
+        CurrentSpeed = FMath::Max( 0.0f, SpeedProviderClass->GetDefaultObject< USFSplineSpeedProvider >()->GetSpeed( GetNormalizedDistanceOnSpline(), FollowedSplineComponent, this, delta_time ) );
     }
     else
     {
