@@ -246,7 +246,9 @@ void USFSplineFollowingMovementComponent::TickComponent( const float delta_time,
         if ( bOrientRotationToMovement )
         {
             const auto current_rotator = UpdatedComponent->GetComponentRotation();
-            const auto target_rotator = Velocity.GetSafeNormal().Rotation().GetNormalized();
+            auto target_rotator = Velocity.GetSafeNormal().Rotation().GetNormalized();
+
+            ConstrainRotation( target_rotator );
 
             const auto final_rotation = FMath::RInterpTo( current_rotator, target_rotator, delta_time, RotationSpeed );
 
@@ -609,8 +611,9 @@ void USFSplineFollowingMovementComponent::SetDistanceOnSplineInternal( const flo
 
     if ( bOrientRotationToMovement )
     {
-        const auto spline_rotation_at_distance = FollowedSplineComponent->GetRotationAtDistanceAlongSpline( distance_on_spline, ESplineCoordinateSpace::World );
+        auto spline_rotation_at_distance = FollowedSplineComponent->GetRotationAtDistanceAlongSpline( distance_on_spline, ESplineCoordinateSpace::World );
 
+        ConstrainRotation( spline_rotation_at_distance );
         UpdatedComponent->SetWorldRotation( spline_rotation_at_distance );
     }
 
@@ -691,4 +694,14 @@ void USFSplineFollowingMovementComponent::ResetPositionObservers()
     {
         observer.bHasBeenTriggered = false;
     }
+}
+
+void USFSplineFollowingMovementComponent::ConstrainRotation( FRotator & rotation ) const
+{
+    const auto current_rotator = UpdatedComponent->GetComponentRotation();
+
+    rotation = FRotator(
+        RotationConstraints.bConstrainY ? current_rotator.Pitch : rotation.Pitch,
+        RotationConstraints.bConstrainZ ? current_rotator.Yaw : rotation.Yaw,
+        RotationConstraints.bConstrainX ? current_rotator.Roll : rotation.Roll );
 }

@@ -84,6 +84,21 @@ struct SPLINEFOLLOW_API FSFFollowSplineInfos
     float RotationSpeedOverride;
 };
 
+USTRUCT( BlueprintType )
+struct FSFRotationConstraints
+{
+    GENERATED_BODY()
+
+    UPROPERTY( EditAnywhere, BlueprintReadWrite )
+    uint8 bConstrainX : 1;
+
+    UPROPERTY( EditAnywhere, BlueprintReadWrite )
+    uint8 bConstrainY : 1;
+
+    UPROPERTY( EditAnywhere, BlueprintReadWrite )
+    uint8 bConstrainZ : 1;
+};
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam( FSWOnSplineFollowingReachedEndDelegate, AActor *, owner_actor );
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam( FSWOnSplineFollowingLoopedDelegate, int, loop_count );
 DECLARE_DELEGATE_OneParam( FSWOnSplineFollowingReachedPositionDelegate, float );
@@ -168,6 +183,7 @@ private:
     void UpdateCurrentSpeed( float delta_time );
     void ProcessPositionObservers( float distance_on_spline );
     void ResetPositionObservers();
+    void ConstrainRotation( FRotator & rotation ) const;
 
     UPROPERTY( BlueprintAssignable )
     FSWOnSplineFollowingReachedEndDelegate OnSplineFollowingReachedEndDelegate;
@@ -230,6 +246,9 @@ private:
 
     UPROPERTY( EditAnywhere, BlueprintReadWrite, meta = ( AllowPrivateAccess = true ) )
     uint8 bOrientRotationToMovement : 1;
+
+    UPROPERTY( EditAnywhere, BlueprintReadWrite, meta = ( AllowPrivateAccess = true, EditCondition = "bOrientRotationToMovement", EditConditionHides ) )
+    FSFRotationConstraints RotationConstraints;
 
     UPROPERTY( EditAnywhere, BlueprintReadWrite, meta = ( AllowPrivateAccess = true ) )
     uint8 bLoops : 1;
