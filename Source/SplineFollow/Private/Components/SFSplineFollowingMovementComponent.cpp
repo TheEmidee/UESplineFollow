@@ -310,6 +310,10 @@ bool USFSplineFollowingMovementComponent::FollowSpline( const FSFFollowSplineInf
     if ( follow_spline_infos.SpeedProviderClassOverride != nullptr )
     {
         SpeedProviderClass = follow_spline_infos.SpeedProviderClassOverride;
+    }
+
+    if ( SpeedProviderClass != nullptr )
+    {
         SpeedProviderClass->GetDefaultObject< USFSplineSpeedProvider >()->Setup( FollowedSplineComponent, this );
     }
 
