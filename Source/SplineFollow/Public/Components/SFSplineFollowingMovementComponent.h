@@ -85,18 +85,18 @@ struct SPLINEFOLLOW_API FSFFollowSplineInfos
 };
 
 USTRUCT( BlueprintType )
-struct FSFRotationConstraint
+struct FSFRotationConstraints
 {
     GENERATED_BODY()
 
     UPROPERTY( EditAnywhere, BlueprintReadWrite )
-    uint8 Constrain_X : 1;
+    uint8 bConstrainX : 1;
 
     UPROPERTY( EditAnywhere, BlueprintReadWrite )
-    uint8 Constrain_Y : 1;
+    uint8 bConstrainY : 1;
 
     UPROPERTY( EditAnywhere, BlueprintReadWrite )
-    uint8 Constrain_Z : 1;
+    uint8 bConstrainZ : 1;
 };
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam( FSWOnSplineFollowingReachedEndDelegate, AActor *, owner_actor );
@@ -245,7 +245,7 @@ private:
     uint8 bOrientRotationToMovement : 1;
 
     UPROPERTY( EditAnywhere, BlueprintReadWrite, meta = ( AllowPrivateAccess = true, EditCondition = "bOrientRotationToMovement", EditConditionHides ) )
-    FSFRotationConstraint RotationConstraints;
+    FSFRotationConstraints RotationConstraints;
 
     UPROPERTY( EditAnywhere, BlueprintReadWrite, meta = ( AllowPrivateAccess = true ) )
     uint8 bLoops : 1;

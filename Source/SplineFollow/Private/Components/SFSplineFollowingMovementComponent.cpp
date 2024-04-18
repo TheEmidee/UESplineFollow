@@ -698,7 +698,7 @@ void USFSplineFollowingMovementComponent::ConstrainRotation( FRotator & rotation
     const auto current_rotator = UpdatedComponent->GetComponentRotation();
 
     rotation = FRotator(
-        RotationConstraints.Constrain_Y ? current_rotator.Pitch : rotation.Pitch,
-        RotationConstraints.Constrain_Z ? current_rotator.Yaw : rotation.Yaw,
-        RotationConstraints.Constrain_X ? current_rotator.Roll : rotation.Roll );
+        RotationConstraints.bConstrainY ? current_rotator.Pitch : rotation.Pitch,
+        RotationConstraints.bConstrainZ ? current_rotator.Yaw : rotation.Yaw,
+        RotationConstraints.bConstrainX ? current_rotator.Roll : rotation.Roll );
 }
