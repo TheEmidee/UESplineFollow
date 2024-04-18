@@ -210,6 +210,9 @@ private:
     UPROPERTY( EditAnywhere, BlueprintReadWrite, meta = ( AllowPrivateAccess = true ) )
     TSubclassOf< USFSplineSpeedProvider > SpeedProviderClass;
 
+    UPROPERTY( BlueprintReadOnly, meta = ( AllowPrivateAccess = true ) )
+    TObjectPtr< USFSplineSpeedProvider > SpeedProvider;
+
     UPROPERTY( EditAnywhere, BlueprintReadWrite, meta = ( AllowPrivateAccess = true ) )
     uint8 bInvertSpeed : 1;
 

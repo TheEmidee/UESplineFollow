@@ -304,9 +304,6 @@ bool USFSplineFollowingMovementComponent::FollowSpline( const FSFFollowSplineInf
 
     bLoops = follow_spline_infos.bLoops;
 
-    SetNormalizedDistanceOnSpline( follow_spline_infos.NormalizedDistanceOnSpline );
-    ToggleSplineMovement( follow_spline_infos.bEnableMovement );
-
     if ( follow_spline_infos.SpeedProviderClassOverride != nullptr )
     {
         SpeedProviderClass = follow_spline_infos.SpeedProviderClassOverride;
@@ -314,13 +311,19 @@ bool USFSplineFollowingMovementComponent::FollowSpline( const FSFFollowSplineInf
 
     if ( SpeedProviderClass != nullptr )
     {
-        SpeedProviderClass->GetDefaultObject< USFSplineSpeedProvider >()->Setup( FollowedSplineComponent, this );
+        if ( SpeedProvider = NewObject< USFSplineSpeedProvider >( this, SpeedProviderClass ); SpeedProvider != nullptr )
+        {
+            SpeedProvider->Setup( FollowedSplineComponent, this );
+        }
     }
 
     if ( follow_spline_infos.bOverrideRotationSpeed )
     {
         RotationSpeed = follow_spline_infos.RotationSpeedOverride;
     }
+
+    SetNormalizedDistanceOnSpline( follow_spline_infos.NormalizedDistanceOnSpline );
+    ToggleSplineMovement( follow_spline_infos.bEnableMovement );
 
     return true;
 }
@@ -629,9 +632,9 @@ void USFSplineFollowingMovementComponent::RefreshComponents()
 
 void USFSplineFollowingMovementComponent::UpdateCurrentSpeed( float delta_time )
 {
-    if ( SpeedProviderClass != nullptr )
+    if ( SpeedProvider != nullptr )
     {
-        CurrentSpeed = FMath::Max( 0.0f, SpeedProviderClass->GetDefaultObject< USFSplineSpeedProvider >()->GetSpeed( GetNormalizedDistanceOnSpline(), FollowedSplineComponent, this, delta_time ) );
+        CurrentSpeed = FMath::Max( 0.0f, SpeedProvider->GetSpeed( GetNormalizedDistanceOnSpline(), FollowedSplineComponent, this, delta_time ) );
     }
     else
     {
