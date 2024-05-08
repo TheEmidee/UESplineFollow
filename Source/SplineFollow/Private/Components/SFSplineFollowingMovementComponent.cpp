@@ -319,6 +319,8 @@ bool USFSplineFollowingMovementComponent::FollowSpline( const FSFFollowSplineInf
         }
     }
 
+    UpdateCurrentSpeed( 0.0f );
+
     if ( follow_spline_infos.bOverrideRotationSpeed )
     {
         RotationSpeed = follow_spline_infos.RotationSpeedOverride;
@@ -647,6 +649,11 @@ void USFSplineFollowingMovementComponent::UpdateCurrentSpeed( float delta_time )
 
 void USFSplineFollowingMovementComponent::ProcessPositionObservers( float distance_on_spline )
 {
+    if ( CurrentSpeed == 0.0f )
+    {
+        return;
+    }
+
     const auto normalized_position_on_spline = distance_on_spline / FollowedSplineComponent->GetSplineLength();
 
     for ( auto index = PositionObservers.Num() - 1; index >= 0; --index )
