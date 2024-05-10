@@ -270,6 +270,7 @@ private:
 
     TArray< FPositionObserver > PositionObservers;
     int LastProcessedMarkerIndex;
+    uint8 bShouldLastProcessedMarkerIndex : 1;
 };
 
 FORCEINLINE USplineComponent * USFSplineFollowingMovementComponent::GetFollowedSpline() const

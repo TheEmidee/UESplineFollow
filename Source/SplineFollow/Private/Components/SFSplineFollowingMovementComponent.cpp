@@ -106,6 +106,7 @@ USFSplineFollowingMovementComponent::USFSplineFollowingMovementComponent() :
     bInvertSpeed = false;
     InitialPosition = 0.0f;
     LastProcessedMarkerIndex = INDEX_NONE;
+    bShouldLastProcessedMarkerIndex = false;
     bStartsMovementDuringBeginPlay = true;
     bOrientRotationToMovement = false;
     bLoops = false;
@@ -183,6 +184,16 @@ void USFSplineFollowingMovementComponent::TickComponent( const float delta_time,
         if ( bInvertSpeed )
         {
             CurrentSpeed *= -1.0f;
+        }
+
+        if ( bShouldLastProcessedMarkerIndex )
+        {
+            if ( CurrentSpeed < 0.0f )
+            {
+                LastProcessedMarkerIndex += 1;
+            }
+
+            bShouldLastProcessedMarkerIndex = false;
         }
 
         auto distance_on_spline = DistanceOnSpline + time_tick * CurrentSpeed;
@@ -369,7 +380,7 @@ void USFSplineFollowingMovementComponent::SetDistanceOnSpline( const float dista
 
         UpdateCurrentSpeed( 0.0f );
 
-        if ( CurrentSpeed > 0.0f )
+        if ( CurrentSpeed >= 0.0f )
         {
             for ( auto index = 0; index < spline_marker_proxies.Num(); ++index )
             {
@@ -382,6 +393,7 @@ void USFSplineFollowingMovementComponent::SetDistanceOnSpline( const float dista
                 }
 
                 LastProcessedMarkerIndex = index;
+                bShouldLastProcessedMarkerIndex = CurrentSpeed == 0;
             }
         }
         else
