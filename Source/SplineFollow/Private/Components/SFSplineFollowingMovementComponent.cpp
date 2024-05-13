@@ -106,7 +106,7 @@ USFSplineFollowingMovementComponent::USFSplineFollowingMovementComponent() :
     bInvertSpeed = false;
     InitialPosition = 0.0f;
     LastProcessedMarkerIndex = INDEX_NONE;
-    bShouldLastProcessedMarkerIndex = false;
+    bUpdateLastProcessedMarker = false;
     bStartsMovementDuringBeginPlay = true;
     bOrientRotationToMovement = false;
     bLoops = false;
@@ -180,21 +180,6 @@ void USFSplineFollowingMovementComponent::TickComponent( const float delta_time,
         remaining_time -= time_tick;
 
         UpdateCurrentSpeed( delta_time );
-
-        if ( bInvertSpeed )
-        {
-            CurrentSpeed *= -1.0f;
-        }
-
-        if ( bShouldLastProcessedMarkerIndex )
-        {
-            if ( CurrentSpeed < 0.0f )
-            {
-                LastProcessedMarkerIndex += 1;
-            }
-
-            bShouldLastProcessedMarkerIndex = false;
-        }
 
         auto distance_on_spline = DistanceOnSpline + time_tick * CurrentSpeed;
 
@@ -372,46 +357,8 @@ void USFSplineFollowingMovementComponent::UnFollowSpline()
 void USFSplineFollowingMovementComponent::SetDistanceOnSpline( const float distance_on_spline )
 {
     SetDistanceOnSplineInternal( distance_on_spline );
-
-    if ( const auto * spline_component = Cast< USFSplineComponent >( FollowedSplineComponent ) )
-    {
-        const auto & spline_marker_proxies = spline_component->GetSplineMarkerProxies();
-        const auto spline_length = spline_component->GetSplineLength();
-
-        UpdateCurrentSpeed( 0.0f );
-
-        if ( CurrentSpeed >= 0.0f )
-        {
-            for ( auto index = 0; index < spline_marker_proxies.Num(); ++index )
-            {
-                const auto & marker_proxy = spline_marker_proxies[ index ];
-                const auto marker_distance = spline_length * marker_proxy.SplineNormalizedDistance;
-
-                if ( marker_distance > distance_on_spline )
-                {
-                    break;
-                }
-
-                LastProcessedMarkerIndex = index;
-                bShouldLastProcessedMarkerIndex = CurrentSpeed == 0;
-            }
-        }
-        else
-        {
-            for ( auto index = spline_marker_proxies.Num() - 1; index >= 0; --index )
-            {
-                const auto & marker_proxy = spline_marker_proxies[ index ];
-                const auto marker_distance = spline_length * marker_proxy.SplineNormalizedDistance;
-
-                if ( marker_distance < distance_on_spline )
-                {
-                    break;
-                }
-
-                LastProcessedMarkerIndex = index;
-            }
-        }
-    }
+    UpdateCurrentSpeed( 0.0f );
+    UpdateLastProcessedMarker();
 }
 
 void USFSplineFollowingMovementComponent::SetNormalizedDistanceOnSpline( const float normalized_distance_on_spline )
@@ -657,6 +604,17 @@ void USFSplineFollowingMovementComponent::UpdateCurrentSpeed( float delta_time )
     {
         CurrentSpeed = 0.0f;
     }
+
+    if ( bInvertSpeed )
+    {
+        CurrentSpeed *= -1.0f;
+    }
+
+    if ( bUpdateLastProcessedMarker && CurrentSpeed != 0.0f )
+    {
+        UpdateLastProcessedMarker();
+        bUpdateLastProcessedMarker = false;
+    }
 }
 
 void USFSplineFollowingMovementComponent::ProcessPositionObservers( float distance_on_spline )
@@ -723,4 +681,33 @@ void USFSplineFollowingMovementComponent::ConstrainRotation( FRotator & rotation
         RotationConstraints.bConstrainY ? current_rotator.Pitch : rotation.Pitch,
         RotationConstraints.bConstrainZ ? current_rotator.Yaw : rotation.Yaw,
         RotationConstraints.bConstrainX ? current_rotator.Roll : rotation.Roll );
+}
+
+void USFSplineFollowingMovementComponent::UpdateLastProcessedMarker()
+{
+    if ( CurrentSpeed == 0.0f )
+    {
+        bUpdateLastProcessedMarker = true;
+        return;
+    }
+
+    const auto * spline_component = Cast< USFSplineComponent >( FollowedSplineComponent );
+
+    const auto & spline_marker_proxies = spline_component->GetSplineMarkerProxies();
+    const auto spline_length = spline_component->GetSplineLength();
+
+    const auto check_multiplier = CurrentSpeed > 0.0f ? 1.0f : -1.0f;
+
+    for ( auto index = 0; index < spline_marker_proxies.Num(); ++index )
+    {
+        const auto & marker_proxy = spline_marker_proxies[ index ];
+        const auto marker_distance = spline_length * marker_proxy.SplineNormalizedDistance;
+
+        if ( marker_distance * check_multiplier > DistanceOnSpline * check_multiplier )
+        {
+            break;
+        }
+
+        LastProcessedMarkerIndex = index;
+    }
 }

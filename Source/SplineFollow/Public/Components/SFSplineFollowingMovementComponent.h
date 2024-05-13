@@ -184,6 +184,7 @@ private:
     void ProcessPositionObservers( float distance_on_spline );
     void ResetPositionObservers();
     void ConstrainRotation( FRotator & rotation ) const;
+    void UpdateLastProcessedMarker();
 
     UPROPERTY( BlueprintAssignable )
     FSWOnSplineFollowingReachedEndDelegate OnSplineFollowingReachedEndDelegate;
@@ -270,7 +271,7 @@ private:
 
     TArray< FPositionObserver > PositionObservers;
     int LastProcessedMarkerIndex;
-    uint8 bShouldLastProcessedMarkerIndex : 1;
+    uint8 bUpdateLastProcessedMarker : 1;
 };
 
 FORCEINLINE USplineComponent * USFSplineFollowingMovementComponent::GetFollowedSpline() const
