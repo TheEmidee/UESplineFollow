@@ -393,9 +393,15 @@ bool USFSplineFollowingMovementComponent::IsFollowingSpline() const
     return FollowedSplineComponent != nullptr && IsComponentTickEnabled();
 }
 
-void USFSplineFollowingMovementComponent::AddSplineOffsetData( USFSplineOffsetData * offset_data )
+void USFSplineFollowingMovementComponent::AddSplineOffsetData( TSubclassOf< USFSplineOffsetData > offset_data )
 {
-    SplineOffsetDatas.Add( offset_data );
+    if ( !ensureAlways( offset_data != nullptr ) )
+    {
+        return;
+    }
+
+    auto * offset = NewObject< USFSplineOffsetData >( offset_data );
+    SplineOffsetDatas.Add( offset );
 }
 
 void USFSplineFollowingMovementComponent::RegisterPositionObserver( const FSWOnSplineFollowingReachedPositionDelegate & delegate, float normalized_position, bool trigger_once /*= true*/ )
