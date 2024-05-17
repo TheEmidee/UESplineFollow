@@ -2,7 +2,10 @@
 
 #include "Components/SFSplineComponent.h"
 #include "Components/SFSplineMarkers.h"
-#include "Components/SplineComponent.h"
+#include "Components/SFSplineOffsetData.h"
+
+#include <Components/SplineComponent.h>
+#include <Kismet/KismetMathLibrary.h>
 
 // Minimum delta time considered when ticking. Delta times below this are not considered. This is a very small non-zero positive value to avoid potential divide-by-zero in simulation code.
 static constexpr float MinTickTime = 1e-6f;
@@ -251,6 +254,8 @@ void USFSplineFollowingMovementComponent::TickComponent( const float delta_time,
             UpdatedComponent->SetWorldRotation( final_rotation );
         }
     }
+
+    ApplyOffsetData( delta_time );
 }
 
 void USFSplineFollowingMovementComponent::UpdateTickRegistration()
@@ -386,6 +391,11 @@ float USFSplineFollowingMovementComponent::GetNormalizedDistanceOnSpline() const
 bool USFSplineFollowingMovementComponent::IsFollowingSpline() const
 {
     return FollowedSplineComponent != nullptr && IsComponentTickEnabled();
+}
+
+void USFSplineFollowingMovementComponent::AddSplineOffsetData( USFSplineOffsetData * offset_data )
+{
+    SplineOffsetDatas.Add( offset_data );
 }
 
 void USFSplineFollowingMovementComponent::RegisterPositionObserver( const FSWOnSplineFollowingReachedPositionDelegate & delegate, float normalized_position, bool trigger_once /*= true*/ )
@@ -710,4 +720,30 @@ void USFSplineFollowingMovementComponent::UpdateLastProcessedMarker()
 
         LastProcessedMarkerIndex = index;
     }
+}
+
+void USFSplineFollowingMovementComponent::ApplyOffsetData( const float delta_time )
+{
+    auto result_transform = FTransform::Identity;
+
+    for ( auto & offset : SplineOffsetDatas )
+    {
+        if ( offset == nullptr )
+        {
+            continue;
+        }
+
+        auto * offset_ptr = offset.Get();
+        auto transform = FTransform::Identity;
+        offset_ptr->GetOffsetTransform( transform, delta_time );
+        result_transform.Accumulate( transform );
+    }
+
+    const auto rotation = FollowedSplineComponent->GetRotationAtDistanceAlongSpline( DistanceOnSpline, ESplineCoordinateSpace::World ).Quaternion();
+
+    const auto location_offset = UKismetMathLibrary::Quat_RotateVector( rotation, result_transform.GetLocation() );
+    const auto rotation_offset = rotation * result_transform.GetRotation();
+    const auto scale_offset = UKismetMathLibrary::Quat_RotateVector( rotation, result_transform.GetScale3D() );
+
+    UpdatedComponent->AddWorldTransform( FTransform( rotation_offset, location_offset, scale_offset ) );
 }

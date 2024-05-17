@@ -3,6 +3,7 @@
 
 #include "SFSplineFollowingMovementComponent.generated.h"
 
+class USFSplineOffsetData;
 class USFSplineFollowingMovementComponent;
 class USplineComponent;
 class UCurveFloat;
@@ -151,6 +152,9 @@ public:
     UFUNCTION( BlueprintPure )
     bool IsFollowingSpline() const;
 
+    UFUNCTION( BlueprintCallable )
+    void AddSplineOffsetData( USFSplineOffsetData * offset_data );
+
     void RegisterPositionObserver( const FSWOnSplineFollowingReachedPositionDelegate & delegate, float normalized_position, bool trigger_once = true );
 
 #if WITH_EDITOR
@@ -185,6 +189,7 @@ private:
     void ResetPositionObservers();
     void ConstrainRotation( FRotator & rotation ) const;
     void UpdateLastProcessedMarker();
+    void ApplyOffsetData( float delta_time );
 
     UPROPERTY( BlueprintAssignable )
     FSWOnSplineFollowingReachedEndDelegate OnSplineFollowingReachedEndDelegate;
@@ -268,6 +273,9 @@ private:
 
     UPROPERTY( EditAnywhere, BlueprintReadWrite, meta = ( AllowPrivateAccess = true ) )
     float RotationSpeed;
+
+    UPROPERTY( BlueprintReadOnly, VisibleAnywhere, meta = ( AllowPrivateAccess = true ) )
+    TArray< TObjectPtr< USFSplineOffsetData > > SplineOffsetDatas;
 
     TArray< FPositionObserver > PositionObservers;
     int LastProcessedMarkerIndex;
