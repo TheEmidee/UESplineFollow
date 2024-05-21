@@ -29,15 +29,9 @@ void USFSplineOffsetData::Initialize()
     MaxTime = time;
 }
 
-void USFSplineOffsetData::GetOffsetTransform( FTransform & transform, const float delta_time )
+bool USFSplineOffsetData::GetOffsetTransform( FTransform & transform, const float delta_time )
 {
     transform.SetIdentity();
-
-    if ( ElapsedTime >= MaxTime )
-    {
-        OnSplineOffsetFinishedDelegate.Broadcast( this );
-        return;
-    }
 
     ElapsedTime += delta_time;
 
@@ -65,4 +59,12 @@ void USFSplineOffsetData::GetOffsetTransform( FTransform & transform, const floa
             checkNoEntry();
         }
     }
+
+    if ( ElapsedTime >= MaxTime )
+    {
+        OnSplineOffsetFinishedDelegate.Broadcast( this );
+        return false;
+    }
+
+    return true;
 }

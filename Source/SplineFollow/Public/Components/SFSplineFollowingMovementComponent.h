@@ -176,9 +176,6 @@ private:
         bool bHasBeenTriggered;
     };
 
-    UFUNCTION()
-    void OnSplineOffsetFinished( USFSplineOffsetData * offset_data );
-
     bool HasStoppedSimulation() const;
     bool CheckStillInWorld();
     bool ShouldUseSubStepping() const;

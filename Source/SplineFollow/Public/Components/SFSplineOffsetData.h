@@ -24,10 +24,8 @@ class SPLINEFOLLOW_API USFSplineOffsetData final : public UObject
 public:
     USFSplineOffsetData();
 
-    FSFOnSplineOffsetFinishedDelegate & OnSplineOffsetFinished();
-
     void Initialize();
-    void GetOffsetTransform( FTransform & transform, float delta_time );
+    bool GetOffsetTransform( FTransform & transform, float delta_time );
 
 private:
     UPROPERTY( EditDefaultsOnly, BlueprintReadOnly, meta = ( AllowPrivateAccess = true ) )
@@ -45,8 +43,3 @@ private:
     float ElapsedTime;
     float MaxTime;
 };
-
-FORCEINLINE FSFOnSplineOffsetFinishedDelegate & USFSplineOffsetData::OnSplineOffsetFinished()
-{
-    return OnSplineOffsetFinishedDelegate;
-}

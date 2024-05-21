@@ -402,7 +402,6 @@ USFSplineOffsetData * USFSplineFollowingMovementComponent::AddSplineOffsetData( 
 
     auto * offset = NewObject< USFSplineOffsetData >( this, offset_data );
     offset->Initialize();
-    offset->OnSplineOffsetFinished().AddDynamic( this, &ThisClass::OnSplineOffsetFinished );
     SplineOffsetDatas.Add( offset );
 
     return offset;
@@ -432,11 +431,6 @@ void USFSplineFollowingMovementComponent::PostEditChangeProperty( FPropertyChang
     }
 }
 #endif
-
-void USFSplineFollowingMovementComponent::OnSplineOffsetFinished( USFSplineOffsetData * offset_data )
-{
-    SplineOffsetDatas.Remove( offset_data );
-}
 
 bool USFSplineFollowingMovementComponent::HasStoppedSimulation() const
 {
@@ -748,8 +742,10 @@ void USFSplineFollowingMovementComponent::ApplyOffsetData( const float delta_tim
     auto result_rotation_offset = FQuat::Identity;
     auto result_scale_offset = FVector::OneVector;
 
-    for ( auto & offset : SplineOffsetDatas )
+    for ( auto offset_index = SplineOffsetDatas.Num() - 1; offset_index >= 0; --offset_index )
     {
+        auto & offset = SplineOffsetDatas[ offset_index ];
+
         if ( offset == nullptr )
         {
             continue;
@@ -757,7 +753,10 @@ void USFSplineFollowingMovementComponent::ApplyOffsetData( const float delta_tim
 
         auto * offset_ptr = offset.Get();
         auto transform = FTransform::Identity;
-        offset_ptr->GetOffsetTransform( transform, delta_time );
+        if ( !offset_ptr->GetOffsetTransform( transform, delta_time ) )
+        {
+            SplineOffsetDatas.Remove( offset_ptr );
+        }
 
         result_location_offset += transform.GetLocation();
         result_rotation_offset *= transform.GetRotation();
