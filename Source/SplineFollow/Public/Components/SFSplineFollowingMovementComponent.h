@@ -153,7 +153,7 @@ public:
     bool IsFollowingSpline() const;
 
     UFUNCTION( BlueprintCallable )
-    void AddSplineOffsetData( TSubclassOf< USFSplineOffsetData > offset_data );
+    USFSplineOffsetData * AddSplineOffsetData( TSubclassOf< USFSplineOffsetData > offset_data );
 
     void RegisterPositionObserver( const FSWOnSplineFollowingReachedPositionDelegate & delegate, float normalized_position, bool trigger_once = true );
 
