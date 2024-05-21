@@ -6,6 +6,8 @@
 
 #include "SFSplineOffsetData.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam( FSFOnSplineOffsetFinishedDelegate, USFSplineOffsetData *, offset_data );
+
 UENUM()
 enum class ESFSplineOffsetType : uint8
 {
@@ -22,6 +24,9 @@ class SPLINEFOLLOW_API USFSplineOffsetData final : public UObject
 public:
     USFSplineOffsetData();
 
+    FSFOnSplineOffsetFinishedDelegate & OnSplineOffsetFinished();
+
+    void Initialize();
     void GetOffsetTransform( FTransform & transform, float delta_time );
 
 private:
@@ -34,5 +39,14 @@ private:
     UPROPERTY( EditDefaultsOnly, BlueprintReadOnly, meta = ( AllowPrivateAccess = true ) )
     ESFSplineOffsetType OffsetType;
 
+    UPROPERTY( BlueprintAssignable )
+    FSFOnSplineOffsetFinishedDelegate OnSplineOffsetFinishedDelegate;
+
     float ElapsedTime;
+    float MaxTime;
 };
+
+FORCEINLINE FSFOnSplineOffsetFinishedDelegate & USFSplineOffsetData::OnSplineOffsetFinished()
+{
+    return OnSplineOffsetFinishedDelegate;
+}
