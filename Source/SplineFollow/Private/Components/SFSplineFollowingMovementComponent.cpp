@@ -172,6 +172,7 @@ void USFSplineFollowingMovementComponent::TickComponent( const float delta_time,
 
     const auto spline_length = followed_spline->GetSplineLength();
     const auto current_world_location = UpdatedComponent->GetComponentLocation();
+    const auto current_world_rotation = UpdatedComponent->GetComponentRotation();
 
     while ( remaining_time >= MinTickTime && ( iterations < MaxSimulationIterations ) && IsValid( actor_owner ) && !HasStoppedSimulation() )
     {
@@ -244,12 +245,8 @@ void USFSplineFollowingMovementComponent::TickComponent( const float delta_time,
 
         if ( bOrientRotationToMovement )
         {
-            const auto current_rotator = UpdatedComponent->GetComponentRotation();
-            auto target_rotator = Velocity.GetSafeNormal().Rotation().GetNormalized();
-
-            ConstrainRotation( target_rotator );
-
-            const auto final_rotation = FMath::RInterpTo( current_rotator, target_rotator, delta_time, RotationSpeed );
+            const auto new_world_rotation = UpdatedComponent->GetComponentRotation();
+            const auto final_rotation = FMath::RInterpTo( current_world_rotation, new_world_rotation, delta_time, RotationSpeed );
 
             UpdatedComponent->SetWorldRotation( final_rotation );
         }
@@ -766,9 +763,8 @@ void USFSplineFollowingMovementComponent::ApplyOffsetData( const float delta_tim
     const auto rotation = FollowedSplineComponent->GetRotationAtDistanceAlongSpline( DistanceOnSpline, ESplineCoordinateSpace::World ).Quaternion();
 
     const auto location_offset = UKismetMathLibrary::Quat_RotateVector( rotation, result_location_offset );
-    const auto rotation_offset = rotation * result_rotation_offset;
 
     UpdatedComponent->AddWorldOffset( location_offset );
-    UpdatedComponent->SetWorldRotation( rotation_offset );
+    UpdatedComponent->AddWorldRotation( result_rotation_offset );
     UpdatedComponent->SetWorldScale3D( result_scale_offset );
 }
