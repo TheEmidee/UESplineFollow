@@ -401,6 +401,7 @@ void USFSplineFollowingMovementComponent::AddSplineOffsetData( TSubclassOf< USFS
     }
 
     auto * offset = NewObject< USFSplineOffsetData >( this, offset_data );
+    offset->OnSplineOffsetFinished().AddDynamic( this, &ThisClass::OnSplineOffsetFinished );
     SplineOffsetDatas.Add( offset );
 }
 
@@ -428,6 +429,11 @@ void USFSplineFollowingMovementComponent::PostEditChangeProperty( FPropertyChang
     }
 }
 #endif
+
+void USFSplineFollowingMovementComponent::OnSplineOffsetFinished( USFSplineOffsetData * offset_data )
+{
+    SplineOffsetDatas.Remove( offset_data );
+}
 
 bool USFSplineFollowingMovementComponent::HasStoppedSimulation() const
 {
