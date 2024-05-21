@@ -29,29 +29,26 @@ void USFSplineOffsetData::Initialize()
     MaxTime = time;
 }
 
-bool USFSplineOffsetData::GetOffsetTransform( FTransform & transform, const float delta_time )
+bool USFSplineOffsetData::ApplyOffsetToTransform( FTransform & transform, const float delta_time )
 {
-    transform.SetIdentity();
-
-    ElapsedTime += delta_time;
-
     const auto offset = OffsetCurve.GetValue( ElapsedTime );
 
     switch ( OffsetType )
     {
         case ESFSplineOffsetType::Location:
         {
-            transform.SetLocation( offset );
+            transform.SetLocation( transform.GetLocation() + offset );
         }
         break;
         case ESFSplineOffsetType::Rotation:
         {
-            transform.SetRotation( FRotator( offset.X, offset.Y, offset.Z ).Quaternion() );
+            auto offset_rotation = FRotator( offset.X, offset.Y, offset.Z ).Quaternion();
+            transform.SetRotation( transform.GetRotation() * offset_rotation );
         }
         break;
         case ESFSplineOffsetType::Scale:
         {
-            transform.SetScale3D( offset );
+            transform.SetScale3D( transform.GetScale3D() * offset );
         }
         break;
         default:
@@ -60,10 +57,12 @@ bool USFSplineOffsetData::GetOffsetTransform( FTransform & transform, const floa
         }
     }
 
+    ElapsedTime += delta_time;
+
     if ( ElapsedTime >= MaxTime )
     {
         OnSplineOffsetFinishedDelegate.Broadcast( this );
-        return false;
+        return !bResetOnEnd;
     }
 
     return true;

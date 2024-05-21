@@ -25,7 +25,7 @@ public:
     USFSplineOffsetData();
 
     void Initialize();
-    bool GetOffsetTransform( FTransform & transform, float delta_time );
+    bool ApplyOffsetToTransform( FTransform & transform, float delta_time );
 
 private:
     UPROPERTY( EditDefaultsOnly, BlueprintReadOnly, meta = ( AllowPrivateAccess = true ) )
