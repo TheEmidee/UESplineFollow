@@ -735,9 +735,7 @@ void USFSplineFollowingMovementComponent::ApplyOffsetData( const float delta_tim
         return;
     }
 
-    auto result_location_offset = FVector::ZeroVector;
-    auto result_rotation_offset = FQuat::Identity;
-    auto result_scale_offset = FVector::OneVector;
+    auto transform = FTransform::Identity;
 
     for ( auto offset_index = SplineOffsetDatas.Num() - 1; offset_index >= 0; --offset_index )
     {
@@ -749,22 +747,16 @@ void USFSplineFollowingMovementComponent::ApplyOffsetData( const float delta_tim
         }
 
         auto * offset_ptr = offset.Get();
-        auto transform = FTransform::Identity;
-        if ( !offset_ptr->GetOffsetTransform( transform, delta_time ) )
+        if ( !offset_ptr->ApplyOffsetToTransform( transform, delta_time ) )
         {
             SplineOffsetDatas.Remove( offset_ptr );
         }
-
-        result_location_offset += transform.GetLocation();
-        result_rotation_offset *= transform.GetRotation();
-        result_scale_offset *= transform.GetScale3D();
     }
 
     const auto rotation = FollowedSplineComponent->GetRotationAtDistanceAlongSpline( DistanceOnSpline, ESplineCoordinateSpace::World ).Quaternion();
-
-    const auto location_offset = UKismetMathLibrary::Quat_RotateVector( rotation, result_location_offset );
+    const auto location_offset = UKismetMathLibrary::Quat_RotateVector( rotation, transform.GetLocation() );
 
     UpdatedComponent->AddWorldOffset( location_offset );
-    UpdatedComponent->AddWorldRotation( result_rotation_offset );
-    UpdatedComponent->SetWorldScale3D( result_scale_offset );
+    UpdatedComponent->AddWorldRotation( transform.GetRotation() );
+    UpdatedComponent->SetWorldScale3D( transform.GetScale3D() );
 }
