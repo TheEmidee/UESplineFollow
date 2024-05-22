@@ -193,7 +193,7 @@ private:
         TObjectPtr< USFSplineOffsetData > OffsetData;
         FRuntimeVectorCurve OffsetCurve;
         ESFSplineOffsetType OffsetType;
-        uint8 bResetOnEnd : 1;
+        bool bResetOnEnd;
         float ElapsedTime;
         float MaxTime;
     };
