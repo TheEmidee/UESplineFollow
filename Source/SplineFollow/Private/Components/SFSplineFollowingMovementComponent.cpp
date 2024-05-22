@@ -821,8 +821,8 @@ void USFSplineFollowingMovementComponent::ApplyOffsetData( const float delta_tim
 
         if ( !offset.ApplyOffsetToTransform( transform, delta_time ) )
         {
-            SplineOffsetDatas.RemoveAt( offset_index );
             OnSplineOffsetFinishedDelegate.Broadcast( offset.OffsetData );
+            SplineOffsetDatas.RemoveAt( offset_index );
         }
     }
 
