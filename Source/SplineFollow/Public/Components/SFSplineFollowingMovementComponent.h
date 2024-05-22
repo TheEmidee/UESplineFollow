@@ -10,14 +10,17 @@ class USFSplineFollowingMovementComponent;
 class USplineComponent;
 class UCurveFloat;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam( FSFOnSplineOffsetFinishedDelegate, USFSplineOffsetData *, offset_data );
+
 struct FSFSplineOffsetInfo
 {
     FSFSplineOffsetInfo();
-    FSFSplineOffsetInfo( const FRuntimeVectorCurve & offset_curve, ESFSplineOffsetType offset_type, bool reset_on_end );
+    FSFSplineOffsetInfo( USFSplineOffsetData * offset_data );
 
     void Initialize();
     bool ApplyOffsetToTransform( FTransform & transform, float delta_time );
 
+    TObjectPtr< USFSplineOffsetData > OffsetData;
     FRuntimeVectorCurve OffsetCurve;
     ESFSplineOffsetType OffsetType;
     uint8 bResetOnEnd : 1;
@@ -213,6 +216,9 @@ private:
 
     UPROPERTY( BlueprintAssignable )
     FSWOnSplineFollowingLoopedDelegate OnSplineFollowingLoopedDelegate;
+
+    UPROPERTY( BlueprintAssignable )
+    FSFOnSplineOffsetFinishedDelegate OnSplineOffsetFinishedDelegate;
 
     /**
      * If true, forces sub-stepping to break up movement into discrete smaller steps to improve accuracy of the trajectory.

@@ -5,8 +5,6 @@
 
 #include "SFSplineOffsetData.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam( FSFOnSplineOffsetFinishedDelegate, USFSplineOffsetData *, offset_data );
-
 UENUM()
 enum class ESFSplineOffsetType : uint8
 {
@@ -23,9 +21,6 @@ class SPLINEFOLLOW_API USFSplineOffsetData final : public UDataAsset
 public:
     USFSplineOffsetData();
 
-    void Initialize();
-    bool ApplyOffsetToTransform( FTransform & transform, float delta_time );
-
     UPROPERTY( EditDefaultsOnly, BlueprintReadOnly, meta = ( AllowPrivateAccess = true ) )
     FRuntimeVectorCurve OffsetCurve;
 
@@ -34,10 +29,4 @@ public:
 
     UPROPERTY( EditDefaultsOnly, BlueprintReadOnly, meta = ( AllowPrivateAccess = true ) )
     ESFSplineOffsetType OffsetType;
-
-    UPROPERTY( BlueprintAssignable )
-    FSFOnSplineOffsetFinishedDelegate OnSplineOffsetFinishedDelegate;
-
-    float ElapsedTime;
-    float MaxTime;
 };

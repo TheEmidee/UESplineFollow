@@ -20,17 +20,25 @@ float USFSplineSpeedProvider::GetSpeed_Implementation( float normalized_position
 }
 
 FSFSplineOffsetInfo::FSFSplineOffsetInfo() :
-    FSFSplineOffsetInfo( FRuntimeVectorCurve(), ESFSplineOffsetType::Location, true )
-{
-}
-
-FSFSplineOffsetInfo::FSFSplineOffsetInfo( const FRuntimeVectorCurve & offset_curve, const ESFSplineOffsetType offset_type, const bool reset_on_end ) :
-    OffsetCurve( offset_curve ),
-    OffsetType( offset_type ),
-    bResetOnEnd( reset_on_end ),
+    OffsetType( ESFSplineOffsetType::Location ),
+    bResetOnEnd( true ),
     ElapsedTime( 0.0f ),
     MaxTime( 0.0f )
 {
+}
+
+FSFSplineOffsetInfo::FSFSplineOffsetInfo( USFSplineOffsetData * offset_data )
+{
+    check( offset_data != nullptr );
+
+    OffsetData = offset_data;
+    OffsetCurve = offset_data->OffsetCurve;
+    OffsetType = offset_data->OffsetType;
+    bResetOnEnd = offset_data->bResetOnEnd;
+    ElapsedTime = 0.0f;
+    MaxTime = 0.0f;
+
+    Initialize();
 }
 
 void FSFSplineOffsetInfo::Initialize()
@@ -86,7 +94,6 @@ bool FSFSplineOffsetInfo::ApplyOffsetToTransform( FTransform & transform, float 
 
     if ( ElapsedTime >= MaxTime )
     {
-        // :TODO: broadcast
         return !bResetOnEnd;
     }
 
@@ -472,7 +479,7 @@ void USFSplineFollowingMovementComponent::AddSplineOffsetData( USFSplineOffsetDa
         return;
     }
 
-    SplineOffsetDatas.Emplace( offset_data->OffsetCurve, offset_data->OffsetType, offset_data->bResetOnEnd );
+    SplineOffsetDatas.Emplace( offset_data );
 }
 
 void USFSplineFollowingMovementComponent::RegisterPositionObserver( const FSWOnSplineFollowingReachedPositionDelegate & delegate, float normalized_position, bool trigger_once /*= true*/ )
@@ -814,7 +821,8 @@ void USFSplineFollowingMovementComponent::ApplyOffsetData( const float delta_tim
 
         if ( !offset.ApplyOffsetToTransform( transform, delta_time ) )
         {
-            SplineOffsetDatas.Remove( offset );
+            SplineOffsetDatas.RemoveAt( offset_index );
+            OnSplineOffsetFinishedDelegate.Broadcast( offset.OffsetData );
         }
     }
 
