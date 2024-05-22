@@ -2,7 +2,10 @@
 
 #include "Components/SFSplineComponent.h"
 #include "Components/SFSplineMarkers.h"
-#include "Components/SplineComponent.h"
+#include "Components/SFSplineOffsetData.h"
+
+#include <Components/SplineComponent.h>
+#include <Kismet/KismetMathLibrary.h>
 
 // Minimum delta time considered when ticking. Delta times below this are not considered. This is a very small non-zero positive value to avoid potential divide-by-zero in simulation code.
 static constexpr float MinTickTime = 1e-6f;
@@ -14,6 +17,86 @@ void USFSplineSpeedProvider::Setup_Implementation( USplineComponent * followed_s
 float USFSplineSpeedProvider::GetSpeed_Implementation( float normalized_position_on_spline, USplineComponent * followed_spline_component, USFSplineFollowingMovementComponent * /* spline_following_movement_component */, float delta_time )
 {
     return 0.0f;
+}
+
+USFSplineFollowingMovementComponent::FSFSplineOffsetInfo::FSFSplineOffsetInfo() :
+    OffsetType( ESFSplineOffsetType::Location ),
+    bResetOnEnd( true ),
+    ElapsedTime( 0.0f ),
+    MaxTime( 0.0f )
+{
+}
+
+USFSplineFollowingMovementComponent::FSFSplineOffsetInfo::FSFSplineOffsetInfo( USFSplineOffsetData * offset_data ) :
+    OffsetData( offset_data ),
+    OffsetCurve( offset_data->OffsetCurve ),
+    OffsetType( offset_data->OffsetType ),
+    bResetOnEnd( offset_data->bResetOnEnd ),
+    ElapsedTime( 0.0f ),
+    MaxTime( 0.0f )
+{
+    check( offset_data != nullptr );
+
+    Initialize();
+}
+
+void USFSplineFollowingMovementComponent::FSFSplineOffsetInfo::Initialize()
+{
+    auto time = 0.0f;
+
+    for ( auto curve_index = 0; curve_index < 3; ++curve_index )
+    {
+        auto min_time = 0.0f;
+        auto max_time = 0.0f;
+
+        const auto curve = OffsetCurve.GetRichCurve( curve_index );
+        curve->GetTimeRange( min_time, max_time );
+
+        if ( max_time > time )
+        {
+            time = max_time;
+        }
+    }
+
+    MaxTime = time;
+}
+
+bool USFSplineFollowingMovementComponent::FSFSplineOffsetInfo::ApplyOffsetToTransform( FTransform & transform, float delta_time )
+{
+    const auto offset = OffsetCurve.GetValue( ElapsedTime );
+
+    switch ( OffsetType )
+    {
+        case ESFSplineOffsetType::Location:
+        {
+            transform.SetLocation( transform.GetLocation() + offset );
+        }
+        break;
+        case ESFSplineOffsetType::Rotation:
+        {
+            auto offset_rotation = FRotator( offset.X, offset.Y, offset.Z ).Quaternion();
+            transform.SetRotation( transform.GetRotation() * offset_rotation );
+        }
+        break;
+        case ESFSplineOffsetType::Scale:
+        {
+            transform.SetScale3D( transform.GetScale3D() * offset );
+        }
+        break;
+        default:
+        {
+            checkNoEntry();
+        }
+    }
+
+    ElapsedTime += delta_time;
+
+    if ( ElapsedTime >= MaxTime )
+    {
+        return !bResetOnEnd;
+    }
+
+    return true;
 }
 
 USFSplineSpeedProvider_Constant::USFSplineSpeedProvider_Constant() :
@@ -95,6 +178,7 @@ bool FSFFollowSplineInfos::NetSerialize( FArchive & archive, UPackageMap * /* pa
 USFSplineFollowingMovementComponent::USFSplineFollowingMovementComponent() :
     bForceSubStepping( true ),
     FollowedSplineComponent( nullptr ),
+    RotationConstraints(),
     NormalizedDistanceOnSpline( 0 )
 {
     PrimaryComponentTick.bCanEverTick = true;
@@ -169,6 +253,7 @@ void USFSplineFollowingMovementComponent::TickComponent( const float delta_time,
 
     const auto spline_length = followed_spline->GetSplineLength();
     const auto current_world_location = UpdatedComponent->GetComponentLocation();
+    const auto current_world_rotation = UpdatedComponent->GetComponentRotation();
 
     while ( remaining_time >= MinTickTime && ( iterations < MaxSimulationIterations ) && IsValid( actor_owner ) && !HasStoppedSimulation() )
     {
@@ -241,16 +326,14 @@ void USFSplineFollowingMovementComponent::TickComponent( const float delta_time,
 
         if ( bOrientRotationToMovement )
         {
-            const auto current_rotator = UpdatedComponent->GetComponentRotation();
-            auto target_rotator = Velocity.GetSafeNormal().Rotation().GetNormalized();
-
-            ConstrainRotation( target_rotator );
-
-            const auto final_rotation = FMath::RInterpTo( current_rotator, target_rotator, delta_time, RotationSpeed );
+            const auto new_world_rotation = UpdatedComponent->GetComponentRotation();
+            const auto final_rotation = FMath::RInterpTo( current_world_rotation, new_world_rotation, delta_time, RotationSpeed );
 
             UpdatedComponent->SetWorldRotation( final_rotation );
         }
     }
+
+    ApplyOffsetData( delta_time );
 }
 
 void USFSplineFollowingMovementComponent::UpdateTickRegistration()
@@ -386,6 +469,16 @@ float USFSplineFollowingMovementComponent::GetNormalizedDistanceOnSpline() const
 bool USFSplineFollowingMovementComponent::IsFollowingSpline() const
 {
     return FollowedSplineComponent != nullptr && IsComponentTickEnabled();
+}
+
+void USFSplineFollowingMovementComponent::AddSplineOffsetData( USFSplineOffsetData * offset_data )
+{
+    if ( !ensureAlways( offset_data != nullptr ) )
+    {
+        return;
+    }
+
+    SplineOffsetDatas.Emplace( offset_data );
 }
 
 void USFSplineFollowingMovementComponent::RegisterPositionObserver( const FSWOnSplineFollowingReachedPositionDelegate & delegate, float normalized_position, bool trigger_once /*= true*/ )
@@ -710,4 +803,32 @@ void USFSplineFollowingMovementComponent::UpdateLastProcessedMarker()
 
         LastProcessedMarkerIndex = index;
     }
+}
+
+void USFSplineFollowingMovementComponent::ApplyOffsetData( const float delta_time )
+{
+    if ( SplineOffsetDatas.IsEmpty() )
+    {
+        return;
+    }
+
+    auto transform = FTransform::Identity;
+
+    for ( auto offset_index = SplineOffsetDatas.Num() - 1; offset_index >= 0; --offset_index )
+    {
+        auto & offset = SplineOffsetDatas[ offset_index ];
+
+        if ( !offset.ApplyOffsetToTransform( transform, delta_time ) )
+        {
+            OnSplineOffsetFinishedDelegate.Broadcast( offset.OffsetData );
+            SplineOffsetDatas.RemoveAt( offset_index );
+        }
+    }
+
+    const auto rotation = FollowedSplineComponent->GetRotationAtDistanceAlongSpline( DistanceOnSpline, ESplineCoordinateSpace::World ).Quaternion();
+    const auto location_offset = UKismetMathLibrary::Quat_RotateVector( rotation, transform.GetLocation() );
+
+    UpdatedComponent->AddWorldOffset( location_offset );
+    UpdatedComponent->AddWorldRotation( transform.GetRotation() );
+    UpdatedComponent->SetWorldScale3D( transform.GetScale3D() );
 }

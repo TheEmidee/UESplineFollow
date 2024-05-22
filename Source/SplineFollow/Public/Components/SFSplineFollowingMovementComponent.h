@@ -1,11 +1,18 @@
 #pragma once
+
 #include "GameFramework/MovementComponent.h"
+
+#include <Curves/CurveVector.h>
 
 #include "SFSplineFollowingMovementComponent.generated.h"
 
+enum class ESFSplineOffsetType : uint8;
+class USFSplineOffsetData;
 class USFSplineFollowingMovementComponent;
 class USplineComponent;
 class UCurveFloat;
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam( FSFOnSplineOffsetFinishedDelegate, USFSplineOffsetData *, offset_data );
 
 UCLASS( Abstract, HideDropdown, BlueprintType, Blueprintable )
 class USFSplineSpeedProvider : public UObject
@@ -151,6 +158,9 @@ public:
     UFUNCTION( BlueprintPure )
     bool IsFollowingSpline() const;
 
+    UFUNCTION( BlueprintCallable )
+    void AddSplineOffsetData( USFSplineOffsetData * offset_data );
+
     void RegisterPositionObserver( const FSWOnSplineFollowingReachedPositionDelegate & delegate, float normalized_position, bool trigger_once = true );
 
 #if WITH_EDITOR
@@ -172,6 +182,22 @@ private:
         bool bHasBeenTriggered;
     };
 
+    struct FSFSplineOffsetInfo
+    {
+        FSFSplineOffsetInfo();
+        FSFSplineOffsetInfo( USFSplineOffsetData * offset_data );
+
+        void Initialize();
+        bool ApplyOffsetToTransform( FTransform & transform, float delta_time );
+
+        TObjectPtr< USFSplineOffsetData > OffsetData;
+        FRuntimeVectorCurve OffsetCurve;
+        ESFSplineOffsetType OffsetType;
+        bool bResetOnEnd;
+        float ElapsedTime;
+        float MaxTime;
+    };
+
     bool HasStoppedSimulation() const;
     bool CheckStillInWorld();
     bool ShouldUseSubStepping() const;
@@ -185,12 +211,16 @@ private:
     void ResetPositionObservers();
     void ConstrainRotation( FRotator & rotation ) const;
     void UpdateLastProcessedMarker();
+    void ApplyOffsetData( float delta_time );
 
     UPROPERTY( BlueprintAssignable )
     FSWOnSplineFollowingReachedEndDelegate OnSplineFollowingReachedEndDelegate;
 
     UPROPERTY( BlueprintAssignable )
     FSWOnSplineFollowingLoopedDelegate OnSplineFollowingLoopedDelegate;
+
+    UPROPERTY( BlueprintAssignable )
+    FSFOnSplineOffsetFinishedDelegate OnSplineOffsetFinishedDelegate;
 
     /**
      * If true, forces sub-stepping to break up movement into discrete smaller steps to improve accuracy of the trajectory.
@@ -269,6 +299,7 @@ private:
     UPROPERTY( EditAnywhere, BlueprintReadWrite, meta = ( AllowPrivateAccess = true ) )
     float RotationSpeed;
 
+    TArray< FSFSplineOffsetInfo > SplineOffsetDatas;
     TArray< FPositionObserver > PositionObservers;
     int LastProcessedMarkerIndex;
     uint8 bUpdateLastProcessedMarker : 1;
