@@ -1,6 +1,8 @@
 #pragma once
-#include "Curves/CurveVector.h"
+
 #include "GameFramework/MovementComponent.h"
+
+#include <Curves/CurveVector.h>
 
 #include "SFSplineFollowingMovementComponent.generated.h"
 
@@ -11,22 +13,6 @@ class USplineComponent;
 class UCurveFloat;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam( FSFOnSplineOffsetFinishedDelegate, USFSplineOffsetData *, offset_data );
-
-struct FSFSplineOffsetInfo
-{
-    FSFSplineOffsetInfo();
-    FSFSplineOffsetInfo( USFSplineOffsetData * offset_data );
-
-    void Initialize();
-    bool ApplyOffsetToTransform( FTransform & transform, float delta_time );
-
-    TObjectPtr< USFSplineOffsetData > OffsetData;
-    FRuntimeVectorCurve OffsetCurve;
-    ESFSplineOffsetType OffsetType;
-    uint8 bResetOnEnd : 1;
-    float ElapsedTime;
-    float MaxTime;
-};
 
 UCLASS( Abstract, HideDropdown, BlueprintType, Blueprintable )
 class USFSplineSpeedProvider : public UObject
@@ -194,6 +180,22 @@ private:
         float NormalizedPosition;
         bool bTriggerOnce;
         bool bHasBeenTriggered;
+    };
+
+    struct FSFSplineOffsetInfo
+    {
+        FSFSplineOffsetInfo();
+        FSFSplineOffsetInfo( USFSplineOffsetData * offset_data );
+
+        void Initialize();
+        bool ApplyOffsetToTransform( FTransform & transform, float delta_time );
+
+        TObjectPtr< USFSplineOffsetData > OffsetData;
+        FRuntimeVectorCurve OffsetCurve;
+        ESFSplineOffsetType OffsetType;
+        uint8 bResetOnEnd : 1;
+        float ElapsedTime;
+        float MaxTime;
     };
 
     bool HasStoppedSimulation() const;

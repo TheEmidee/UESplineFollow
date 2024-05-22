@@ -19,7 +19,7 @@ float USFSplineSpeedProvider::GetSpeed_Implementation( float normalized_position
     return 0.0f;
 }
 
-FSFSplineOffsetInfo::FSFSplineOffsetInfo() :
+USFSplineFollowingMovementComponent::FSFSplineOffsetInfo::FSFSplineOffsetInfo() :
     OffsetType( ESFSplineOffsetType::Location ),
     bResetOnEnd( true ),
     ElapsedTime( 0.0f ),
@@ -27,21 +27,20 @@ FSFSplineOffsetInfo::FSFSplineOffsetInfo() :
 {
 }
 
-FSFSplineOffsetInfo::FSFSplineOffsetInfo( USFSplineOffsetData * offset_data )
+USFSplineFollowingMovementComponent::FSFSplineOffsetInfo::FSFSplineOffsetInfo( USFSplineOffsetData * offset_data ) :
+    OffsetData( offset_data ),
+    OffsetCurve( offset_data->OffsetCurve ),
+    OffsetType( offset_data->OffsetType ),
+    bResetOnEnd( offset_data->bResetOnEnd ),
+    ElapsedTime( 0.0f ),
+    MaxTime( 0.0f )
 {
     check( offset_data != nullptr );
-
-    OffsetData = offset_data;
-    OffsetCurve = offset_data->OffsetCurve;
-    OffsetType = offset_data->OffsetType;
-    bResetOnEnd = offset_data->bResetOnEnd;
-    ElapsedTime = 0.0f;
-    MaxTime = 0.0f;
 
     Initialize();
 }
 
-void FSFSplineOffsetInfo::Initialize()
+void USFSplineFollowingMovementComponent::FSFSplineOffsetInfo::Initialize()
 {
     auto time = 0.0f;
 
@@ -62,7 +61,7 @@ void FSFSplineOffsetInfo::Initialize()
     MaxTime = time;
 }
 
-bool FSFSplineOffsetInfo::ApplyOffsetToTransform( FTransform & transform, float delta_time )
+bool USFSplineFollowingMovementComponent::FSFSplineOffsetInfo::ApplyOffsetToTransform( FTransform & transform, float delta_time )
 {
     const auto offset = OffsetCurve.GetValue( ElapsedTime );
 
