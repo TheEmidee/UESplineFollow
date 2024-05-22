@@ -13,7 +13,7 @@ enum class ESFSplineOffsetType : uint8
     Scale
 };
 
-UCLASS( Abstract, Blueprintable, BlueprintType )
+UCLASS( Blueprintable, BlueprintType )
 class SPLINEFOLLOW_API USFSplineOffsetData final : public UDataAsset
 {
     GENERATED_BODY()
