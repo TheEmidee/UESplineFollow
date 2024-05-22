@@ -2,7 +2,6 @@
 
 #include <CoreMinimal.h>
 #include <Curves/CurveVector.h>
-#include <UObject/Object.h>
 
 #include "SFSplineOffsetData.generated.h"
 
@@ -17,7 +16,7 @@ enum class ESFSplineOffsetType : uint8
 };
 
 UCLASS( Abstract, Blueprintable, BlueprintType )
-class SPLINEFOLLOW_API USFSplineOffsetData final : public UObject
+class SPLINEFOLLOW_API USFSplineOffsetData final : public UDataAsset
 {
     GENERATED_BODY()
 
@@ -27,7 +26,6 @@ public:
     void Initialize();
     bool ApplyOffsetToTransform( FTransform & transform, float delta_time );
 
-private:
     UPROPERTY( EditDefaultsOnly, BlueprintReadOnly, meta = ( AllowPrivateAccess = true ) )
     FRuntimeVectorCurve OffsetCurve;
 

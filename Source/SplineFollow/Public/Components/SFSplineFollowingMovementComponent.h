@@ -1,12 +1,29 @@
 #pragma once
+#include "Curves/CurveVector.h"
 #include "GameFramework/MovementComponent.h"
 
 #include "SFSplineFollowingMovementComponent.generated.h"
 
+enum class ESFSplineOffsetType : uint8;
 class USFSplineOffsetData;
 class USFSplineFollowingMovementComponent;
 class USplineComponent;
 class UCurveFloat;
+
+struct FSFSplineOffsetInfo
+{
+    FSFSplineOffsetInfo();
+    FSFSplineOffsetInfo( const FRuntimeVectorCurve & offset_curve, ESFSplineOffsetType offset_type, bool reset_on_end );
+
+    void Initialize();
+    bool ApplyOffsetToTransform( FTransform & transform, float delta_time );
+
+    FRuntimeVectorCurve OffsetCurve;
+    ESFSplineOffsetType OffsetType;
+    uint8 bResetOnEnd : 1;
+    float ElapsedTime;
+    float MaxTime;
+};
 
 UCLASS( Abstract, HideDropdown, BlueprintType, Blueprintable )
 class USFSplineSpeedProvider : public UObject
@@ -153,7 +170,7 @@ public:
     bool IsFollowingSpline() const;
 
     UFUNCTION( BlueprintCallable )
-    USFSplineOffsetData * AddSplineOffsetData( TSubclassOf< USFSplineOffsetData > offset_data );
+    void AddSplineOffsetData( USFSplineOffsetData * offset_data );
 
     void RegisterPositionObserver( const FSWOnSplineFollowingReachedPositionDelegate & delegate, float normalized_position, bool trigger_once = true );
 
@@ -274,9 +291,7 @@ private:
     UPROPERTY( EditAnywhere, BlueprintReadWrite, meta = ( AllowPrivateAccess = true ) )
     float RotationSpeed;
 
-    UPROPERTY( BlueprintReadOnly, VisibleAnywhere, meta = ( AllowPrivateAccess = true ) )
-    TArray< TObjectPtr< USFSplineOffsetData > > SplineOffsetDatas;
-
+    TArray< FSFSplineOffsetInfo > SplineOffsetDatas;
     TArray< FPositionObserver > PositionObservers;
     int LastProcessedMarkerIndex;
     uint8 bUpdateLastProcessedMarker : 1;
