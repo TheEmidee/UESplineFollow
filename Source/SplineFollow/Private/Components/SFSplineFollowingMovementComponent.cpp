@@ -255,6 +255,9 @@ void USFSplineFollowingMovementComponent::TickComponent( const float delta_time,
     const auto current_world_location = UpdatedComponent->GetComponentLocation();
     const auto current_world_rotation = UpdatedComponent->GetComponentRotation();
 
+    auto new_location = FVector::Zero();
+    auto new_rotation = FRotator::ZeroRotator;
+
     while ( remaining_time >= MinTickTime && ( iterations < MaxSimulationIterations ) && IsValid( actor_owner ) && !HasStoppedSimulation() )
     {
         iterations++;
@@ -271,7 +274,7 @@ void USFSplineFollowingMovementComponent::TickComponent( const float delta_time,
         const auto must_wrap_around = CurrentSpeed > 0.0f ? ( distance_on_spline >= spline_length ) : ( distance_on_spline <= 0.0f );
 
         const auto set_distance_on_spline = [ & ]( const float distance ) {
-            SetDistanceOnSplineInternal( distance );
+            SetDistanceOnSplineInternal( new_location, new_rotation, distance );
             ProcessSplineMarkers( distance );
             ProcessPositionObservers( distance );
         };
@@ -317,23 +320,22 @@ void USFSplineFollowingMovementComponent::TickComponent( const float delta_time,
             OnSplineFollowingLoopedDelegate.Broadcast( LoopCount );
         }
 
-        const auto new_world_location = UpdatedComponent->GetComponentLocation();
-
-        const auto delta = new_world_location - current_world_location;
+        const auto delta = new_location - current_world_location;
         Velocity = delta / time_tick;
 
         UpdateComponentVelocity();
 
         if ( bOrientRotationToMovement )
         {
-            const auto new_world_rotation = UpdatedComponent->GetComponentRotation();
-            const auto final_rotation = FMath::RInterpTo( current_world_rotation, new_world_rotation, delta_time, RotationSpeed );
+            const auto final_rotation = FMath::RInterpTo( current_world_rotation, new_rotation, delta_time, RotationSpeed );
 
             UpdatedComponent->SetWorldRotation( final_rotation );
         }
     }
 
-    ApplyOffsetData( delta_time );
+    auto new_transform = FTransform( new_rotation, new_location );
+    ApplyOffsetData( new_transform, delta_time );
+    UpdatedComponent->SetWorldTransform( new_transform );
 }
 
 void USFSplineFollowingMovementComponent::UpdateTickRegistration()
@@ -439,7 +441,13 @@ void USFSplineFollowingMovementComponent::UnFollowSpline()
 
 void USFSplineFollowingMovementComponent::SetDistanceOnSpline( const float distance_on_spline )
 {
-    SetDistanceOnSplineInternal( distance_on_spline );
+    auto new_location = FVector::Zero();
+    auto new_rotation = FRotator::ZeroRotator;
+
+    SetDistanceOnSplineInternal( new_location, new_rotation, distance_on_spline );
+    UpdatedComponent->SetWorldLocation( new_location );
+    UpdatedComponent->SetWorldRotation( new_rotation );
+
     UpdateCurrentSpeed( 0.0f );
     UpdateLastProcessedMarker();
 }
@@ -652,23 +660,21 @@ void USFSplineFollowingMovementComponent::ProcessSplineMarkers( const float dist
     }
 }
 
-void USFSplineFollowingMovementComponent::SetDistanceOnSplineInternal( const float distance_on_spline )
+void USFSplineFollowingMovementComponent::SetDistanceOnSplineInternal( FVector & updated_location, FRotator & updated_rotation, const float distance_on_spline )
 {
     if ( FollowedSplineComponent == nullptr || UpdatedComponent == nullptr )
     {
         return;
     }
 
-    const auto spline_location_at_distance = FollowedSplineComponent->GetLocationAtDistanceAlongSpline( distance_on_spline, ESplineCoordinateSpace::World );
-
-    UpdatedComponent->SetWorldLocation( spline_location_at_distance );
+    updated_location = FollowedSplineComponent->GetLocationAtDistanceAlongSpline( distance_on_spline, ESplineCoordinateSpace::World );
 
     if ( bOrientRotationToMovement )
     {
         auto spline_rotation_at_distance = FollowedSplineComponent->GetRotationAtDistanceAlongSpline( distance_on_spline, ESplineCoordinateSpace::World );
 
         ConstrainRotation( spline_rotation_at_distance );
-        UpdatedComponent->SetWorldRotation( spline_rotation_at_distance );
+        updated_rotation = spline_rotation_at_distance;
     }
 
     DistanceOnSpline = distance_on_spline;
@@ -805,20 +811,20 @@ void USFSplineFollowingMovementComponent::UpdateLastProcessedMarker()
     }
 }
 
-void USFSplineFollowingMovementComponent::ApplyOffsetData( const float delta_time )
+void USFSplineFollowingMovementComponent::ApplyOffsetData( FTransform & transform, const float delta_time )
 {
     if ( SplineOffsetDatas.IsEmpty() )
     {
         return;
     }
 
-    auto transform = FTransform::Identity;
+    auto offset_transform = FTransform::Identity;
 
     for ( auto offset_index = SplineOffsetDatas.Num() - 1; offset_index >= 0; --offset_index )
     {
         auto & offset = SplineOffsetDatas[ offset_index ];
 
-        if ( !offset.ApplyOffsetToTransform( transform, delta_time ) )
+        if ( !offset.ApplyOffsetToTransform( offset_transform, delta_time ) )
         {
             OnSplineOffsetFinishedDelegate.Broadcast( offset.OffsetData );
             SplineOffsetDatas.RemoveAt( offset_index );
@@ -826,9 +832,9 @@ void USFSplineFollowingMovementComponent::ApplyOffsetData( const float delta_tim
     }
 
     const auto rotation = FollowedSplineComponent->GetRotationAtDistanceAlongSpline( DistanceOnSpline, ESplineCoordinateSpace::World ).Quaternion();
-    const auto location_offset = UKismetMathLibrary::Quat_RotateVector( rotation, transform.GetLocation() );
+    const auto location_offset = UKismetMathLibrary::Quat_RotateVector( rotation, offset_transform.GetLocation() );
 
-    UpdatedComponent->AddWorldOffset( location_offset );
-    UpdatedComponent->AddWorldRotation( transform.GetRotation() );
-    UpdatedComponent->SetWorldScale3D( transform.GetScale3D() );
+    transform.SetLocation( transform.GetLocation() + location_offset );
+    transform.SetRotation( transform.GetRotation() * offset_transform.GetRotation() );
+    transform.SetScale3D( offset_transform.GetScale3D() );
 }

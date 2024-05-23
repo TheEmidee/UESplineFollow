@@ -204,14 +204,14 @@ private:
     float GetSimulationTimeStep( float remaining_time, int32 iterations ) const;
     void UpdateInitialPosition();
     void ProcessSplineMarkers( float distance_on_spline );
-    void SetDistanceOnSplineInternal( float distance_on_spline );
+    void SetDistanceOnSplineInternal( FVector & updated_location, FRotator & updated_rotation, float distance_on_spline );
     void RefreshComponents();
     void UpdateCurrentSpeed( float delta_time );
     void ProcessPositionObservers( float distance_on_spline );
     void ResetPositionObservers();
     void ConstrainRotation( FRotator & rotation ) const;
     void UpdateLastProcessedMarker();
-    void ApplyOffsetData( float delta_time );
+    void ApplyOffsetData( FTransform & transform, float delta_time );
 
     UPROPERTY( BlueprintAssignable )
     FSWOnSplineFollowingReachedEndDelegate OnSplineFollowingReachedEndDelegate;
