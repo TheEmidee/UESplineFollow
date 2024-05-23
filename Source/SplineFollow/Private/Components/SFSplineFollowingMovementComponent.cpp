@@ -327,9 +327,7 @@ void USFSplineFollowingMovementComponent::TickComponent( const float delta_time,
 
         if ( bOrientRotationToMovement )
         {
-            const auto final_rotation = FMath::RInterpTo( current_world_rotation, new_rotation, delta_time, RotationSpeed );
-
-            UpdatedComponent->SetWorldRotation( final_rotation );
+            new_rotation = FMath::RInterpTo( current_world_rotation, new_rotation, delta_time, RotationSpeed );
         }
     }
 
