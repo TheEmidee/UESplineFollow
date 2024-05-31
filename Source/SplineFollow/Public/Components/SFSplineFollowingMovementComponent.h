@@ -96,6 +96,8 @@ struct FSFRotationConstraints
 {
     GENERATED_BODY()
 
+    FSFRotationConstraints();
+
     UPROPERTY( EditAnywhere, BlueprintReadWrite )
     uint8 bConstrainX : 1;
 
