@@ -175,6 +175,13 @@ bool FSFFollowSplineInfos::NetSerialize( FArchive & archive, UPackageMap * /* pa
     return true;
 }
 
+FSFRotationConstraints::FSFRotationConstraints():
+    bConstrainX( false ),
+    bConstrainY( false ),
+    bConstrainZ( false )
+{
+}
+
 USFSplineFollowingMovementComponent::USFSplineFollowingMovementComponent() :
     bForceSubStepping( true ),
     FollowedSplineComponent( nullptr ),

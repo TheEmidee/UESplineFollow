@@ -213,6 +213,8 @@ struct SPLINEFOLLOW_API FSFSplineMarker_Data : public FSFSplineMarker
 {
     GENERATED_BODY()
 
+    FSFSplineMarker_Data();
+
     UTexture2D * GetSprite() const override;
 
     UPROPERTY( EditAnywhere )
