@@ -175,7 +175,7 @@ bool FSFFollowSplineInfos::NetSerialize( FArchive & archive, UPackageMap * /* pa
     return true;
 }
 
-FSFRotationConstraints::FSFRotationConstraints():
+FSFRotationConstraints::FSFRotationConstraints() :
     bConstrainX( false ),
     bConstrainY( false ),
     bConstrainZ( false )
@@ -484,14 +484,15 @@ bool USFSplineFollowingMovementComponent::IsFollowingSpline() const
     return FollowedSplineComponent != nullptr && IsComponentTickEnabled();
 }
 
-void USFSplineFollowingMovementComponent::AddSplineOffsetData( USFSplineOffsetData * offset_data )
+float USFSplineFollowingMovementComponent::AddSplineOffsetData( USFSplineOffsetData * offset_data )
 {
     if ( !ensureAlways( offset_data != nullptr ) )
     {
-        return;
+        return 0.0f;
     }
 
-    SplineOffsetDatas.Emplace( offset_data );
+    const auto index = SplineOffsetDatas.Emplace( offset_data );
+    return SplineOffsetDatas[ index ].MaxTime;
 }
 
 void USFSplineFollowingMovementComponent::RegisterPositionObserver( const FSWOnSplineFollowingReachedPositionDelegate & delegate, float normalized_position, bool trigger_once /*= true*/ )
