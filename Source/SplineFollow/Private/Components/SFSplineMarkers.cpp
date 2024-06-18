@@ -234,7 +234,7 @@ UTexture2D * FSFSplineMarker_Static::GetSprite() const
     return Super::GetSprite();
 }
 
-FSFSplineMarker_LevelActor::FSFSplineMarker_LevelActor():
+FSFSplineMarker_LevelActor::FSFSplineMarker_LevelActor() :
     LevelActor( nullptr )
 {
 }
@@ -284,7 +284,7 @@ UTexture2D * FSFSplineMarker_LevelActor::GetSprite() const
     return Super::GetSprite();
 }
 
-FSFSplineMarker_Data::FSFSplineMarker_Data():
+FSFSplineMarker_Data::FSFSplineMarker_Data() :
     Sprite( nullptr )
 {
 }
