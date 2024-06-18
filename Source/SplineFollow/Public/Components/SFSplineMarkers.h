@@ -5,8 +5,8 @@
 
 #include "SFSplineMarkers.generated.h"
 
-UENUM()
-enum class ESFSplineMarkerType
+UENUM( BlueprintType )
+enum class ESFSplineMarkerType : uint8
 {
     Single,
     Window
@@ -173,7 +173,7 @@ struct SPLINEFOLLOW_API FSFSplineMarker
     virtual void AddSplineMarkerProxies( TArray< FSFSplineMarkerProxy > & proxies ) const;
     virtual UTexture2D * GetSprite() const;
 
-    UPROPERTY( EditAnywhere )
+    UPROPERTY( EditAnywhere, BlueprintReadOnly )
     uint8 ItIsEnabled : 1;
 
     UPROPERTY( EditAnywhere, BlueprintReadonly )
@@ -189,7 +189,7 @@ struct SPLINEFOLLOW_API FSFSplineMarker_Static : public FSFSplineMarker
     void AddSplineMarkerProxies( TArray< FSFSplineMarkerProxy > & proxies ) const override;
     UTexture2D * GetSprite() const override;
 
-    UPROPERTY( EditAnywhere )
+    UPROPERTY( EditAnywhere, BlueprintReadOnly )
     TSubclassOf< USFSplineMarkerAction > ActionClass;
 };
 
@@ -204,7 +204,7 @@ struct SPLINEFOLLOW_API FSFSplineMarker_LevelActor : public FSFSplineMarker
     void AddSplineMarkerProxies( TArray< FSFSplineMarkerProxy > & proxies ) const override;
     UTexture2D * GetSprite() const override;
 
-    UPROPERTY( EditAnywhere )
+    UPROPERTY( EditAnywhere, BlueprintReadOnly )
     ASFSplineMarkerLevelActor * LevelActor;
 };
 
@@ -217,7 +217,7 @@ struct SPLINEFOLLOW_API FSFSplineMarker_Data : public FSFSplineMarker
 
     UTexture2D * GetSprite() const override;
 
-    UPROPERTY( EditAnywhere )
+    UPROPERTY( EditAnywhere, BlueprintReadOnly )
     UTexture2D * Sprite;
 
     UPROPERTY( EditAnywhere, BlueprintReadonly )
