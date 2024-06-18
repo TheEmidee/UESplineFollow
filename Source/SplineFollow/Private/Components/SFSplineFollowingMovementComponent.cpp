@@ -175,7 +175,7 @@ bool FSFFollowSplineInfos::NetSerialize( FArchive & archive, UPackageMap * /* pa
     return true;
 }
 
-FSFRotationConstraints::FSFRotationConstraints():
+FSFRotationConstraints::FSFRotationConstraints() :
     bConstrainX( false ),
     bConstrainY( false ),
     bConstrainZ( false )
