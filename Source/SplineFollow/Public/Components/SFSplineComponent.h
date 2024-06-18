@@ -29,13 +29,13 @@ public:
 #endif
 
 private:
-    UPROPERTY( EditAnywhere )
+    UPROPERTY( EditAnywhere, BlueprintReadWrite, meta = ( AllowPrivateAccess = true ) )
     TArray< FSFSplineMarker_Static > StaticActionMarkers;
 
-    UPROPERTY( EditAnywhere )
+    UPROPERTY( EditAnywhere, BlueprintReadWrite, meta = ( AllowPrivateAccess = true ) )
     TArray< FSFSplineMarker_LevelActor > LevelActorActionMarkers;
 
-    UPROPERTY( EditAnywhere, BlueprintReadOnly, meta = ( AllowPrivateAccess = true ) )
+    UPROPERTY( EditAnywhere, BlueprintReadWrite, meta = ( AllowPrivateAccess = true ) )
     TArray< FSFSplineMarker_Data > DataMarkers;
 
     TArray< FSFSplineMarkerProxy > SplineMarkerProxies;
