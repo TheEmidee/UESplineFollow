@@ -174,11 +174,24 @@ struct SPLINEFOLLOW_API FSFSplineMarker
     virtual UTexture2D * GetSprite() const;
 
     UPROPERTY( EditAnywhere, BlueprintReadOnly )
+    FName Name;
+
+    UPROPERTY( EditAnywhere, BlueprintReadOnly )
     uint8 ItIsEnabled : 1;
 
     UPROPERTY( EditAnywhere, BlueprintReadonly )
     FSFSplineMarkerInfos Infos;
+
+    bool operator==( const auto & other ) const
+    {
+        return Name == other.Name && Infos.SingleActionNormalizedSplineDistance == other.Infos.SingleActionNormalizedSplineDistance;
+    }
 };
+
+FORCEINLINE uint32 GetTypeHash( const FSFSplineMarker & spline_marker )
+{
+    return HashCombine( GetTypeHash( spline_marker.Name ), GetTypeHash( spline_marker.Infos.SingleActionNormalizedSplineDistance ) );
+}
 
 USTRUCT()
 struct SPLINEFOLLOW_API FSFSplineMarker_Static : public FSFSplineMarker
