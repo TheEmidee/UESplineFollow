@@ -166,7 +166,7 @@ struct SPLINEFOLLOW_API FSFSplineMarker
     FSFSplineMarker() :
         ItIsEnabled( true )
     {
-        Name = TEXT("Marker");
+        Name = TEXT( "Marker" );
     }
 
     virtual ~FSFSplineMarker() = default;
