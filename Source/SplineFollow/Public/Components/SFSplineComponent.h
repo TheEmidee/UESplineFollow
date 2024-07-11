@@ -16,6 +16,11 @@ public:
 #if WITH_EDITOR
     friend class FSFSplineMarkerComponentVisualizer;
 #endif
+    UFUNCTION( BlueprintCallable, BlueprintPure )
+    void GetAllMarkers( TArray< FSFSplineMarker > & markers );
+
+    UFUNCTION( BlueprintCallable, BlueprintPure )
+    void GetAllMarkersInfos( TArray< FSFSplineMarkerInfos > & markers_infos );
 
     const TArray< FSFSplineMarkerProxy > & GetSplineMarkerProxies() const;
     const TArray< FSFSplineMarker_Data > & GetSplineDataMarker() const;

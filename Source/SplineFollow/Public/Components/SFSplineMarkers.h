@@ -19,6 +19,15 @@ enum class ESFSplineMarkerProcessActionType
     WindowEnd
 };
 
+UENUM( BlueprintType, meta = ( BitFlags, UseEnumValuesAdMaskValusInEditor = "true" ) )
+enum class ESFSplineMarkerObjectType : uint8
+{
+    Action,
+    Data,
+    LevelActor,
+    Invalid
+};
+
 struct FSFSplineMarkerProxy
 {
     FSFSplineMarkerProxy( const float spline_length_percentage, const TFunction< void( AActor * ) > & function ) :
@@ -78,7 +87,12 @@ struct SPLINEFOLLOW_API FSFSplineMarkerInfos
         SingleActionNormalizedSplineDistance( 0.0f ),
         WindowStartNormalizedSplineDistance( 0.0f ),
         WindowEndNormalizedSplineDistance( 0.5f )
-    {}
+    {
+        Name = TEXT( "Marker" );
+    }
+
+    UPROPERTY( EditAnywhere, BlueprintReadOnly )
+    FName Name;
 
     UPROPERTY( EditAnywhere, BlueprintReadOnly )
     ESFSplineMarkerType Type;
@@ -158,16 +172,53 @@ FORCEINLINE UTexture2D * ASFSplineMarkerLevelActor::GetSprite() const
     return Sprite;
 }
 
-USTRUCT( BlueprintType )
+UCLASS( DefaultToInstanced, Blueprintable, BlueprintType, Abstract, EditInlineNew )
+class SPLINEFOLLOW_API USFSplineMarkerObject : public UObject
+{
+    GENERATED_BODY()
+
+    UPROPERTY( EditDefaultsOnly )
+    UTexture2D * Sprite;
+
+    UPROPERTY( EditDefaultsOnly )
+    FLinearColor Color;
+};
+
+UCLASS()
+class SPLINEFOLLOW_API USFSplineMarkerObject_Action : public USFSplineMarkerObject
+{
+    GENERATED_BODY()
+};
+
+UCLASS()
+class SPLINEFOLLOW_API USFSplineMarkerObject_Data : public USFSplineMarkerObject
+{
+    GENERATED_BODY()
+
+    UPROPERTY( Instanced )
+    USFSplineMarkerData * Data;
+};
+
+UCLASS( DefaultToInstanced )
+class SPLINEFOLLOW_API USFSplineMarkerData : public UObject
+{
+    GENERATED_BODY()
+};
+
+UCLASS()
+class SPLINEFOLLOW_API USFSplineMarkerObject_LevelActor : public USFSplineMarkerObject
+{
+    GENERATED_BODY()
+};
+
+USTRUCT( BlueprintType, Blueprintable )
 struct SPLINEFOLLOW_API FSFSplineMarker
 {
     GENERATED_BODY()
 
     FSFSplineMarker() :
         ItIsEnabled( true )
-    {
-        Name = TEXT( "Marker" );
-    }
+    {}
 
     virtual ~FSFSplineMarker() = default;
 
@@ -176,23 +227,23 @@ struct SPLINEFOLLOW_API FSFSplineMarker
     virtual UTexture2D * GetSprite() const;
 
     UPROPERTY( EditAnywhere, BlueprintReadOnly )
-    FName Name;
-
-    UPROPERTY( EditAnywhere, BlueprintReadOnly )
     uint8 ItIsEnabled : 1;
 
     UPROPERTY( EditAnywhere, BlueprintReadonly )
     FSFSplineMarkerInfos Infos;
 
+    UPROPERTY( EditAnywhere, Instanced, BlueprintReadonly )
+    TObjectPtr< USFSplineMarkerObject > Object;
+
     bool operator==( const auto & other ) const
     {
-        return Name == other.Name && Infos.SingleActionNormalizedSplineDistance == other.Infos.SingleActionNormalizedSplineDistance;
+        return Infos.Name == other.Infos.Name && Infos.SingleActionNormalizedSplineDistance == other.Infos.SingleActionNormalizedSplineDistance;
     }
 };
 
 FORCEINLINE uint32 GetTypeHash( const FSFSplineMarker & spline_marker )
 {
-    return HashCombine( GetTypeHash( spline_marker.Name ), GetTypeHash( spline_marker.Infos.SingleActionNormalizedSplineDistance ) );
+    return HashCombine( GetTypeHash( spline_marker.Infos.Name ), GetTypeHash( spline_marker.Infos.SingleActionNormalizedSplineDistance ) );
 }
 
 USTRUCT()
@@ -243,3 +294,10 @@ FORCEINLINE UTexture2D * FSFSplineMarker_Data::GetSprite() const
 {
     return Sprite;
 }
+
+UCLASS( Blueprintable, BlueprintType )
+class USFSplineMarkerType : public UObject
+{
+    GENERATED_BODY()
+public:
+};
