@@ -87,12 +87,7 @@ struct SPLINEFOLLOW_API FSFSplineMarkerInfos
         SingleActionNormalizedSplineDistance( 0.0f ),
         WindowStartNormalizedSplineDistance( 0.0f ),
         WindowEndNormalizedSplineDistance( 0.5f )
-    {
-        Name = TEXT( "Marker" );
-    }
-
-    UPROPERTY( EditAnywhere, BlueprintReadOnly )
-    FName Name;
+    {}
 
     UPROPERTY( EditAnywhere, BlueprintReadOnly )
     ESFSplineMarkerType Type;
@@ -177,11 +172,12 @@ class SPLINEFOLLOW_API USFSplineMarkerObject : public UObject
 {
     GENERATED_BODY()
 
-    UPROPERTY( EditDefaultsOnly )
+protected:
+    UPROPERTY( BlueprintReadOnly, EditAnywhere )
     UTexture2D * Sprite;
 
-    UPROPERTY( EditDefaultsOnly )
-    FLinearColor Color;
+    UPROPERTY( BlueprintReadOnly, EditAnywhere )
+    FLinearColor Color = FLinearColor::White;
 };
 
 UCLASS()
@@ -195,7 +191,8 @@ class SPLINEFOLLOW_API USFSplineMarkerObject_Data : public USFSplineMarkerObject
 {
     GENERATED_BODY()
 
-    UPROPERTY( Instanced )
+protected:
+    UPROPERTY( BlueprintReadOnly, EditAnywhere, Instanced )
     USFSplineMarkerData * Data;
 };
 
@@ -203,6 +200,11 @@ UCLASS( DefaultToInstanced )
 class SPLINEFOLLOW_API USFSplineMarkerData : public UObject
 {
     GENERATED_BODY()
+
+protected:
+    // Test
+    UPROPERTY( BlueprintReadOnly, EditDefaultsOnly )
+    UTexture2D * Sprite;
 };
 
 UCLASS()
@@ -218,7 +220,12 @@ struct SPLINEFOLLOW_API FSFSplineMarker
 
     FSFSplineMarker() :
         ItIsEnabled( true )
-    {}
+    {
+        Name = TEXT( "Marker" );
+    }
+
+    UPROPERTY( EditAnywhere, BlueprintReadOnly )
+    FName Name;
 
     virtual ~FSFSplineMarker() = default;
 
@@ -237,13 +244,13 @@ struct SPLINEFOLLOW_API FSFSplineMarker
 
     bool operator==( const auto & other ) const
     {
-        return Infos.Name == other.Infos.Name && Infos.SingleActionNormalizedSplineDistance == other.Infos.SingleActionNormalizedSplineDistance;
+        return Name == other.Name && Infos.SingleActionNormalizedSplineDistance == other.Infos.SingleActionNormalizedSplineDistance;
     }
 };
 
 FORCEINLINE uint32 GetTypeHash( const FSFSplineMarker & spline_marker )
 {
-    return HashCombine( GetTypeHash( spline_marker.Infos.Name ), GetTypeHash( spline_marker.Infos.SingleActionNormalizedSplineDistance ) );
+    return HashCombine( GetTypeHash( spline_marker.Name ), GetTypeHash( spline_marker.Infos.SingleActionNormalizedSplineDistance ) );
 }
 
 USTRUCT()

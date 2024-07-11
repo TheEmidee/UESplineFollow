@@ -8,76 +8,43 @@
 #include <Misc/UObjectToken.h>
 #endif
 
-void USFSplineComponent::GetAllMarkers( TArray< FSFSplineMarker > & markers )
-{
-    markers.Reset();
-
-    for ( const auto & static_marker : StaticActionMarkers )
-    {
-        markers.Add( static_marker );
-    }
-
-    for ( const auto & level_marker : LevelActorActionMarkers )
-    {
-        markers.Add( level_marker );
-    }
-
-    for ( const auto & data_marker : DataMarkers )
-    {
-        markers.Add( data_marker );
-    }
-}
-
-void USFSplineComponent::GetAllMarkersInfos( TArray< FSFSplineMarkerInfos > & markers_infos )
-{
-    markers_infos.Reset();
-
-    TArray< FSFSplineMarker > markers;
-    GetAllMarkers( markers );
-
-    for ( const auto & marker : markers )
-    {
-        markers_infos.Add( marker.Infos );
-    }
-}
-
 void USFSplineComponent::OnRegister()
 {
     Super::OnRegister();
 
     // Temp - works only the first time and not on duplicate
 
-    TArray< FSFSplineMarkerInfos > markers_infos;
-    GetAllMarkersInfos( markers_infos );
-    TMap< FName, int > name_count;
-
-    for ( auto & info : markers_infos )
-    {
-        if ( ++name_count.FindOrAdd( info.Name ) > 1 )
-        {
-            FString s = info.Name.ToString();
-            s.Append( FString::FromInt( name_count.FindRef( info.Name ) ) );
-            info.Name = FName( s );
-        }
-    }
-
-    for ( auto & static_marker : StaticActionMarkers )
-    {
-        static_marker.Infos.Name = markers_infos[ 0 ].Name;
-        markers_infos.RemoveAt( 0 );
-    }
-
-    for ( auto & level_marker : LevelActorActionMarkers )
-    {
-        level_marker.Infos.Name = markers_infos[ 0 ].Name;
-        markers_infos.RemoveAt( 0 );
-    }
-
-    for ( auto & data_marker : DataMarkers )
-    {
-        data_marker.Infos.Name = markers_infos[ 0 ].Name;
-        markers_infos.RemoveAt( 0 );
-    }
+    // TArray< FSFSplineMarkerInfos > markers_infos;
+    // GetAllMarkersInfos( markers_infos );
+    // TMap< FName, int > name_count;
+    //
+    // for ( auto & info : markers_infos )
+    // {
+    //     if ( ++name_count.FindOrAdd( info.Name ) > 1 )
+    //     {
+    //         FString s = info.Name.ToString();
+    //         s.Append( FString::FromInt( name_count.FindRef( info.Name ) ) );
+    //         info.Name = FName( s );
+    //     }
+    // }
+    //
+    // for ( auto & static_marker : StaticActionMarkers )
+    // {
+    //     static_marker.Infos.Name = markers_infos[ 0 ].Name;
+    //     markers_infos.RemoveAt( 0 );
+    // }
+    //
+    // for ( auto & level_marker : LevelActorActionMarkers )
+    // {
+    //     level_marker.Infos.Name = markers_infos[ 0 ].Name;
+    //     markers_infos.RemoveAt( 0 );
+    // }
+    //
+    // for ( auto & data_marker : DataMarkers )
+    // {
+    //     data_marker.Infos.Name = markers_infos[ 0 ].Name;
+    //     markers_infos.RemoveAt( 0 );
+    // }
 
     // End temp
 
