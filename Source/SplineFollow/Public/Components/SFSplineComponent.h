@@ -23,6 +23,7 @@ public:
     void OnRegister() override;
 
     void UpdateSpline() override;
+    void Serialize( FArchive & archive );
 
 #if WITH_EDITOR
     void CheckForErrors() override;

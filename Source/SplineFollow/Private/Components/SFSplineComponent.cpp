@@ -58,6 +58,33 @@ void USFSplineComponent::UpdateSpline()
         set_new_distances( level_actor_action_marker.Infos );
     }
 }
+void USFSplineComponent::Serialize( FArchive & archive )
+{
+    Super::Serialize( archive );
+
+    if ( archive.IsSaving() )
+    {
+        SplineMarkers.Empty();
+        
+        // Working
+        // SplineMarkers.AddDefaulted();
+
+        for ( const auto & action_marker : StaticActionMarkers )
+        {
+            FSFSplineMarker marker;
+            marker.Object = NewObject< USFSplineMarkerObject_Action >();
+            Cast< USFSplineMarkerObject_Action >( marker.Object )->ActionClass = action_marker.ActionClass;
+            SplineMarkers.Add( marker );
+            // not mapped correctly - need to investigate
+        }
+
+        StaticActionMarkers.Empty();
+    }
+
+    // for each static marker
+    // add new marker in new list
+    // empty static markers
+}
 
 #if WITH_EDITOR
 void USFSplineComponent::CheckForErrors()

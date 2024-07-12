@@ -175,6 +175,10 @@ UCLASS()
 class SPLINEFOLLOW_API USFSplineMarkerObject_Action : public USFSplineMarkerObject
 {
     GENERATED_BODY()
+
+public:
+    UPROPERTY( BlueprintReadOnly, EditAnywhere )
+    TSubclassOf< USFSplineMarkerAction > ActionClass;
 };
 
 UCLASS()
@@ -182,26 +186,25 @@ class SPLINEFOLLOW_API USFSplineMarkerObject_Data : public USFSplineMarkerObject
 {
     GENERATED_BODY()
 
-protected:
-    UPROPERTY( BlueprintReadOnly, EditAnywhere, Instanced )
-    TObjectPtr< USFSplineMarkerData > Data;
+public:
+    UPROPERTY( BlueprintReadOnly, EditAnywhere )
+    TSubclassOf< USFSplineMarkerData > Data;
 };
 
-UCLASS( DefaultToInstanced )
+UCLASS( Blueprintable, BlueprintType )
 class SPLINEFOLLOW_API USFSplineMarkerData : public UObject
 {
     GENERATED_BODY()
-
-protected:
-    // Test will be replaced with real data
-    UPROPERTY( BlueprintReadOnly, EditDefaultsOnly )
-    UTexture2D * Sprite;
 };
 
 UCLASS()
 class SPLINEFOLLOW_API USFSplineMarkerObject_LevelActor : public USFSplineMarkerObject
 {
     GENERATED_BODY()
+
+public:
+    UPROPERTY( BlueprintReadOnly, EditAnywhere )
+    TObjectPtr< ASFSplineMarkerLevelActor > LevelActor;
 };
 
 USTRUCT( BlueprintType, Blueprintable )
