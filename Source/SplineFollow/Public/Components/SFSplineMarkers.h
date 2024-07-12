@@ -165,7 +165,7 @@ class SPLINEFOLLOW_API USFSplineMarkerObject : public UObject
 
 protected:
     UPROPERTY( BlueprintReadOnly, EditAnywhere )
-    UTexture2D * Sprite;
+    TObjectPtr< UTexture2D > Sprite;
 
     UPROPERTY( BlueprintReadOnly, EditAnywhere )
     FLinearColor Color = FLinearColor::White;
@@ -184,7 +184,7 @@ class SPLINEFOLLOW_API USFSplineMarkerObject_Data : public USFSplineMarkerObject
 
 protected:
     UPROPERTY( BlueprintReadOnly, EditAnywhere, Instanced )
-    USFSplineMarkerData * Data;
+    TObjectPtr< USFSplineMarkerData > Data;
 };
 
 UCLASS( DefaultToInstanced )
@@ -292,10 +292,3 @@ FORCEINLINE UTexture2D * FSFSplineMarker_Data::GetSprite() const
 {
     return Sprite;
 }
-
-UCLASS( Blueprintable, BlueprintType )
-class USFSplineMarkerType : public UObject
-{
-    GENERATED_BODY()
-public:
-};
