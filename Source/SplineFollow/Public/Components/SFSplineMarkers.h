@@ -193,7 +193,7 @@ class SPLINEFOLLOW_API USFSplineMarkerData : public UObject
     GENERATED_BODY()
 
 protected:
-    // Test
+    // Test will be replaced with real data
     UPROPERTY( BlueprintReadOnly, EditDefaultsOnly )
     UTexture2D * Sprite;
 };
