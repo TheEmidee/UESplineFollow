@@ -19,15 +19,6 @@ enum class ESFSplineMarkerProcessActionType
     WindowEnd
 };
 
-UENUM( BlueprintType, meta = ( BitFlags, UseEnumValuesAdMaskValusInEditor = "true" ) )
-enum class ESFSplineMarkerObjectType : uint8
-{
-    Action,
-    Data,
-    LevelActor,
-    Invalid
-};
-
 struct FSFSplineMarkerProxy
 {
     FSFSplineMarkerProxy( const float spline_length_percentage, const TFunction< void( AActor * ) > & function ) :
