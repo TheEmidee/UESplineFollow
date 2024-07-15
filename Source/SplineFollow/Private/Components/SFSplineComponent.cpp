@@ -95,10 +95,8 @@ void USFSplineComponent::Serialize( FArchive & archive )
     {
         for ( const auto & action_marker : StaticActionMarkers )
         {
-            FSFSplineMarker marker = action_marker;
-            auto * object_action = NewObject< USFSplineMarkerObject_Action >();
-            object_action->ActionClass = action_marker.ActionClass->GetOwnerClass();
-            marker.Object = object_action;
+            FSFSplineMarker marker = FSFSplineMarker( action_marker.Name, action_marker.ItIsEnabled, action_marker.Infos, NewObject< USFSplineMarkerObject_Action >( this ) );
+            Cast< USFSplineMarkerObject_Action >( marker.Object )->ActionClass = action_marker.ActionClass->GetOwnerClass();
             SplineMarkers.Add( marker );
         }
 
@@ -106,10 +104,8 @@ void USFSplineComponent::Serialize( FArchive & archive )
 
         for ( const auto & level_actor_marker : LevelActorActionMarkers )
         {
-            FSFSplineMarker marker = level_actor_marker;
-            auto * object_action = NewObject< USFSplineMarkerObject_LevelActor >();
-            object_action->LevelActor = level_actor_marker.LevelActor;
-            marker.Object = object_action;
+            FSFSplineMarker marker = FSFSplineMarker( level_actor_marker.Name, level_actor_marker.ItIsEnabled, level_actor_marker.Infos, NewObject< USFSplineMarkerObject_LevelActor >( this ) );
+            Cast< USFSplineMarkerObject_LevelActor >( marker.Object )->LevelActor = level_actor_marker.LevelActor;
             SplineMarkers.Add( marker );
         }
 
@@ -117,10 +113,8 @@ void USFSplineComponent::Serialize( FArchive & archive )
 
         for ( const auto & data_marker : DataMarkers )
         {
-            FSFSplineMarker marker = data_marker;
-            auto * object_action = NewObject< USFSplineMarkerObject_Data >();
-            object_action->Data = data_marker.Data;
-            marker.Object = object_action;
+            FSFSplineMarker marker = FSFSplineMarker( data_marker.Name, data_marker.ItIsEnabled, data_marker.Infos, NewObject< USFSplineMarkerObject_Data >( this ) );
+            Cast< USFSplineMarkerObject_Data >( marker.Object )->Data = data_marker.Data;
             SplineMarkers.Add( marker );
         }
 

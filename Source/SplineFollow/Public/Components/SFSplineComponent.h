@@ -21,13 +21,13 @@ public:
 
     UFUNCTION( BlueprintCallable, BlueprintPure )
     TArray< FSFSplineMarker > GetMarkersByObjectType( TSubclassOf< USFSplineMarkerObject > object_type ) const;
-    
+
     UFUNCTION( BlueprintCallable, BlueprintPure )
     TArray< FSFSplineMarker > GetActionMarkers() const;
-    
+
     UFUNCTION( BlueprintCallable, BlueprintPure )
     TArray< FSFSplineMarker > GetLevelActorMarkers() const;
-    
+
     UFUNCTION( BlueprintCallable, BlueprintPure )
     TArray< FSFSplineMarker > GetDataMarkers() const;
 
