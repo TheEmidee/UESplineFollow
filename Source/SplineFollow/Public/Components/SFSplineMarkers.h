@@ -191,7 +191,7 @@ public:
     TSubclassOf< USFSplineMarkerData > Data;
 };
 
-UCLASS( Blueprintable, BlueprintType )
+UCLASS( Abstract, Blueprintable, BlueprintType )
 class SPLINEFOLLOW_API USFSplineMarkerData : public UObject
 {
     GENERATED_BODY()

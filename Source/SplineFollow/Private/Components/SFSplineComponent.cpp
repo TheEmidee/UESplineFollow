@@ -58,32 +58,46 @@ void USFSplineComponent::UpdateSpline()
         set_new_distances( level_actor_action_marker.Infos );
     }
 }
+
 void USFSplineComponent::Serialize( FArchive & archive )
 {
-    Super::Serialize( archive );
-
     if ( archive.IsSaving() )
     {
-        SplineMarkers.Empty();
-        
-        // Working
-        // SplineMarkers.AddDefaulted();
-
         for ( const auto & action_marker : StaticActionMarkers )
         {
-            FSFSplineMarker marker;
-            marker.Object = NewObject< USFSplineMarkerObject_Action >();
-            Cast< USFSplineMarkerObject_Action >( marker.Object )->ActionClass = action_marker.ActionClass;
+            FSFSplineMarker marker = action_marker;
+            auto * object_action = NewObject< USFSplineMarkerObject_Action >();
+            object_action->ActionClass = action_marker.ActionClass->GetOwnerClass();
+            marker.Object = object_action;
             SplineMarkers.Add( marker );
-            // not mapped correctly - need to investigate
         }
 
         StaticActionMarkers.Empty();
+
+        for ( const auto & level_actor_marker : LevelActorActionMarkers )
+        {
+            FSFSplineMarker marker = level_actor_marker;
+            auto * object_action = NewObject< USFSplineMarkerObject_LevelActor >();
+            object_action->LevelActor = level_actor_marker.LevelActor;
+            marker.Object = object_action;
+            SplineMarkers.Add( marker );
+        }
+
+        LevelActorActionMarkers.Empty();
+
+        for ( const auto & data_marker : DataMarkers )
+        {
+            FSFSplineMarker marker = data_marker;
+            auto * object_action = NewObject< USFSplineMarkerObject_Data >();
+            object_action->Data = data_marker.Data;
+            marker.Object = object_action;
+            SplineMarkers.Add( marker );
+        }
+
+        DataMarkers.Empty();
     }
 
-    // for each static marker
-    // add new marker in new list
-    // empty static markers
+    Super::Serialize( archive );
 }
 
 #if WITH_EDITOR
