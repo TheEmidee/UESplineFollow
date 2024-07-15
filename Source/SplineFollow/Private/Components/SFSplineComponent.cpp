@@ -8,6 +8,36 @@
 #include <Misc/UObjectToken.h>
 #endif
 
+TArray< FSFSplineMarker > USFSplineComponent::GetMarkersByObjectType( TSubclassOf< USFSplineMarkerObject > object_type ) const
+{
+    TArray< FSFSplineMarker > markers;
+
+    for ( const auto & marker : SplineMarkers )
+    {
+        if ( marker.Object.IsA( object_type ) )
+        {
+            markers.Add( marker );
+        }
+    }
+
+    return markers;
+}
+
+TArray< FSFSplineMarker > USFSplineComponent::GetActionMarkers() const
+{
+    return GetMarkersByObjectType( USFSplineMarkerObject_Action::StaticClass() );
+}
+
+TArray< FSFSplineMarker > USFSplineComponent::GetLevelActorMarkers() const
+{
+    return GetMarkersByObjectType( USFSplineMarkerObject_LevelActor::StaticClass() );
+}
+
+TArray< FSFSplineMarker > USFSplineComponent::GetDataMarkers() const
+{
+    return GetMarkersByObjectType( USFSplineMarkerObject_Data::StaticClass() );
+}
+
 void USFSplineComponent::OnRegister()
 {
     Super::OnRegister();
