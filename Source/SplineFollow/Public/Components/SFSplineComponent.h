@@ -30,6 +30,9 @@ public:
 
 private:
     UPROPERTY( EditAnywhere, BlueprintReadWrite, meta = ( AllowPrivateAccess = true ) )
+    TArray< FSFSplineMarker > SplineMarkers;
+
+    UPROPERTY( EditAnywhere, BlueprintReadWrite, meta = ( AllowPrivateAccess = true ) )
     TArray< FSFSplineMarker_Static > StaticActionMarkers;
 
     UPROPERTY( EditAnywhere, BlueprintReadWrite, meta = ( AllowPrivateAccess = true ) )

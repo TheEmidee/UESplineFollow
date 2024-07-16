@@ -8,7 +8,7 @@
   "CreatedBy": "Michael Delva",
   "CreatedByURL": "http://www.emidee.net",
   "EnabledByDefault": false,
-  "CanContainContent": false,
+  "CanContainContent": true,
 
   "Modules": [
     {
@@ -26,6 +26,13 @@
     {
       "Name": "GameplayAbilities",
       "Enabled": true
+    },
+    {
+      "Name": "ScriptableToolsEditorMode",
+      "Enabled": true,
+      "TargetAllowList": [
+        "Editor"
+      ]
     }
   ]
 }
