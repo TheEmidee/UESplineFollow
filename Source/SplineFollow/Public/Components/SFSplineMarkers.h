@@ -163,6 +163,9 @@ class SPLINEFOLLOW_API USFSplineMarkerObject : public UObject
 {
     GENERATED_BODY()
 
+public:
+    virtual void AddSplineMarkerProxies( TArray< FSFSplineMarkerProxy > & proxies, const FSFSplineMarkerInfos & infos ) const;
+
 protected:
     UPROPERTY( BlueprintReadOnly, EditAnywhere )
     TObjectPtr< UTexture2D > Sprite;
@@ -177,6 +180,8 @@ class SPLINEFOLLOW_API USFSplineMarkerObject_Action : public USFSplineMarkerObje
     GENERATED_BODY()
 
 public:
+    void AddSplineMarkerProxies( TArray< FSFSplineMarkerProxy > & proxies, const FSFSplineMarkerInfos & infos ) const override;
+
     UPROPERTY( BlueprintReadOnly, EditAnywhere )
     TSubclassOf< USFSplineMarkerAction > ActionClass;
 };
@@ -203,6 +208,8 @@ class SPLINEFOLLOW_API USFSplineMarkerObject_LevelActor : public USFSplineMarker
     GENERATED_BODY()
 
 public:
+    void AddSplineMarkerProxies( TArray< FSFSplineMarkerProxy > & proxies, const FSFSplineMarkerInfos & infos ) const override;
+
     UPROPERTY( BlueprintReadOnly, EditAnywhere )
     TObjectPtr< ASFSplineMarkerLevelActor > LevelActor;
 };

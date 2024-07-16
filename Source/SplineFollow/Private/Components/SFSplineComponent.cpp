@@ -52,8 +52,7 @@ void USFSplineComponent::OnRegister()
         }
     };
 
-    fill_proxies( SplineMarkerProxies, StaticActionMarkers );
-    fill_proxies( SplineMarkerProxies, LevelActorActionMarkers );
+    fill_proxies( SplineMarkerProxies, SplineMarkers );
 
     SplineMarkerProxies.Sort( []( const auto & left, const auto & right ) {
         return left.SplineNormalizedDistance < right.SplineNormalizedDistance;
