@@ -92,29 +92,40 @@ void USFSplineComponent::Serialize( FArchive & archive )
 {
     if ( archive.IsSaving() )
     {
+        const auto create_marker = [ & ]< typename T, typename U >( T legacy_marker, U object ) {
+            return FSFSplineMarker( legacy_marker.Name, legacy_marker.ItIsEnabled, legacy_marker.Infos, object );
+        };
+
+        // Create object of typename not working
+        const auto create_object = [ & ]< typename U >() {
+            return NewObject< U >( this );
+        };
+
+        auto * obj = create_object< USFSplineMarkerObject_Action >();
+        
         for ( const auto & action_marker : StaticActionMarkers )
         {
-            auto marker = FSFSplineMarker( action_marker.Name, action_marker.ItIsEnabled, action_marker.Infos, NewObject< USFSplineMarkerObject_Action >( this ) );
-            Cast< USFSplineMarkerObject_Action >( marker.Object )->ActionClass = action_marker.ActionClass->GetOwnerClass();
-            SplineMarkers.Add( marker );
+            auto new_marker = create_marker( action_marker, NewObject< USFSplineMarkerObject_Action >( this ) );
+            Cast< USFSplineMarkerObject_Action >( new_marker.Object )->ActionClass = action_marker.ActionClass->GetOwnerClass();
+            SplineMarkers.Emplace( new_marker );
         }
 
         StaticActionMarkers.Empty();
 
         for ( const auto & level_actor_marker : LevelActorActionMarkers )
         {
-            auto marker = FSFSplineMarker( level_actor_marker.Name, level_actor_marker.ItIsEnabled, level_actor_marker.Infos, NewObject< USFSplineMarkerObject_LevelActor >( this ) );
-            Cast< USFSplineMarkerObject_LevelActor >( marker.Object )->LevelActor = level_actor_marker.LevelActor;
-            SplineMarkers.Add( marker );
+            auto new_marker = create_marker( level_actor_marker, NewObject< USFSplineMarkerObject_LevelActor >( this ) );
+            Cast< USFSplineMarkerObject_LevelActor >( new_marker.Object )->LevelActor = level_actor_marker.LevelActor;
+            SplineMarkers.Emplace( new_marker );
         }
 
         LevelActorActionMarkers.Empty();
 
         for ( const auto & data_marker : DataMarkers )
         {
-            auto marker = FSFSplineMarker( data_marker.Name, data_marker.ItIsEnabled, data_marker.Infos, NewObject< USFSplineMarkerObject_Data >( this ) );
-            Cast< USFSplineMarkerObject_Data >( marker.Object )->Data = data_marker.Data;
-            SplineMarkers.Add( marker );
+            auto new_marker = create_marker( data_marker, NewObject< USFSplineMarkerObject_Data >( this ) );
+            Cast< USFSplineMarkerObject_Data >( new_marker.Object )->Data = data_marker.Data;
+            SplineMarkers.Emplace( new_marker );
         }
 
         DataMarkers.Empty();

@@ -225,11 +225,11 @@ struct SPLINEFOLLOW_API FSFSplineMarker
         Name = TEXT( "Marker" );
     }
 
-    explicit FSFSplineMarker( const FName & Name, uint8 ItIsEnabled, const FSFSplineMarkerInfos & Infos, const TObjectPtr< USFSplineMarkerObject > & Object ) :
-        Name( Name ),
-        ItIsEnabled( ItIsEnabled ),
-        Infos( Infos ),
-        Object( Object )
+    FSFSplineMarker( const FName & name, uint8 it_is_enable, const FSFSplineMarkerInfos & infos, const TObjectPtr< USFSplineMarkerObject > & object ) :
+        Name( name ),
+        ItIsEnabled( it_is_enable ),
+        Infos( infos ),
+        Object( object )
     {}
 
     UPROPERTY( EditAnywhere, BlueprintReadOnly )
