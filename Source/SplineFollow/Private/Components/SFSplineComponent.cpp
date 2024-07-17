@@ -132,7 +132,9 @@ void USFSplineComponent::SaveSplineMarkers( TArray< FSFSplineMarker > markers_to
 {
     SplineMarkers.Reset();
 
-    const auto create_marker = [ & ]< typename T, typename U >( T marker, U object ) {
+    const auto create_marker = [ & ]< typename U >( const auto & marker, U * object ) {
+        object->Sprite = marker.Object->Sprite;
+        object->Color = marker.Object->Color;
         return FSFSplineMarker( marker.Name, marker.ItIsEnabled, marker.Infos, object );
     };
 
