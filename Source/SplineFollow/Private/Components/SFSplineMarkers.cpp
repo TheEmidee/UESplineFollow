@@ -168,7 +168,7 @@ void USFSplineMarkerObject_Action::AddSplineMarkerProxies( TArray< FSFSplineMark
     {
         return;
     }
-    
+
     const auto * marker_action = ActionClass->GetDefaultObject< USFSplineMarkerAction >();
 
     switch ( infos.Type )
@@ -205,7 +205,7 @@ void USFSplineMarkerObject_LevelActor::AddSplineMarkerProxies( TArray< FSFSpline
     {
         return;
     }
-    
+
     switch ( infos.Type )
     {
         case ESFSplineMarkerType::Single:
