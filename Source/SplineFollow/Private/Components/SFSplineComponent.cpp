@@ -96,13 +96,6 @@ void USFSplineComponent::Serialize( FArchive & archive )
             return FSFSplineMarker( legacy_marker.Name, legacy_marker.ItIsEnabled, legacy_marker.Infos, object );
         };
 
-        // Create object of typename not working
-        const auto create_object = [ & ]< typename U >() {
-            return NewObject< U >( this );
-        };
-
-        auto * obj = create_object< USFSplineMarkerObject_Action >();
-        
         for ( const auto & action_marker : StaticActionMarkers )
         {
             auto new_marker = create_marker( action_marker, NewObject< USFSplineMarkerObject_Action >( this ) );
