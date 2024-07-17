@@ -75,6 +75,7 @@ struct SPLINEFOLLOW_API FSFSplineMarkerInfos
 
     FSFSplineMarkerInfos() :
         Type( ESFSplineMarkerType::Single ),
+        bNormalizedDistance( 1 ),
         SingleActionNormalizedSplineDistance( 0.0f ),
         SingleActionSplineDistance( 0.0f ),
         WindowStartNormalizedSplineDistance( 0.0f ),
@@ -88,8 +89,8 @@ struct SPLINEFOLLOW_API FSFSplineMarkerInfos
     UPROPERTY( EditAnywhere, BlueprintReadOnly )
     ESFSplineMarkerType Type;
 
-    UPROPERTY( EditAnywhere, meta = ( InlineCategoryProperty ) )
-    bool bNormalizedDistance = true;
+    UPROPERTY( EditAnywhere, BlueprintReadOnly, meta = ( InlineCategoryProperty ) )
+    uint8 bNormalizedDistance : 1;
 
     UPROPERTY( EditAnywhere, BlueprintReadOnly, meta = ( UIMin = 0.0f, UIMax = 1.0f, ClampMin = 0.0f, ClampMax = 1.0f, EditCondition = "bNormalizedDistance && Type == ESFSplineMarkerType::Single", EditConditionHides ) )
     float SingleActionNormalizedSplineDistance;
