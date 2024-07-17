@@ -139,11 +139,11 @@ void USFSplineComponent::Serialize( FArchive & archive )
 }
 
 #if WITH_EDITOR
-void USFSplineComponent::SaveSplineMarkers( TArray< FSFSplineMarker > markers_to_save )
+void USFSplineComponent::SaveSplineMarkers( const TArray< FSFSplineMarker > & markers_to_save )
 {
     SplineMarkers.Reset();
 
-    const auto create_marker = [ & ]< typename U >( const auto & marker, U * object ) {
+    const auto create_marker = [ & ]( const auto & marker, USFSplineMarkerObject * object ) {
         object->Sprite = marker.Object->Sprite;
         object->Color = marker.Object->Color;
         return FSFSplineMarker( marker.Name, marker.ItIsEnabled, marker.Infos, object );

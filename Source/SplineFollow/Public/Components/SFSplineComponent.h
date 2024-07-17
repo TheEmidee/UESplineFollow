@@ -38,7 +38,7 @@ public:
 
 #if WITH_EDITOR
     UFUNCTION( BlueprintCallable )
-    void SaveSplineMarkers( TArray< FSFSplineMarker > markers_to_save );
+    void SaveSplineMarkers( const TArray< FSFSplineMarker > & markers_to_save );
 
     void CheckForErrors() override;
 #endif
