@@ -37,9 +37,12 @@ public:
     void Serialize( FArchive & archive );
 
 #if WITH_EDITOR
+    UFUNCTION(BlueprintCallable)
+    void SaveSplineMarkers(TArray<FSFSplineMarker> markers_to_save);
+    
     void CheckForErrors() override;
 #endif
-
+    
 private:
     UPROPERTY( EditAnywhere, BlueprintReadWrite, meta = ( AllowPrivateAccess = true ) )
     TArray< FSFSplineMarker > SplineMarkers;

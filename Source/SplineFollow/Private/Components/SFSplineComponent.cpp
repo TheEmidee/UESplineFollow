@@ -128,6 +128,39 @@ void USFSplineComponent::Serialize( FArchive & archive )
 }
 
 #if WITH_EDITOR
+void USFSplineComponent::SaveSplineMarkers( TArray< FSFSplineMarker > markers_to_save )
+{
+    SplineMarkers.Reset();
+
+    const auto create_marker = [ & ]< typename T, typename U >( T marker, U object ) {
+        return FSFSplineMarker( marker.Name, marker.ItIsEnabled, marker.Infos, object );
+    };
+
+    for ( const auto & marker : markers_to_save )
+    {
+        if ( const auto * action_marker = Cast< USFSplineMarkerObject_Action >( marker.Object ) )
+        {
+            auto new_marker = create_marker( marker, NewObject< USFSplineMarkerObject_Action >( this, marker.Object->GetClass() ) );
+            Cast< USFSplineMarkerObject_Action >( new_marker.Object )->ActionClass = action_marker->ActionClass->GetOwnerClass();
+            SplineMarkers.Emplace( new_marker );
+        }
+
+        if ( const auto * level_actor_marker = Cast< USFSplineMarkerObject_LevelActor >( marker.Object ) )
+        {
+            auto new_marker = create_marker( marker, NewObject< USFSplineMarkerObject_LevelActor >( this, marker.Object->GetClass() ) );
+            Cast< USFSplineMarkerObject_LevelActor >( new_marker.Object )->LevelActor = level_actor_marker->LevelActor;
+            SplineMarkers.Emplace( new_marker );
+        }
+
+        if ( const auto * data_marker = Cast< USFSplineMarkerObject_Data >( marker.Object ) )
+        {
+            auto new_marker = create_marker( marker,  NewObject< USFSplineMarkerObject_Data >( this, marker.Object->GetClass() ) );
+            Cast< USFSplineMarkerObject_Data >( new_marker.Object )->Data = data_marker->Data;
+            SplineMarkers.Emplace( new_marker );
+        }
+    }
+}
+
 void USFSplineComponent::CheckForErrors()
 {
     Super::CheckForErrors();
