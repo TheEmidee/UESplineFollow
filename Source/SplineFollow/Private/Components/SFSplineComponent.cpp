@@ -154,7 +154,7 @@ void USFSplineComponent::SaveSplineMarkers( TArray< FSFSplineMarker > markers_to
 
         if ( const auto * data_marker = Cast< USFSplineMarkerObject_Data >( marker.Object ) )
         {
-            auto new_marker = create_marker( marker,  NewObject< USFSplineMarkerObject_Data >( this, marker.Object->GetClass() ) );
+            auto new_marker = create_marker( marker, NewObject< USFSplineMarkerObject_Data >( this, marker.Object->GetClass() ) );
             Cast< USFSplineMarkerObject_Data >( new_marker.Object )->Data = data_marker->Data;
             SplineMarkers.Emplace( new_marker );
         }
