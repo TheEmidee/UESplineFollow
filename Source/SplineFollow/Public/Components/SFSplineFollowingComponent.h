@@ -21,6 +21,7 @@ public:
 
 private:
     void UpdateDestination( float delta_time );
+    void FollowDestination();
 
     UPROPERTY()
     TObjectPtr< UCharacterMovementComponent > MovementComponent;
@@ -28,7 +29,7 @@ private:
     UPROPERTY( VisibleInstanceOnly, BlueprintReadWrite, meta = ( AllowPrivateAccess = true ) )
     TObjectPtr< USplineComponent > FollowedSplineComponent;
 
-    UPROPERTY( BlueprintReadOnly )
+    UPROPERTY( BlueprintReadOnly, meta = ( AllowPrivateAccess = true ) )
     float SplineDistance;
 
     FVector Destination;

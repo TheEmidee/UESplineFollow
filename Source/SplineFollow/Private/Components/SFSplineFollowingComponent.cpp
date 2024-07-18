@@ -23,9 +23,10 @@ void USFSplineFollowingComponent::TickComponent( const float delta_time, const E
     Super::TickComponent( delta_time, tick_type, this_tick_function );
 
     UpdateDestination( delta_time );
+    FollowDestination();
 }
 
-void USFSplineFollowingComponent::UpdateDestination( float delta_time )
+void USFSplineFollowingComponent::UpdateDestination( const float delta_time )
 {
     if ( FollowedSplineComponent == nullptr )
     {
@@ -40,4 +41,20 @@ void USFSplineFollowingComponent::UpdateDestination( float delta_time )
     const auto destination_distance = SplineDistance + MovementComponent->GetMaxSpeed() * delta_time;
 
     Destination = FollowedSplineComponent->GetLocationAtDistanceAlongSpline( destination_distance, ESplineCoordinateSpace::World );
+}
+
+void USFSplineFollowingComponent::FollowDestination()
+{
+    if ( FollowedSplineComponent == nullptr )
+    {
+        return;
+    }
+
+    const auto current_location = MovementComponent->GetActorFeetLocation();
+
+    const auto move_input = ( Destination - current_location ).GetSafeNormal();
+ 
+    MovementComponent->AddInputVector( move_input );
+
+    SplineDistance = FollowedSplineComponent->GetDistanceAlongSplineAtLocation( GetOwner()->GetActorLocation(), ESplineCoordinateSpace::World );
 }
