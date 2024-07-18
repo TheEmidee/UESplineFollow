@@ -75,7 +75,7 @@ struct SPLINEFOLLOW_API FSFSplineMarkerInfos
 
     FSFSplineMarkerInfos() :
         Type( ESFSplineMarkerType::Single ),
-        bNormalizedDistance( 1 ),
+        bNormalizedDistance( true ),
         SingleActionNormalizedSplineDistance( 0.0f ),
         SingleActionSplineDistance( 0.0f ),
         WindowStartNormalizedSplineDistance( 0.0f ),
