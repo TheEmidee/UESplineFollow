@@ -18,11 +18,23 @@ public:
 #endif
 
     const TArray< FSFSplineMarkerProxy > & GetSplineMarkerProxies() const;
-    const TArray< FSFSplineMarker_Data > & GetSplineDataMarker() const;
+
+    UFUNCTION( BlueprintCallable, BlueprintPure )
+    TArray< FSFSplineMarker > GetMarkersByObjectType( TSubclassOf< USFSplineMarkerObject > object_type ) const;
+
+    UFUNCTION( BlueprintCallable, BlueprintPure )
+    TArray< FSFSplineMarker > GetActionMarkers() const;
+
+    UFUNCTION( BlueprintCallable, BlueprintPure )
+    TArray< FSFSplineMarker > GetLevelActorMarkers() const;
+
+    UFUNCTION( BlueprintCallable, BlueprintPure )
+    TArray< FSFSplineMarker > GetDataMarkers() const;
 
     void OnRegister() override;
 
     void UpdateSpline() override;
+    void Serialize( FArchive & archive );
 
 #if WITH_EDITOR
     void CheckForErrors() override;
@@ -47,9 +59,4 @@ private:
 FORCEINLINE const TArray< FSFSplineMarkerProxy > & USFSplineComponent::GetSplineMarkerProxies() const
 {
     return SplineMarkerProxies;
-}
-
-FORCEINLINE const TArray< FSFSplineMarker_Data > & USFSplineComponent::GetSplineDataMarker() const
-{
-    return DataMarkers;
 }
