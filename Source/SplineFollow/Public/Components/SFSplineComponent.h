@@ -34,6 +34,7 @@ public:
     void OnRegister() override;
 
     void UpdateSpline() override;
+    void Serialize( FArchive & archive ) override;
 
 #if WITH_EDITOR
     UFUNCTION( BlueprintCallable )
