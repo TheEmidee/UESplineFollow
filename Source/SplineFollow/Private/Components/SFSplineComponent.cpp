@@ -99,6 +99,15 @@ void USFSplineComponent::UpdateSpline()
     }
 }
 
+void USFSplineComponent::Serialize( FArchive & archive )
+{
+    Super::Serialize( archive );
+
+    StaticActionMarkers.Empty();
+    LevelActorActionMarkers.Empty();
+    DataMarkers.Empty();
+}
+
 void USFSplineComponent::CreateMarkerFromDefault( const FSFSplineMarker & default_marker, FSFSplineMarker & new_marker )
 {
     new_marker = FSFSplineMarker(
