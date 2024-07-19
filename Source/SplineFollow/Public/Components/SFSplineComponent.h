@@ -37,6 +37,9 @@ public:
     void Serialize( FArchive & archive );
 
 #if WITH_EDITOR
+    UFUNCTION( BlueprintCallable )
+    void SaveSplineMarkers( const TArray< FSFSplineMarker > & markers_to_save );
+
     void CheckForErrors() override;
 #endif
 

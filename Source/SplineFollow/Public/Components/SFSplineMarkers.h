@@ -166,7 +166,6 @@ class SPLINEFOLLOW_API USFSplineMarkerObject : public UObject
 public:
     virtual void AddSplineMarkerProxies( TArray< FSFSplineMarkerProxy > & proxies, const FSFSplineMarkerInfos & infos ) const;
 
-protected:
     UPROPERTY( BlueprintReadOnly, EditAnywhere )
     TObjectPtr< UTexture2D > Sprite;
 
