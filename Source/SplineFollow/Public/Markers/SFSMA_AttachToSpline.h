@@ -25,8 +25,8 @@ class SPLINEFOLLOW_API USFSMA_AttachToSpline final : public USFSplineMarkerActio
 public:
     USFSMA_AttachToSpline();
 
-    void ExecuteAction_Implementation( AActor * actor, const FSFSplineMarkerInfos & marker_infos ) const override;
-    void ExecuteStartWindowAction_Implementation( AActor * actor, const FSFSplineMarkerInfos & marker_infos ) const override;
+    void ExecuteAction_Implementation( AActor * actor, const FSFSplineMarkerInfos & marker_infos ) override;
+    void ExecuteStartWindowAction_Implementation( AActor * actor, const FSFSplineMarkerInfos & marker_infos ) override;
 
 #if WITH_EDITOR
     EDataValidationResult IsDataValid( FDataValidationContext & context ) const override;
