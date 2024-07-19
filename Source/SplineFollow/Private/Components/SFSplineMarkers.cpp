@@ -190,7 +190,7 @@ void USFSplineMarkerObject_Action::AddSplineMarkerProxies( TArray< FSFSplineMark
         return;
     }
 
-    const auto * marker_action = ActionClass->GetDefaultObject< USFSplineMarkerAction >();
+    const auto * marker_action = ActionClass.Get();
 
     switch ( infos.Type )
     {

@@ -111,7 +111,7 @@ struct SPLINEFOLLOW_API FSFSplineMarkerInfos
     float WindowEndSplineDistance;
 };
 
-UCLASS( Blueprintable, BlueprintType, meta = ( ShowWorldContextPin ) )
+UCLASS( Blueprintable, BlueprintType, meta = ( ShowWorldContextPin ), DefaultToInstanced, EditInlineNew )
 class SPLINEFOLLOW_API USFSplineMarkerAction : public UObject
 {
     GENERATED_BODY()
@@ -132,7 +132,7 @@ protected:
     void ExecuteEndWindowAction( AActor * actor, const FSFSplineMarkerInfos & marker_infos ) const;
 
 private:
-    UPROPERTY( EditDefaultsOnly )
+    UPROPERTY( EditDefaultsOnly, meta = ( EditCondition = "false", EditConditionHides ) )
     UTexture2D * Sprite;
 
     UPROPERTY( EditAnywhere, meta = ( AllowAbstract = false ) )
@@ -200,7 +200,7 @@ public:
     void AddSplineMarkerProxies( TArray< FSFSplineMarkerProxy > & proxies, const FSFSplineMarkerInfos & infos ) const override;
 
     UPROPERTY( BlueprintReadOnly, EditAnywhere )
-    TSubclassOf< USFSplineMarkerAction > ActionClass;
+    TObjectPtr< USFSplineMarkerAction > ActionClass;
 };
 
 UCLASS()
@@ -210,10 +210,10 @@ class SPLINEFOLLOW_API USFSplineMarkerObject_Data : public USFSplineMarkerObject
 
 public:
     UPROPERTY( BlueprintReadOnly, EditAnywhere )
-    TSubclassOf< USFSplineMarkerData > Data;
+    TObjectPtr< USFSplineMarkerData > Data;
 };
 
-UCLASS( Abstract, Blueprintable, BlueprintType )
+UCLASS( Abstract, Blueprintable, BlueprintType, DefaultToInstanced, EditInlineNew )
 class SPLINEFOLLOW_API USFSplineMarkerData : public UObject
 {
     GENERATED_BODY()
