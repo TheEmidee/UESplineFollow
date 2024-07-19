@@ -108,9 +108,9 @@ void USFSplineComponent::Serialize( FArchive & archive )
     DataMarkers.Empty();
 }
 
-void USFSplineComponent::CreateMarkerFromDefault( const FSFSplineMarker & default_marker, FSFSplineMarker & new_marker )
+FSFSplineMarker USFSplineComponent::CreateMarkerFromDefault( const FSFSplineMarker & default_marker )
 {
-    new_marker = FSFSplineMarker(
+    return FSFSplineMarker(
         default_marker.Name,
         default_marker.ItIsEnabled,
         default_marker.Infos,
