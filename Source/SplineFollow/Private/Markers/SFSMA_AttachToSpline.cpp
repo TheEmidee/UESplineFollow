@@ -11,12 +11,12 @@ USFSMA_AttachToSpline::USFSMA_AttachToSpline()
     bAttachToSpline = true;
 }
 
-void USFSMA_AttachToSpline::ExecuteAction_Implementation( AActor * actor, const FSFSplineMarkerInfos & marker_infos ) const
+void USFSMA_AttachToSpline::ExecuteAction_Implementation( AActor * actor, const FSFSplineMarkerInfos & marker_infos )
 {
     FollowNewSplineInternal( actor, marker_infos );
 }
 
-void USFSMA_AttachToSpline::ExecuteStartWindowAction_Implementation( AActor * actor, const FSFSplineMarkerInfos & marker_infos ) const
+void USFSMA_AttachToSpline::ExecuteStartWindowAction_Implementation( AActor * actor, const FSFSplineMarkerInfos & marker_infos )
 {
     FollowNewSplineInternal( actor, marker_infos );
 }

@@ -118,18 +118,18 @@ class SPLINEFOLLOW_API USFSplineMarkerAction : public UObject
 
 public:
     UTexture2D * GetSprite() const;
-    void ProcessAction( AActor * actor, ESFSplineMarkerProcessActionType action_type, const FSFSplineMarkerInfos & marker_infos ) const;
+    void ProcessAction( AActor * actor, ESFSplineMarkerProcessActionType action_type, const FSFSplineMarkerInfos & marker_infos );
     UWorld * GetWorld() const override;
 
 protected:
     UFUNCTION( BlueprintNativeEvent )
-    void ExecuteAction( AActor * actor, const FSFSplineMarkerInfos & marker_infos ) const;
+    void ExecuteAction( AActor * actor, const FSFSplineMarkerInfos & marker_infos );
 
     UFUNCTION( BlueprintNativeEvent )
-    void ExecuteStartWindowAction( AActor * actor, const FSFSplineMarkerInfos & marker_infos ) const;
+    void ExecuteStartWindowAction( AActor * actor, const FSFSplineMarkerInfos & marker_infos );
 
     UFUNCTION( BlueprintNativeEvent )
-    void ExecuteEndWindowAction( AActor * actor, const FSFSplineMarkerInfos & marker_infos ) const;
+    void ExecuteEndWindowAction( AActor * actor, const FSFSplineMarkerInfos & marker_infos );
 
 private:
     UPROPERTY( EditDefaultsOnly, meta = ( EditCondition = "false", EditConditionHides ) )
