@@ -37,6 +37,8 @@ public:
 
 #if WITH_EDITOR
     UFUNCTION( BlueprintCallable )
+    void CreateMarkerFromDefault( const FSFSplineMarker & default_marker, FSFSplineMarker & new_marker );
+    UFUNCTION( BlueprintCallable )
     void SaveSplineMarkers( const TArray< FSFSplineMarker > & markers_to_save );
 
     void CheckForErrors() override;

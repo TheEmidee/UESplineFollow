@@ -99,6 +99,15 @@ void USFSplineComponent::UpdateSpline()
     }
 }
 
+void USFSplineComponent::CreateMarkerFromDefault( const FSFSplineMarker & default_marker, FSFSplineMarker & new_marker )
+{
+    new_marker = FSFSplineMarker(
+        default_marker.Name,
+        default_marker.ItIsEnabled,
+        default_marker.Infos,
+        NewObject< USFSplineMarkerObject >( this, default_marker.Object->GetClass(), NAME_None, RF_NoFlags, default_marker.Object ) );
+}
+
 #if WITH_EDITOR
 void USFSplineComponent::SaveSplineMarkers( const TArray< FSFSplineMarker > & markers_to_save )
 {
@@ -108,7 +117,11 @@ void USFSplineComponent::SaveSplineMarkers( const TArray< FSFSplineMarker > & ma
     {
         if ( marker.Object != nullptr )
         {
-            SplineMarkers.Emplace( FSFSplineMarker( marker.Name, marker.ItIsEnabled, marker.Infos, NewObject< USFSplineMarkerObject >( this, marker.Object->GetClass(), NAME_None, RF_NoFlags, marker.Object ) ) );
+            SplineMarkers.Emplace( FSFSplineMarker(
+                marker.Name,
+                marker.ItIsEnabled,
+                marker.Infos,
+                NewObject< USFSplineMarkerObject >( this, marker.Object->GetClass(), NAME_None, RF_NoFlags, marker.Object ) ) );
         }
     }
 }
