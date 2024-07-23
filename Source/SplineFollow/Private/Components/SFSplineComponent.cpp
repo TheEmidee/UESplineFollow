@@ -101,11 +101,7 @@ void USFSplineComponent::SaveSplineMarkers( const TArray< FSFSplineMarker > & ma
     {
         if ( marker.Object != nullptr )
         {
-            SplineMarkers.Emplace( FSFSplineMarker(
-                marker.Name,
-                marker.ItIsEnabled,
-                marker.Infos,
-                NewObject< USFSplineMarkerObject >( this, marker.Object->GetClass(), NAME_None, RF_NoFlags, marker.Object ) ) );
+            SplineMarkers.Emplace( CreateMarkerFromDefault( marker ) );
         }
     }
 }
