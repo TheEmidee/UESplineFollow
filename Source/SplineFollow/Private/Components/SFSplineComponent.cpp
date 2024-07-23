@@ -87,25 +87,6 @@ void USFSplineComponent::UpdateSpline()
     {
         set_new_distances( marker.Infos );
     }
-
-    for ( auto & static_action_marker : StaticActionMarkers )
-    {
-        set_new_distances( static_action_marker.Infos );
-    }
-
-    for ( auto & level_actor_action_marker : LevelActorActionMarkers )
-    {
-        set_new_distances( level_actor_action_marker.Infos );
-    }
-}
-
-void USFSplineComponent::Serialize( FArchive & archive )
-{
-    Super::Serialize( archive );
-
-    StaticActionMarkers.Empty();
-    LevelActorActionMarkers.Empty();
-    DataMarkers.Empty();
 }
 
 FSFSplineMarker USFSplineComponent::CreateMarkerFromDefault( const FSFSplineMarker & default_marker )
@@ -144,63 +125,52 @@ void USFSplineComponent::CheckForErrors()
         return;
     }
 
-    const auto check_markers_are_valid = [ spline_component = this ]( const auto & array, const FString & property_name ) {
-        for ( const auto & marker : array )
+    for ( const auto & marker : SplineMarkers )
+    {
+        FString error_message( "" );
+
+        ON_SCOPE_EXIT
         {
-            if ( marker.ActionClass == nullptr )
+            if ( !error_message.IsEmpty() )
             {
                 FMessageLog( "MapCheck" )
                     .Error()
-                    ->AddToken( FUObjectToken::Create( spline_component ) )
-                    ->AddToken( FTextToken::Create( FText::FromString( FString::Printf( TEXT( "has an invalid action class in %s" ), *property_name ) ) ) );
+                    ->AddToken( FUObjectToken::Create( this ) )
+                    ->AddToken( FTextToken::Create( FText::FromString( error_message ) ) );
+            }
+        };
 
-                break;
+        if ( marker.Object == nullptr )
+        {
+            error_message = TEXT( "has invalid MarkeObject" );
+            continue;
+        }
+
+        if ( const auto * action_object = Cast< USFSplineMarkerObject_Action >( marker.Object ) )
+        {
+            if ( action_object->ActionClass == nullptr )
+            {
+                error_message = TEXT( "has invalid ActionClass" );
+                continue;
             }
         }
-    };
 
-    check_markers_are_valid( StaticActionMarkers, "StaticActionMarkers" );
-
-    for ( const auto & marker : StaticActionMarkers )
-    {
-        if ( marker.Infos.Type == ESFSplineMarkerType::Single )
+        if ( const auto * action_object = Cast< USFSplineMarkerObject_LevelActor >( marker.Object ) )
         {
-            continue;
+            if ( action_object->LevelActor == nullptr )
+            {
+                error_message = TEXT( "has invalid Level Actor" );
+                continue;
+            }
         }
 
-        if ( marker.Infos.WindowEndNormalizedSplineDistance <= marker.Infos.WindowStartNormalizedSplineDistance )
+        if ( const auto * action_object = Cast< USFSplineMarkerObject_Data >( marker.Object ) )
         {
-            FMessageLog( "MapCheck" )
-                .Error()
-                ->AddToken( FUObjectToken::Create( this ) )
-                ->AddToken( FTextToken::Create( FText::FromString( TEXT( "StaticActionMarkers contains an item which has an End marker before the Start marker" ) ) ) );
-            break;
-        }
-    }
-
-    for ( const auto & marker : LevelActorActionMarkers )
-    {
-        if ( marker.LevelActor == nullptr )
-        {
-            FMessageLog( "MapCheck" )
-                .Error()
-                ->AddToken( FUObjectToken::Create( this ) )
-                ->AddToken( FTextToken::Create( FText::FromString( TEXT( "LevelActorActionMarkers contains a null item" ) ) ) );
-            break;
-        }
-
-        if ( marker.Infos.Type == ESFSplineMarkerType::Single )
-        {
-            continue;
-        }
-
-        if ( marker.Infos.WindowEndNormalizedSplineDistance <= marker.Infos.WindowStartNormalizedSplineDistance )
-        {
-            FMessageLog( "MapCheck" )
-                .Error()
-                ->AddToken( FUObjectToken::Create( this ) )
-                ->AddToken( FTextToken::Create( FText::FromString( TEXT( "LevelActorActionMarkers contains an item which has an End marker before the Start marker" ) ) ) );
-            break;
+            if ( action_object->Data == nullptr )
+            {
+                error_message = TEXT( "has invalid Data" );
+                continue;
+            }
         }
     }
 }
