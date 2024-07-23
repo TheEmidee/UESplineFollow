@@ -50,26 +50,6 @@ EDataValidationResult USFSplineMarkerActorFilter_SelectByClass::IsDataValid( FDa
     return context.GetNumErrors() > 0 ? EDataValidationResult::Invalid : EDataValidationResult::Valid;
 }
 
-void FSFSplineMarkerInfos::UpdateDistances( float length )
-{
-    if ( bNormalizedDistance )
-    {
-        SingleActionSplineDistance = FMath::Clamp( SingleActionNormalizedSplineDistance * length, 0.0f, length );
-        WindowStartSplineDistance = FMath::Clamp( WindowStartNormalizedSplineDistance * length, 0.0f, length );
-        WindowEndSplineDistance = FMath::Clamp( WindowEndNormalizedSplineDistance * length, 0.0f, length );
-    }
-    else
-    {
-        SingleActionNormalizedSplineDistance = FMath::Clamp( SingleActionSplineDistance / length, 0.0f, 1.0f );
-        WindowStartNormalizedSplineDistance = FMath::Clamp( WindowStartSplineDistance / length, 0.0f, 1.0f );
-        WindowEndNormalizedSplineDistance = FMath::Clamp( WindowEndSplineDistance / length, 0.0f, 1.0f );
-    }
-
-    SingleActionSplineDistance = FMath::Clamp( SingleActionSplineDistance, 0.0f, length );
-    WindowStartSplineDistance = FMath::Clamp( WindowStartSplineDistance, 0.0f, length );
-    WindowEndSplineDistance = FMath::Clamp( WindowEndSplineDistance, 0.0f, length );
-}
-
 #endif
 
 void USFSplineMarkerAction::ProcessAction( AActor * actor, const ESFSplineMarkerProcessActionType action_type, const FSFSplineMarkerInfos & marker_infos )

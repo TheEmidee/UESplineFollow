@@ -42,11 +42,6 @@ void USFSplineComponent::OnRegister()
 {
     Super::OnRegister();
 
-    for ( auto & marker : SplineMarkers )
-    {
-        marker.Infos.UpdateDistances( GetSplineLength() );
-    }
-
     const auto fill_proxies = []( TArray< FSFSplineMarkerProxy > & proxies, const auto & markers ) {
         for ( const auto & marker : markers )
         {
@@ -76,11 +71,10 @@ void USFSplineComponent::UpdateSpline()
         return FMath::Clamp( current_distance * old_length / new_length, 0.0f, 1.0f );
     };
 
-    const auto set_new_distances = [ recompute_normalized_distance, new_length ]( auto & infos ) {
+    const auto set_new_distances = [ recompute_normalized_distance ]( auto & infos ) {
         infos.SingleActionNormalizedSplineDistance = recompute_normalized_distance( infos.SingleActionNormalizedSplineDistance );
         infos.WindowEndNormalizedSplineDistance = recompute_normalized_distance( infos.WindowEndNormalizedSplineDistance );
         infos.WindowStartNormalizedSplineDistance = recompute_normalized_distance( infos.WindowStartNormalizedSplineDistance );
-        infos.UpdateDistances( new_length );
     };
 
     for ( auto & marker : SplineMarkers )
