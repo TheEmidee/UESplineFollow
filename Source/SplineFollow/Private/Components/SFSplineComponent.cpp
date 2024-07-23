@@ -83,6 +83,7 @@ void USFSplineComponent::UpdateSpline()
     }
 }
 
+#if WITH_EDITOR
 FSFSplineMarker USFSplineComponent::CreateMarkerFromDefault( const FSFSplineMarker & default_marker )
 {
     return FSFSplineMarker(
@@ -92,7 +93,6 @@ FSFSplineMarker USFSplineComponent::CreateMarkerFromDefault( const FSFSplineMark
         NewObject< USFSplineMarkerObject >( this, default_marker.Object->GetClass(), NAME_None, RF_NoFlags, default_marker.Object ) );
 }
 
-#if WITH_EDITOR
 void USFSplineComponent::SaveSplineMarkers( const TArray< FSFSplineMarker > & markers_to_save )
 {
     SplineMarkers.Reset();
