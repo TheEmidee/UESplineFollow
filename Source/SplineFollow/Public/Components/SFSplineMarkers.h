@@ -75,22 +75,40 @@ struct SPLINEFOLLOW_API FSFSplineMarkerInfos
 
     FSFSplineMarkerInfos() :
         Type( ESFSplineMarkerType::Single ),
+        bNormalizedDistance( true ),
         SingleActionNormalizedSplineDistance( 0.0f ),
+        SingleActionSplineDistance( 0.0f ),
         WindowStartNormalizedSplineDistance( 0.0f ),
-        WindowEndNormalizedSplineDistance( 0.5f )
+        WindowEndNormalizedSplineDistance( 0.5f ),
+        WindowStartSplineDistance( 0.0f ),
+        WindowEndSplineDistance( 0.0f )
     {}
+
+    void UpdateDistances( float length );
 
     UPROPERTY( EditAnywhere, BlueprintReadOnly )
     ESFSplineMarkerType Type;
 
-    UPROPERTY( EditAnywhere, BlueprintReadOnly, meta = ( UIMin = 0.0f, UIMax = 1.0f, ClampMin = 0.0f, ClampMax = 1.0f, EditCondition = "Type == ESFSplineMarkerType::Single" ) )
+    UPROPERTY( EditAnywhere, BlueprintReadOnly, meta = ( InlineCategoryProperty ) )
+    uint8 bNormalizedDistance : 1;
+
+    UPROPERTY( EditAnywhere, BlueprintReadOnly, meta = ( UIMin = 0.0f, UIMax = 1.0f, ClampMin = 0.0f, ClampMax = 1.0f, EditCondition = "bNormalizedDistance && Type == ESFSplineMarkerType::Single", EditConditionHides ) )
     float SingleActionNormalizedSplineDistance;
 
-    UPROPERTY( EditAnywhere, BlueprintReadOnly, meta = ( UIMin = 0.0f, UIMax = 1.0f, ClampMin = 0.0f, ClampMax = 1.0f, EditCondition = "Type == ESFSplineMarkerType::Window" ) )
+    UPROPERTY( EditAnywhere, BlueprintReadOnly, meta = ( ClampMin = 0.0f, Units = "cm", EditCondition = "!bNormalizedDistance && Type == ESFSplineMarkerType::Single", EditConditionHides ) )
+    float SingleActionSplineDistance;
+
+    UPROPERTY( EditAnywhere, BlueprintReadOnly, meta = ( UIMin = 0.0f, UIMax = 1.0f, ClampMin = 0.0f, ClampMax = 1.0f, EditCondition = "bNormalizedDistance && Type == ESFSplineMarkerType::Window", EditConditionHides ) )
     float WindowStartNormalizedSplineDistance;
 
-    UPROPERTY( EditAnywhere, BlueprintReadOnly, meta = ( UIMin = 0.0f, UIMax = 1.0f, ClampMin = 0.0f, ClampMax = 1.0f, EditCondition = "Type == ESFSplineMarkerType::Window" ) )
+    UPROPERTY( EditAnywhere, BlueprintReadOnly, meta = ( UIMin = 0.0f, UIMax = 1.0f, ClampMin = 0.0f, ClampMax = 1.0f, EditCondition = "bNormalizedDistance && Type == ESFSplineMarkerType::Window", EditConditionHides ) )
     float WindowEndNormalizedSplineDistance;
+
+    UPROPERTY( EditAnywhere, BlueprintReadOnly, meta = ( ClampMin = 0.0f, Units = "cm", EditCondition = "!bNormalizedDistance && Type == ESFSplineMarkerType::Window", EditConditionHides ) )
+    float WindowStartSplineDistance;
+
+    UPROPERTY( EditAnywhere, BlueprintReadOnly, meta = ( Units = "cm", EditCondition = "!bNormalizedDistance && Type == ESFSplineMarkerType::Window", EditConditionHides ) )
+    float WindowEndSplineDistance;
 };
 
 UCLASS( Blueprintable, BlueprintType, meta = ( ShowWorldContextPin ) )
