@@ -52,7 +52,7 @@ EDataValidationResult USFSplineMarkerActorFilter_SelectByClass::IsDataValid( FDa
 
 #endif
 
-void USFSplineMarkerAction::ProcessAction( AActor * actor, const ESFSplineMarkerProcessActionType action_type, const FSFSplineMarkerInfos & marker_infos ) const
+void USFSplineMarkerAction::ProcessAction( AActor * actor, const ESFSplineMarkerProcessActionType action_type, const FSFSplineMarkerInfos & marker_infos )
 {
     for ( const auto & actor_filter_class : ActorFilters )
     {
@@ -107,15 +107,15 @@ UWorld * USFSplineMarkerAction::GetWorld() const
     return nullptr;
 }
 
-void USFSplineMarkerAction::ExecuteAction_Implementation( AActor * /*actor*/, const FSFSplineMarkerInfos & /*marker_infos*/ ) const
+void USFSplineMarkerAction::ExecuteAction_Implementation( AActor * /*actor*/, const FSFSplineMarkerInfos & /*marker_infos*/ )
 {
 }
 
-void USFSplineMarkerAction::ExecuteStartWindowAction_Implementation( AActor * /*actor*/, const FSFSplineMarkerInfos & /*marker_infos*/ ) const
+void USFSplineMarkerAction::ExecuteStartWindowAction_Implementation( AActor * /*actor*/, const FSFSplineMarkerInfos & /*marker_infos*/ )
 {
 }
 
-void USFSplineMarkerAction::ExecuteEndWindowAction_Implementation( AActor * /*actor*/, const FSFSplineMarkerInfos & /*marker_infos*/ ) const
+void USFSplineMarkerAction::ExecuteEndWindowAction_Implementation( AActor * /*actor*/, const FSFSplineMarkerInfos & /*marker_infos*/ )
 {
 }
 
@@ -170,7 +170,7 @@ void USFSplineMarkerObject_Action::AddSplineMarkerProxies( TArray< FSFSplineMark
         return;
     }
 
-    const auto * marker_action = ActionClass->GetDefaultObject< USFSplineMarkerAction >();
+    auto * marker_action = ActionClass.Get();
 
     switch ( infos.Type )
     {
@@ -272,7 +272,7 @@ bool FSFSplineMarker_Static::IsValid() const
 
 void FSFSplineMarker_Static::AddSplineMarkerProxies( TArray< FSFSplineMarkerProxy > & proxies ) const
 {
-    const auto * marker_action = ActionClass->GetDefaultObject< USFSplineMarkerAction >();
+    auto * marker_action = ActionClass->GetDefaultObject< USFSplineMarkerAction >();
 
     switch ( Infos.Type )
     {

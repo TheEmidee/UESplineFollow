@@ -16,9 +16,7 @@ void FSFSplineMarkerComponentVisualizer::DrawVisualization( const UActorComponen
 
     if ( const auto * spline_component = Cast< const USFSplineComponent >( component ) )
     {
-        DrawMarkers( spline_component->LevelActorActionMarkers, *spline_component, pdi );
-        DrawMarkers( spline_component->StaticActionMarkers, *spline_component, pdi );
-        DrawMarkers( spline_component->DataMarkers, *spline_component, pdi );
+        DrawMarkers( spline_component->SplineMarkers, *spline_component, pdi );
     }
 }
 

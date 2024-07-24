@@ -77,88 +77,31 @@ void USFSplineComponent::UpdateSpline()
         infos.WindowStartNormalizedSplineDistance = recompute_normalized_distance( infos.WindowStartNormalizedSplineDistance );
     };
 
-    for ( auto & static_action_marker : StaticActionMarkers )
+    for ( auto & marker : SplineMarkers )
     {
-        set_new_distances( static_action_marker.Infos );
+        set_new_distances( marker.Infos );
     }
-
-    for ( auto & level_actor_action_marker : LevelActorActionMarkers )
-    {
-        set_new_distances( level_actor_action_marker.Infos );
-    }
-}
-
-void USFSplineComponent::Serialize( FArchive & archive )
-{
-    if ( archive.IsSaving() )
-    {
-        const auto create_marker = [ & ]< typename T, typename U >( T legacy_marker, U object ) {
-            return FSFSplineMarker( legacy_marker.Name, legacy_marker.ItIsEnabled, legacy_marker.Infos, object );
-        };
-
-        for ( const auto & action_marker : StaticActionMarkers )
-        {
-            auto new_marker = create_marker( action_marker, NewObject< USFSplineMarkerObject_Action >( this ) );
-            Cast< USFSplineMarkerObject_Action >( new_marker.Object )->ActionClass = action_marker.ActionClass->GetOwnerClass();
-            SplineMarkers.Emplace( new_marker );
-        }
-
-        StaticActionMarkers.Empty();
-
-        for ( const auto & level_actor_marker : LevelActorActionMarkers )
-        {
-            auto new_marker = create_marker( level_actor_marker, NewObject< USFSplineMarkerObject_LevelActor >( this ) );
-            Cast< USFSplineMarkerObject_LevelActor >( new_marker.Object )->LevelActor = level_actor_marker.LevelActor;
-            SplineMarkers.Emplace( new_marker );
-        }
-
-        LevelActorActionMarkers.Empty();
-
-        for ( const auto & data_marker : DataMarkers )
-        {
-            auto new_marker = create_marker( data_marker, NewObject< USFSplineMarkerObject_Data >( this ) );
-            Cast< USFSplineMarkerObject_Data >( new_marker.Object )->Data = data_marker.Data;
-            SplineMarkers.Emplace( new_marker );
-        }
-
-        DataMarkers.Empty();
-    }
-
-    Super::Serialize( archive );
 }
 
 #if WITH_EDITOR
+FSFSplineMarker USFSplineComponent::CreateMarkerFromDefault( const FSFSplineMarker & default_marker )
+{
+    return FSFSplineMarker(
+        default_marker.Name,
+        default_marker.ItIsEnabled,
+        default_marker.Infos,
+        NewObject< USFSplineMarkerObject >( this, default_marker.Object->GetClass(), NAME_None, RF_NoFlags, default_marker.Object ) );
+}
+
 void USFSplineComponent::SaveSplineMarkers( const TArray< FSFSplineMarker > & markers_to_save )
 {
     SplineMarkers.Reset();
 
-    const auto create_marker = [ & ]( const auto & marker, USFSplineMarkerObject * object ) {
-        object->Sprite = marker.Object->Sprite;
-        object->Color = marker.Object->Color;
-        return FSFSplineMarker( marker.Name, marker.ItIsEnabled, marker.Infos, object );
-    };
-
     for ( const auto & marker : markers_to_save )
     {
-        if ( const auto * action_marker = Cast< USFSplineMarkerObject_Action >( marker.Object ) )
+        if ( marker.Object != nullptr )
         {
-            auto new_marker = create_marker( marker, NewObject< USFSplineMarkerObject_Action >( this, marker.Object->GetClass() ) );
-            Cast< USFSplineMarkerObject_Action >( new_marker.Object )->ActionClass = action_marker->ActionClass->GetOwnerClass();
-            SplineMarkers.Emplace( new_marker );
-        }
-
-        if ( const auto * level_actor_marker = Cast< USFSplineMarkerObject_LevelActor >( marker.Object ) )
-        {
-            auto new_marker = create_marker( marker, NewObject< USFSplineMarkerObject_LevelActor >( this, marker.Object->GetClass() ) );
-            Cast< USFSplineMarkerObject_LevelActor >( new_marker.Object )->LevelActor = level_actor_marker->LevelActor;
-            SplineMarkers.Emplace( new_marker );
-        }
-
-        if ( const auto * data_marker = Cast< USFSplineMarkerObject_Data >( marker.Object ) )
-        {
-            auto new_marker = create_marker( marker, NewObject< USFSplineMarkerObject_Data >( this, marker.Object->GetClass() ) );
-            Cast< USFSplineMarkerObject_Data >( new_marker.Object )->Data = data_marker->Data;
-            SplineMarkers.Emplace( new_marker );
+            SplineMarkers.Emplace( CreateMarkerFromDefault( marker ) );
         }
     }
 }
@@ -172,63 +115,52 @@ void USFSplineComponent::CheckForErrors()
         return;
     }
 
-    const auto check_markers_are_valid = [ spline_component = this ]( const auto & array, const FString & property_name ) {
-        for ( const auto & marker : array )
+    for ( const auto & marker : SplineMarkers )
+    {
+        FString error_message( "" );
+
+        ON_SCOPE_EXIT
         {
-            if ( marker.ActionClass == nullptr )
+            if ( !error_message.IsEmpty() )
             {
                 FMessageLog( "MapCheck" )
                     .Error()
-                    ->AddToken( FUObjectToken::Create( spline_component ) )
-                    ->AddToken( FTextToken::Create( FText::FromString( FString::Printf( TEXT( "has an invalid action class in %s" ), *property_name ) ) ) );
+                    ->AddToken( FUObjectToken::Create( this ) )
+                    ->AddToken( FTextToken::Create( FText::FromString( error_message ) ) );
+            }
+        };
 
-                break;
+        if ( marker.Object == nullptr )
+        {
+            error_message = TEXT( "has invalid MarkeObject" );
+            continue;
+        }
+
+        if ( const auto * action_object = Cast< USFSplineMarkerObject_Action >( marker.Object ) )
+        {
+            if ( action_object->ActionClass == nullptr )
+            {
+                error_message = TEXT( "has invalid ActionClass" );
+                continue;
             }
         }
-    };
 
-    check_markers_are_valid( StaticActionMarkers, "StaticActionMarkers" );
-
-    for ( const auto & marker : StaticActionMarkers )
-    {
-        if ( marker.Infos.Type == ESFSplineMarkerType::Single )
+        if ( const auto * action_object = Cast< USFSplineMarkerObject_LevelActor >( marker.Object ) )
         {
-            continue;
+            if ( action_object->LevelActor == nullptr )
+            {
+                error_message = TEXT( "has invalid Level Actor" );
+                continue;
+            }
         }
 
-        if ( marker.Infos.WindowEndNormalizedSplineDistance <= marker.Infos.WindowStartNormalizedSplineDistance )
+        if ( const auto * action_object = Cast< USFSplineMarkerObject_Data >( marker.Object ) )
         {
-            FMessageLog( "MapCheck" )
-                .Error()
-                ->AddToken( FUObjectToken::Create( this ) )
-                ->AddToken( FTextToken::Create( FText::FromString( TEXT( "StaticActionMarkers contains an item which has an End marker before the Start marker" ) ) ) );
-            break;
-        }
-    }
-
-    for ( const auto & marker : LevelActorActionMarkers )
-    {
-        if ( marker.LevelActor == nullptr )
-        {
-            FMessageLog( "MapCheck" )
-                .Error()
-                ->AddToken( FUObjectToken::Create( this ) )
-                ->AddToken( FTextToken::Create( FText::FromString( TEXT( "LevelActorActionMarkers contains a null item" ) ) ) );
-            break;
-        }
-
-        if ( marker.Infos.Type == ESFSplineMarkerType::Single )
-        {
-            continue;
-        }
-
-        if ( marker.Infos.WindowEndNormalizedSplineDistance <= marker.Infos.WindowStartNormalizedSplineDistance )
-        {
-            FMessageLog( "MapCheck" )
-                .Error()
-                ->AddToken( FUObjectToken::Create( this ) )
-                ->AddToken( FTextToken::Create( FText::FromString( TEXT( "LevelActorActionMarkers contains an item which has an End marker before the Start marker" ) ) ) );
-            break;
+            if ( action_object->Data == nullptr )
+            {
+                error_message = TEXT( "has invalid Data" );
+                continue;
+            }
         }
     }
 }
