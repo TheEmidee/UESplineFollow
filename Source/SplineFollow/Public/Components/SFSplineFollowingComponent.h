@@ -5,6 +5,7 @@
 
 #include "SFSplineFollowingComponent.generated.h"
 
+struct FSFFollowSplineInfos;
 class USplineComponent;
 class UCharacterMovementComponent;
 
@@ -15,6 +16,9 @@ class SPLINEFOLLOW_API USFSplineFollowingComponent : public UActorComponent
 
 public:
     USFSplineFollowingComponent();
+
+    UFUNCTION( BlueprintCallable )
+    void FollowSpline(const FSFFollowSplineInfos & spline_infos);
 
     void BeginPlay() override;
     void TickComponent( float delta_time, ELevelTick tick_type, FActorComponentTickFunction * this_tick_function ) override;

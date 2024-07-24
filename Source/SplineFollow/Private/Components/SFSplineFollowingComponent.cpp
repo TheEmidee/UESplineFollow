@@ -1,5 +1,6 @@
 #include "Components/SFSplineFollowingComponent.h"
 
+#include "Components/SFSplineFollowingMovementComponent.h"
 #include "Components/SplineComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
@@ -9,6 +10,14 @@ USFSplineFollowingComponent::USFSplineFollowingComponent() :
     Destination( FVector::ZeroVector )
 {
     PrimaryComponentTick.bCanEverTick = true;
+}
+
+void USFSplineFollowingComponent::FollowSpline( const FSFFollowSplineInfos & spline_infos )
+{
+    FollowedSplineComponent = spline_infos.SplineComponent;
+
+    const auto & transform = FollowedSplineComponent->GetTransformAtDistanceAlongSpline( 0.0f, ESplineCoordinateSpace::World );
+    GetOwner()->SetActorLocationAndRotation( transform.GetLocation(), transform.GetRotation() );
 }
 
 void USFSplineFollowingComponent::BeginPlay()
@@ -53,7 +62,7 @@ void USFSplineFollowingComponent::FollowDestination()
     const auto current_location = MovementComponent->GetActorFeetLocation();
 
     const auto move_input = ( Destination - current_location ).GetSafeNormal();
- 
+
     MovementComponent->AddInputVector( move_input );
 
     SplineDistance = FollowedSplineComponent->GetDistanceAlongSplineAtLocation( GetOwner()->GetActorLocation(), ESplineCoordinateSpace::World );
