@@ -158,6 +158,82 @@ void ASFSplineMarkerLevelActor::ProcessAction( AActor * actor, const ESFSplineMa
     }
 }
 
+void USFSplineMarkerObject::AddSplineMarkerProxies( TArray< FSFSplineMarkerProxy > & /*proxies*/, const FSFSplineMarkerInfos & /*infos*/ ) const
+{
+}
+
+void USFSplineMarkerObject_Action::AddSplineMarkerProxies( TArray< FSFSplineMarkerProxy > & proxies, const FSFSplineMarkerInfos & infos ) const
+{
+    if ( ActionClass == nullptr )
+    {
+        return;
+    }
+
+    const auto * marker_action = ActionClass->GetDefaultObject< USFSplineMarkerAction >();
+
+    switch ( infos.Type )
+    {
+        case ESFSplineMarkerType::Single:
+        {
+            proxies.Emplace( FSFSplineMarkerProxy( infos.SingleActionNormalizedSplineDistance, [ marker_action, infos = infos ]( AActor * actor ) {
+                marker_action->ProcessAction( actor, ESFSplineMarkerProcessActionType::Single, infos );
+            } ) );
+        }
+        break;
+        case ESFSplineMarkerType::Window:
+        {
+            proxies.Emplace( FSFSplineMarkerProxy( infos.WindowStartNormalizedSplineDistance, [ marker_action, infos = infos ]( AActor * actor ) {
+                marker_action->ProcessAction( actor, ESFSplineMarkerProcessActionType::WindowStart, infos );
+            } ) );
+
+            proxies.Emplace( FSFSplineMarkerProxy( infos.WindowEndNormalizedSplineDistance, [ marker_action, infos = infos ]( AActor * actor ) {
+                marker_action->ProcessAction( actor, ESFSplineMarkerProcessActionType::WindowEnd, infos );
+            } ) );
+        }
+        break;
+        default:
+        {
+            checkNoEntry();
+        }
+        break;
+    }
+}
+
+void USFSplineMarkerObject_LevelActor::AddSplineMarkerProxies( TArray< FSFSplineMarkerProxy > & proxies, const FSFSplineMarkerInfos & infos ) const
+{
+    if ( LevelActor == nullptr )
+    {
+        return;
+    }
+
+    switch ( infos.Type )
+    {
+        case ESFSplineMarkerType::Single:
+        {
+            proxies.Emplace( FSFSplineMarkerProxy( infos.SingleActionNormalizedSplineDistance, [ level_actor = LevelActor, infos = infos ]( AActor * actor ) {
+                level_actor->ProcessAction( actor, ESFSplineMarkerProcessActionType::Single, infos );
+            } ) );
+        }
+        break;
+        case ESFSplineMarkerType::Window:
+        {
+            proxies.Emplace( FSFSplineMarkerProxy( infos.WindowStartNormalizedSplineDistance, [ level_actor = LevelActor, infos = infos ]( AActor * actor ) {
+                level_actor->ProcessAction( actor, ESFSplineMarkerProcessActionType::WindowStart, infos );
+            } ) );
+
+            proxies.Emplace( FSFSplineMarkerProxy( infos.WindowEndNormalizedSplineDistance, [ level_actor = LevelActor, infos = infos ]( AActor * actor ) {
+                level_actor->ProcessAction( actor, ESFSplineMarkerProcessActionType::WindowEnd, infos );
+            } ) );
+        }
+        break;
+        default:
+        {
+            checkNoEntry();
+        }
+        break;
+    }
+}
+
 void ASFSplineMarkerLevelActor::ExecuteAction_Implementation( AActor * /*actor*/, const FSFSplineMarkerInfos & /*marker_infos*/ ) const
 {
 }
@@ -175,8 +251,12 @@ bool FSFSplineMarker::IsValid() const
     return ItIsEnabled;
 }
 
-void FSFSplineMarker::AddSplineMarkerProxies( TArray< FSFSplineMarkerProxy > & /*proxies*/ ) const
+void FSFSplineMarker::AddSplineMarkerProxies( TArray< FSFSplineMarkerProxy > & proxies ) const
 {
+    if ( Object != nullptr )
+    {
+        Object->AddSplineMarkerProxies( proxies, Infos );
+    }
 }
 
 UTexture2D * FSFSplineMarker::GetSprite() const
