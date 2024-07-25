@@ -226,7 +226,7 @@ class SPLINEFOLLOW_API USFSplineMarkerObject_LevelActor : public USFSplineMarker
 public:
     FText GetStartDataText() const override;
     FText GetEndDataText() const override;
-    
+
     void AddSplineMarkerProxies( TArray< FSFSplineMarkerProxy > & proxies, const FSFSplineMarkerInfos & infos ) const override;
 
     UPROPERTY( BlueprintReadOnly, EditAnywhere )
@@ -241,7 +241,7 @@ class SPLINEFOLLOW_API USFSplineMarkerObject_Data : public USFSplineMarkerObject
 public:
     FText GetStartDataText() const override;
     FText GetEndDataText() const override;
-    
+
     UPROPERTY( BlueprintReadOnly, EditAnywhere )
     TObjectPtr< USFSplineMarkerData > Data;
 };
