@@ -117,7 +117,6 @@ class SPLINEFOLLOW_API USFSplineMarkerAction : public UObject
     GENERATED_BODY()
 
 public:
-    UTexture2D * GetSprite() const;
     void ProcessAction( AActor * actor, ESFSplineMarkerProcessActionType action_type, const FSFSplineMarkerInfos & marker_infos );
     UWorld * GetWorld() const override;
 
@@ -132,17 +131,9 @@ protected:
     void ExecuteEndWindowAction( AActor * actor, const FSFSplineMarkerInfos & marker_infos );
 
 private:
-    UPROPERTY( EditDefaultsOnly, meta = ( EditCondition = "false", EditConditionHides ) )
-    UTexture2D * Sprite;
-
     UPROPERTY( EditAnywhere, meta = ( AllowAbstract = false ) )
     TArray< TSubclassOf< USFSplineMarkerActorFilter > > ActorFilters;
 };
-
-FORCEINLINE UTexture2D * USFSplineMarkerAction::GetSprite() const
-{
-    return Sprite;
-}
 
 UCLASS( Abstract )
 class SPLINEFOLLOW_API ASFSplineMarkerLevelActor : public AActor
@@ -150,7 +141,6 @@ class SPLINEFOLLOW_API ASFSplineMarkerLevelActor : public AActor
     GENERATED_BODY()
 
 public:
-    UTexture2D * GetSprite() const;
     void ProcessAction( AActor * actor, ESFSplineMarkerProcessActionType action_type, const FSFSplineMarkerInfos & marker_infos ) const;
 
 protected:
@@ -164,17 +154,15 @@ protected:
     void ExecuteEndWindowAction( AActor * actor, const FSFSplineMarkerInfos & marker_infos ) const;
 
 private:
-    UPROPERTY( EditDefaultsOnly )
-    UTexture2D * Sprite;
-
     UPROPERTY( EditAnywhere, meta = ( AllowAbstract = false ) )
     TArray< TSubclassOf< USFSplineMarkerActorFilter > > ActorFilters;
 };
 
-FORCEINLINE UTexture2D * ASFSplineMarkerLevelActor::GetSprite() const
+UCLASS( Abstract, Blueprintable, BlueprintType, DefaultToInstanced, EditInlineNew )
+class SPLINEFOLLOW_API USFSplineMarkerData : public UObject
 {
-    return Sprite;
-}
+    GENERATED_BODY()
+};
 
 UCLASS( DefaultToInstanced, Blueprintable, BlueprintType, Abstract, EditInlineNew )
 class SPLINEFOLLOW_API USFSplineMarkerObject : public UObject
@@ -204,22 +192,6 @@ public:
 };
 
 UCLASS()
-class SPLINEFOLLOW_API USFSplineMarkerObject_Data : public USFSplineMarkerObject
-{
-    GENERATED_BODY()
-
-public:
-    UPROPERTY( BlueprintReadOnly, EditAnywhere )
-    TObjectPtr< USFSplineMarkerData > Data;
-};
-
-UCLASS( Abstract, Blueprintable, BlueprintType, DefaultToInstanced, EditInlineNew )
-class SPLINEFOLLOW_API USFSplineMarkerData : public UObject
-{
-    GENERATED_BODY()
-};
-
-UCLASS()
 class SPLINEFOLLOW_API USFSplineMarkerObject_LevelActor : public USFSplineMarkerObject
 {
     GENERATED_BODY()
@@ -229,6 +201,16 @@ public:
 
     UPROPERTY( BlueprintReadOnly, EditAnywhere )
     TObjectPtr< ASFSplineMarkerLevelActor > LevelActor;
+};
+
+UCLASS()
+class SPLINEFOLLOW_API USFSplineMarkerObject_Data : public USFSplineMarkerObject
+{
+    GENERATED_BODY()
+
+public:
+    UPROPERTY( BlueprintReadOnly, EditAnywhere )
+    TObjectPtr< USFSplineMarkerData > Data;
 };
 
 USTRUCT( BlueprintType, Blueprintable )
@@ -256,7 +238,6 @@ struct SPLINEFOLLOW_API FSFSplineMarker
 
     virtual bool IsValid() const;
     virtual void AddSplineMarkerProxies( TArray< FSFSplineMarkerProxy > & proxies ) const;
-    virtual UTexture2D * GetSprite() const;
 
     UPROPERTY( EditAnywhere, BlueprintReadOnly )
     uint8 ItIsEnabled : 1;
@@ -276,53 +257,4 @@ struct SPLINEFOLLOW_API FSFSplineMarker
 FORCEINLINE uint32 GetTypeHash( const FSFSplineMarker & spline_marker )
 {
     return HashCombine( GetTypeHash( spline_marker.Name ), GetTypeHash( spline_marker.Infos.SingleActionNormalizedSplineDistance ) );
-}
-
-USTRUCT()
-struct SPLINEFOLLOW_API FSFSplineMarker_Static : public FSFSplineMarker
-{
-    GENERATED_BODY()
-
-    bool IsValid() const override;
-    void AddSplineMarkerProxies( TArray< FSFSplineMarkerProxy > & proxies ) const override;
-    UTexture2D * GetSprite() const override;
-
-    UPROPERTY( EditAnywhere, BlueprintReadOnly )
-    TSubclassOf< USFSplineMarkerAction > ActionClass;
-};
-
-USTRUCT()
-struct SPLINEFOLLOW_API FSFSplineMarker_LevelActor : public FSFSplineMarker
-{
-    GENERATED_BODY()
-
-    FSFSplineMarker_LevelActor();
-
-    bool IsValid() const override;
-    void AddSplineMarkerProxies( TArray< FSFSplineMarkerProxy > & proxies ) const override;
-    UTexture2D * GetSprite() const override;
-
-    UPROPERTY( EditAnywhere, BlueprintReadOnly )
-    ASFSplineMarkerLevelActor * LevelActor;
-};
-
-USTRUCT( Blueprintable, BlueprintType )
-struct SPLINEFOLLOW_API FSFSplineMarker_Data : public FSFSplineMarker
-{
-    GENERATED_BODY()
-
-    FSFSplineMarker_Data();
-
-    UTexture2D * GetSprite() const override;
-
-    UPROPERTY( EditAnywhere, BlueprintReadOnly )
-    UTexture2D * Sprite;
-
-    UPROPERTY( EditAnywhere, BlueprintReadonly )
-    TSubclassOf< UObject > Data;
-};
-
-FORCEINLINE UTexture2D * FSFSplineMarker_Data::GetSprite() const
-{
-    return Sprite;
 }
