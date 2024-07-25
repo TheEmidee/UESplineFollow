@@ -51,6 +51,16 @@ EDataValidationResult USFSplineMarkerActorFilter_SelectByClass::IsDataValid( FDa
 }
 #endif
 
+FText USFSplineMarkerAction::GetStartDataText_Implementation() const
+{
+    return FText::GetEmpty();
+}
+
+FText USFSplineMarkerAction::GetEndDataText_Implementation() const
+{
+    return GetStartDataText();
+}
+
 void USFSplineMarkerAction::ProcessAction( AActor * actor, const ESFSplineMarkerProcessActionType action_type, const FSFSplineMarkerInfos & marker_infos )
 {
     for ( const auto & actor_filter_class : ActorFilters )
@@ -118,6 +128,15 @@ void USFSplineMarkerAction::ExecuteEndWindowAction_Implementation( AActor * /*ac
 {
 }
 
+FText ASFSplineMarkerLevelActor::GetStartDataText_Implementation() const
+{
+    return FText::GetEmpty();
+}
+FText ASFSplineMarkerLevelActor::GetEndDataText_Implementation() const
+{
+    return GetStartDataText();
+}
+
 void ASFSplineMarkerLevelActor::ProcessAction( AActor * actor, const ESFSplineMarkerProcessActionType action_type, const FSFSplineMarkerInfos & marker_infos ) const
 {
     for ( const auto & actor_filter_class : ActorFilters )
@@ -170,8 +189,38 @@ void ASFSplineMarkerLevelActor::ExecuteEndWindowAction_Implementation( AActor * 
 {
 }
 
+FText USFSplineMarkerData::GetStartDataText_Implementation() const
+{
+    return FText::GetEmpty();
+}
+
+FText USFSplineMarkerData::GetEndDataText_Implementation() const
+{
+    return GetStartDataText();
+}
+
+FText USFSplineMarkerObject::GetStartDataText() const
+{
+    return FText::GetEmpty();
+}
+
+FText USFSplineMarkerObject::GetEndDataText() const
+{
+    return GetStartDataText();
+}
+
 void USFSplineMarkerObject::AddSplineMarkerProxies( TArray< FSFSplineMarkerProxy > & /*proxies*/, const FSFSplineMarkerInfos & /*infos*/ ) const
 {
+}
+
+FText USFSplineMarkerObject_Action::GetStartDataText() const
+{
+    return ActionClass != nullptr ? ActionClass->GetStartDataText() : Super::GetStartDataText();
+}
+
+FText USFSplineMarkerObject_Action::GetEndDataText() const
+{
+    return ActionClass != nullptr ? ActionClass->GetEndDataText() : Super::GetEndDataText();
 }
 
 void USFSplineMarkerObject_Action::AddSplineMarkerProxies( TArray< FSFSplineMarkerProxy > & proxies, const FSFSplineMarkerInfos & infos ) const
@@ -211,6 +260,16 @@ void USFSplineMarkerObject_Action::AddSplineMarkerProxies( TArray< FSFSplineMark
     }
 }
 
+FText USFSplineMarkerObject_LevelActor::GetStartDataText() const
+{
+    return LevelActor != nullptr ? LevelActor->GetStartDataText() : Super::GetStartDataText();
+}
+
+FText USFSplineMarkerObject_LevelActor::GetEndDataText() const
+{
+    return LevelActor != nullptr ? LevelActor->GetEndDataText() : Super::GetEndDataText();
+}
+
 void USFSplineMarkerObject_LevelActor::AddSplineMarkerProxies( TArray< FSFSplineMarkerProxy > & proxies, const FSFSplineMarkerInfos & infos ) const
 {
     if ( LevelActor == nullptr )
@@ -244,6 +303,16 @@ void USFSplineMarkerObject_LevelActor::AddSplineMarkerProxies( TArray< FSFSpline
         }
         break;
     }
+}
+
+FText USFSplineMarkerObject_Data::GetStartDataText() const
+{
+    return Data != nullptr ? Data->GetStartDataText() : Super::GetStartDataText();
+}
+
+FText USFSplineMarkerObject_Data::GetEndDataText() const
+{
+    return Data != nullptr ? Data->GetEndDataText() : Super::GetEndDataText();
 }
 
 bool FSFSplineMarker::IsValid() const
