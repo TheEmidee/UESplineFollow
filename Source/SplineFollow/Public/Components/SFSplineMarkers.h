@@ -111,12 +111,18 @@ struct SPLINEFOLLOW_API FSFSplineMarkerInfos
     float WindowEndSplineDistance;
 };
 
-UCLASS( Blueprintable, BlueprintType, meta = ( ShowWorldContextPin ), DefaultToInstanced, EditInlineNew )
+UCLASS( Abstract, Blueprintable, BlueprintType, meta = ( ShowWorldContextPin ), DefaultToInstanced, EditInlineNew )
 class SPLINEFOLLOW_API USFSplineMarkerAction : public UObject
 {
     GENERATED_BODY()
 
 public:
+    UFUNCTION( BlueprintNativeEvent )
+    FText GetStartDataText() const;
+
+    UFUNCTION( BlueprintNativeEvent )
+    FText GetEndDataText() const;
+
     void ProcessAction( AActor * actor, ESFSplineMarkerProcessActionType action_type, const FSFSplineMarkerInfos & marker_infos );
     UWorld * GetWorld() const override;
 
@@ -141,6 +147,12 @@ class SPLINEFOLLOW_API ASFSplineMarkerLevelActor : public AActor
     GENERATED_BODY()
 
 public:
+    UFUNCTION( BlueprintNativeEvent )
+    FText GetStartDataText() const;
+
+    UFUNCTION( BlueprintNativeEvent )
+    FText GetEndDataText() const;
+
     void ProcessAction( AActor * actor, ESFSplineMarkerProcessActionType action_type, const FSFSplineMarkerInfos & marker_infos ) const;
 
 protected:
@@ -162,6 +174,12 @@ UCLASS( Abstract, Blueprintable, BlueprintType, DefaultToInstanced, EditInlineNe
 class SPLINEFOLLOW_API USFSplineMarkerData : public UObject
 {
     GENERATED_BODY()
+public:
+    UFUNCTION( BlueprintNativeEvent )
+    FText GetStartDataText() const;
+
+    UFUNCTION( BlueprintNativeEvent )
+    FText GetEndDataText() const;
 };
 
 UCLASS( DefaultToInstanced, Blueprintable, BlueprintType, Abstract, EditInlineNew )
@@ -170,6 +188,12 @@ class SPLINEFOLLOW_API USFSplineMarkerObject : public UObject
     GENERATED_BODY()
 
 public:
+    UFUNCTION( BlueprintCallable )
+    virtual FText GetStartDataText() const;
+
+    UFUNCTION( BlueprintCallable )
+    virtual FText GetEndDataText() const;
+
     virtual void AddSplineMarkerProxies( TArray< FSFSplineMarkerProxy > & proxies, const FSFSplineMarkerInfos & infos ) const;
 
     UPROPERTY( BlueprintReadOnly, EditAnywhere )
@@ -185,6 +209,9 @@ class SPLINEFOLLOW_API USFSplineMarkerObject_Action : public USFSplineMarkerObje
     GENERATED_BODY()
 
 public:
+    FText GetStartDataText() const override;
+    FText GetEndDataText() const override;
+
     void AddSplineMarkerProxies( TArray< FSFSplineMarkerProxy > & proxies, const FSFSplineMarkerInfos & infos ) const override;
 
     UPROPERTY( BlueprintReadOnly, EditAnywhere )
@@ -197,6 +224,9 @@ class SPLINEFOLLOW_API USFSplineMarkerObject_LevelActor : public USFSplineMarker
     GENERATED_BODY()
 
 public:
+    FText GetStartDataText() const override;
+    FText GetEndDataText() const override;
+
     void AddSplineMarkerProxies( TArray< FSFSplineMarkerProxy > & proxies, const FSFSplineMarkerInfos & infos ) const override;
 
     UPROPERTY( BlueprintReadOnly, EditAnywhere )
@@ -209,6 +239,9 @@ class SPLINEFOLLOW_API USFSplineMarkerObject_Data : public USFSplineMarkerObject
     GENERATED_BODY()
 
 public:
+    FText GetStartDataText() const override;
+    FText GetEndDataText() const override;
+
     UPROPERTY( BlueprintReadOnly, EditAnywhere )
     TObjectPtr< USFSplineMarkerData > Data;
 };
