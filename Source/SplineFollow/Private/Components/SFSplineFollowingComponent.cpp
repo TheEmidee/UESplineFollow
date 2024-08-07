@@ -99,7 +99,7 @@ void USFSplineFollowingComponent::FollowDestination() const
         const auto spline_offset_dir = spline_offset.GetSafeNormal();
         const auto spline_offset_distance = spline_offset.SquaredLength();
 
-        desired_movement -= spline_offset_dir * spline_offset_distance * 0.01f;
+        desired_movement -= spline_offset_dir * spline_offset_distance * SplineSnapMultiplier;
     }
 
     const auto move_input = desired_movement.GetSafeNormal();

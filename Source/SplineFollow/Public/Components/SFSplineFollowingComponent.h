@@ -45,6 +45,9 @@ private:
     UPROPERTY( EditAnywhere, meta = ( ClampMin = "0.0166", ClampMax = "0.50", UIMin = "0.0166", UIMax = "0.50" ) )
     float MaxSimulationTimeStep;
 
+    UPROPERTY( EditDefaultsOnly )
+    float SplineSnapMultiplier;
+
     FVector Destination;
     float DestinationDistance;
 };
