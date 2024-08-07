@@ -51,7 +51,17 @@ EDataValidationResult USFSplineMarkerActorFilter_SelectByClass::IsDataValid( FDa
 }
 #endif
 
-void USFSplineMarkerAction::ProcessAction( AActor * actor, const ESFSplineMarkerProcessActionType action_type, const FSFSplineMarkerInfos & marker_infos ) const
+FText USFSplineMarkerAction::GetStartDataText_Implementation() const
+{
+    return FText::GetEmpty();
+}
+
+FText USFSplineMarkerAction::GetEndDataText_Implementation() const
+{
+    return GetStartDataText();
+}
+
+void USFSplineMarkerAction::ProcessAction( AActor * actor, const ESFSplineMarkerProcessActionType action_type, const FSFSplineMarkerInfos & marker_infos )
 {
     for ( const auto & actor_filter_class : ActorFilters )
     {
@@ -106,16 +116,25 @@ UWorld * USFSplineMarkerAction::GetWorld() const
     return nullptr;
 }
 
-void USFSplineMarkerAction::ExecuteAction_Implementation( AActor * /*actor*/, const FSFSplineMarkerInfos & /*marker_infos*/ ) const
+void USFSplineMarkerAction::ExecuteAction_Implementation( AActor * /*actor*/, const FSFSplineMarkerInfos & /*marker_infos*/ )
 {
 }
 
-void USFSplineMarkerAction::ExecuteStartWindowAction_Implementation( AActor * /*actor*/, const FSFSplineMarkerInfos & /*marker_infos*/ ) const
+void USFSplineMarkerAction::ExecuteStartWindowAction_Implementation( AActor * /*actor*/, const FSFSplineMarkerInfos & /*marker_infos*/ )
 {
 }
 
-void USFSplineMarkerAction::ExecuteEndWindowAction_Implementation( AActor * /*actor*/, const FSFSplineMarkerInfos & /*marker_infos*/ ) const
+void USFSplineMarkerAction::ExecuteEndWindowAction_Implementation( AActor * /*actor*/, const FSFSplineMarkerInfos & /*marker_infos*/ )
 {
+}
+
+FText ASFSplineMarkerLevelActor::GetStartDataText_Implementation() const
+{
+    return FText::GetEmpty();
+}
+FText ASFSplineMarkerLevelActor::GetEndDataText_Implementation() const
+{
+    return GetStartDataText();
 }
 
 void ASFSplineMarkerLevelActor::ProcessAction( AActor * actor, const ESFSplineMarkerProcessActionType action_type, const FSFSplineMarkerInfos & marker_infos ) const
@@ -158,8 +177,50 @@ void ASFSplineMarkerLevelActor::ProcessAction( AActor * actor, const ESFSplineMa
     }
 }
 
+void ASFSplineMarkerLevelActor::ExecuteAction_Implementation( AActor * /*actor*/, const FSFSplineMarkerInfos & /*marker_infos*/ ) const
+{
+}
+
+void ASFSplineMarkerLevelActor::ExecuteStartWindowAction_Implementation( AActor * /*actor*/, const FSFSplineMarkerInfos & /*marker_infos*/ ) const
+{
+}
+
+void ASFSplineMarkerLevelActor::ExecuteEndWindowAction_Implementation( AActor * /*actor*/, const FSFSplineMarkerInfos & /*marker_infos*/ ) const
+{
+}
+
+FText USFSplineMarkerData::GetStartDataText_Implementation() const
+{
+    return FText::GetEmpty();
+}
+
+FText USFSplineMarkerData::GetEndDataText_Implementation() const
+{
+    return GetStartDataText();
+}
+
+FText USFSplineMarkerObject::GetStartDataText() const
+{
+    return FText::GetEmpty();
+}
+
+FText USFSplineMarkerObject::GetEndDataText() const
+{
+    return GetStartDataText();
+}
+
 void USFSplineMarkerObject::AddSplineMarkerProxies( TArray< FSFSplineMarkerProxy > & /*proxies*/, const FSFSplineMarkerInfos & /*infos*/ ) const
 {
+}
+
+FText USFSplineMarkerObject_Action::GetStartDataText() const
+{
+    return ActionClass != nullptr ? ActionClass->GetStartDataText() : Super::GetStartDataText();
+}
+
+FText USFSplineMarkerObject_Action::GetEndDataText() const
+{
+    return ActionClass != nullptr ? ActionClass->GetEndDataText() : Super::GetEndDataText();
 }
 
 void USFSplineMarkerObject_Action::AddSplineMarkerProxies( TArray< FSFSplineMarkerProxy > & proxies, const FSFSplineMarkerInfos & infos ) const
@@ -169,7 +230,7 @@ void USFSplineMarkerObject_Action::AddSplineMarkerProxies( TArray< FSFSplineMark
         return;
     }
 
-    const auto * marker_action = ActionClass->GetDefaultObject< USFSplineMarkerAction >();
+    auto * marker_action = ActionClass.Get();
 
     switch ( infos.Type )
     {
@@ -197,6 +258,16 @@ void USFSplineMarkerObject_Action::AddSplineMarkerProxies( TArray< FSFSplineMark
         }
         break;
     }
+}
+
+FText USFSplineMarkerObject_LevelActor::GetStartDataText() const
+{
+    return LevelActor != nullptr ? LevelActor->GetStartDataText() : Super::GetStartDataText();
+}
+
+FText USFSplineMarkerObject_LevelActor::GetEndDataText() const
+{
+    return LevelActor != nullptr ? LevelActor->GetEndDataText() : Super::GetEndDataText();
 }
 
 void USFSplineMarkerObject_LevelActor::AddSplineMarkerProxies( TArray< FSFSplineMarkerProxy > & proxies, const FSFSplineMarkerInfos & infos ) const
@@ -234,16 +305,14 @@ void USFSplineMarkerObject_LevelActor::AddSplineMarkerProxies( TArray< FSFSpline
     }
 }
 
-void ASFSplineMarkerLevelActor::ExecuteAction_Implementation( AActor * /*actor*/, const FSFSplineMarkerInfos & /*marker_infos*/ ) const
+FText USFSplineMarkerObject_Data::GetStartDataText() const
 {
+    return Data != nullptr ? Data->GetStartDataText() : Super::GetStartDataText();
 }
 
-void ASFSplineMarkerLevelActor::ExecuteStartWindowAction_Implementation( AActor * /*actor*/, const FSFSplineMarkerInfos & /*marker_infos*/ ) const
+FText USFSplineMarkerObject_Data::GetEndDataText() const
 {
-}
-
-void ASFSplineMarkerLevelActor::ExecuteEndWindowAction_Implementation( AActor * /*actor*/, const FSFSplineMarkerInfos & /*marker_infos*/ ) const
-{
+    return Data != nullptr ? Data->GetEndDataText() : Super::GetEndDataText();
 }
 
 bool FSFSplineMarker::IsValid() const
@@ -257,114 +326,4 @@ void FSFSplineMarker::AddSplineMarkerProxies( TArray< FSFSplineMarkerProxy > & p
     {
         Object->AddSplineMarkerProxies( proxies, Infos );
     }
-}
-
-UTexture2D * FSFSplineMarker::GetSprite() const
-{
-    return nullptr;
-}
-
-bool FSFSplineMarker_Static::IsValid() const
-{
-    return Super::IsValid() && ActionClass != nullptr;
-}
-
-void FSFSplineMarker_Static::AddSplineMarkerProxies( TArray< FSFSplineMarkerProxy > & proxies ) const
-{
-    const auto * marker_action = ActionClass->GetDefaultObject< USFSplineMarkerAction >();
-
-    switch ( Infos.Type )
-    {
-        case ESFSplineMarkerType::Single:
-        {
-            proxies.Emplace( FSFSplineMarkerProxy( Infos.SingleActionNormalizedSplineDistance, [ marker_action, infos = Infos ]( AActor * actor ) {
-                marker_action->ProcessAction( actor, ESFSplineMarkerProcessActionType::Single, infos );
-            } ) );
-        }
-        break;
-        case ESFSplineMarkerType::Window:
-        {
-            proxies.Emplace( FSFSplineMarkerProxy( Infos.WindowStartNormalizedSplineDistance, [ marker_action, infos = Infos ]( AActor * actor ) {
-                marker_action->ProcessAction( actor, ESFSplineMarkerProcessActionType::WindowStart, infos );
-            } ) );
-
-            proxies.Emplace( FSFSplineMarkerProxy( Infos.WindowEndNormalizedSplineDistance, [ marker_action, infos = Infos ]( AActor * actor ) {
-                marker_action->ProcessAction( actor, ESFSplineMarkerProcessActionType::WindowEnd, infos );
-            } ) );
-        }
-        break;
-        default:
-        {
-            checkNoEntry();
-        }
-        break;
-    }
-}
-
-UTexture2D * FSFSplineMarker_Static::GetSprite() const
-{
-    if ( ActionClass != nullptr )
-    {
-        if ( const auto * marker_action = ActionClass->GetDefaultObject< USFSplineMarkerAction >() )
-        {
-            return marker_action->GetSprite();
-        }
-    }
-
-    return Super::GetSprite();
-}
-
-FSFSplineMarker_LevelActor::FSFSplineMarker_LevelActor() :
-    LevelActor( nullptr )
-{
-}
-
-bool FSFSplineMarker_LevelActor::IsValid() const
-{
-    return Super::IsValid() && LevelActor != nullptr;
-}
-
-void FSFSplineMarker_LevelActor::AddSplineMarkerProxies( TArray< FSFSplineMarkerProxy > & proxies ) const
-{
-    switch ( Infos.Type )
-    {
-        case ESFSplineMarkerType::Single:
-        {
-            proxies.Emplace( FSFSplineMarkerProxy( Infos.SingleActionNormalizedSplineDistance, [ level_actor = LevelActor, infos = Infos ]( AActor * actor ) {
-                level_actor->ProcessAction( actor, ESFSplineMarkerProcessActionType::Single, infos );
-            } ) );
-        }
-        break;
-        case ESFSplineMarkerType::Window:
-        {
-            proxies.Emplace( FSFSplineMarkerProxy( Infos.WindowStartNormalizedSplineDistance, [ level_actor = LevelActor, infos = Infos ]( AActor * actor ) {
-                level_actor->ProcessAction( actor, ESFSplineMarkerProcessActionType::WindowStart, infos );
-            } ) );
-
-            proxies.Emplace( FSFSplineMarkerProxy( Infos.WindowEndNormalizedSplineDistance, [ level_actor = LevelActor, infos = Infos ]( AActor * actor ) {
-                level_actor->ProcessAction( actor, ESFSplineMarkerProcessActionType::WindowEnd, infos );
-            } ) );
-        }
-        break;
-        default:
-        {
-            checkNoEntry();
-        }
-        break;
-    }
-}
-
-UTexture2D * FSFSplineMarker_LevelActor::GetSprite() const
-{
-    if ( LevelActor != nullptr )
-    {
-        return LevelActor->GetSprite();
-    }
-
-    return Super::GetSprite();
-}
-
-FSFSplineMarker_Data::FSFSplineMarker_Data() :
-    Sprite( nullptr )
-{
 }

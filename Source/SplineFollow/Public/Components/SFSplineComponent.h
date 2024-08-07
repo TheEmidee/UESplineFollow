@@ -34,9 +34,10 @@ public:
     void OnRegister() override;
 
     void UpdateSpline() override;
-    void Serialize( FArchive & archive );
 
 #if WITH_EDITOR
+    UFUNCTION( BlueprintCallable )
+    FSFSplineMarker CreateMarkerFromDefault( const FSFSplineMarker & default_marker );
     UFUNCTION( BlueprintCallable )
     void SaveSplineMarkers( const TArray< FSFSplineMarker > & markers_to_save );
 
@@ -46,15 +47,6 @@ public:
 private:
     UPROPERTY( EditAnywhere, BlueprintReadWrite, meta = ( AllowPrivateAccess = true ) )
     TArray< FSFSplineMarker > SplineMarkers;
-
-    UPROPERTY( EditAnywhere, BlueprintReadWrite, meta = ( AllowPrivateAccess = true ) )
-    TArray< FSFSplineMarker_Static > StaticActionMarkers;
-
-    UPROPERTY( EditAnywhere, BlueprintReadWrite, meta = ( AllowPrivateAccess = true ) )
-    TArray< FSFSplineMarker_LevelActor > LevelActorActionMarkers;
-
-    UPROPERTY( EditAnywhere, BlueprintReadWrite, meta = ( AllowPrivateAccess = true ) )
-    TArray< FSFSplineMarker_Data > DataMarkers;
 
     TArray< FSFSplineMarkerProxy > SplineMarkerProxies;
 };
