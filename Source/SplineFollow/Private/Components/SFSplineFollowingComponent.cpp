@@ -9,7 +9,7 @@ static constexpr float min_tick_time = 1e-6f;
 
 USFSplineFollowingComponent::USFSplineFollowingComponent() :
     MovementComponent( nullptr ),
-    SplineDistance( 0.0f ),
+    DistanceOnSpline( 0.0f ),
     MaxSimulationIterations( 4 ),
     MaxSimulationTimeStep( 0.05f ),
     Destination( FVector::ZeroVector ),
@@ -26,7 +26,17 @@ void USFSplineFollowingComponent::FollowSpline( const FSFFollowSplineInfos & spl
     const auto feet_location = MovementComponent->GetActorFeetLocation();
     const auto actor_location = MovementComponent->GetActorLocation();
     GetOwner()->SetActorLocationAndRotation( transform.GetLocation() + actor_location - feet_location, transform.GetRotation() );
-    SplineDistance = 0.0f;
+    DistanceOnSpline = 0.0f;
+}
+
+float USFSplineFollowingComponent::GetNormalizedDistanceOnSpline() const
+{
+    if ( FollowedSplineComponent == nullptr )
+    {
+        return -1.0f;
+    }
+
+    return DistanceOnSpline / FollowedSplineComponent->GetSplineLength();
 }
 
 void USFSplineFollowingComponent::BeginPlay()
@@ -77,8 +87,8 @@ void USFSplineFollowingComponent::UpdateDestination( const float delta_time )
         return;
     }
 
-    SplineDistance = DestinationDistance;
-    DestinationDistance = SplineDistance + MovementComponent->GetMaxSpeed() * delta_time;
+    DistanceOnSpline = DestinationDistance;
+    DestinationDistance = DistanceOnSpline + MovementComponent->GetMaxSpeed() * delta_time;
     Destination = FollowedSplineComponent->GetLocationAtDistanceAlongSpline( DestinationDistance, ESplineCoordinateSpace::World );
 }
 
@@ -89,7 +99,7 @@ void USFSplineFollowingComponent::FollowDestination() const
         return;
     }
 
-    const auto current_location = FollowedSplineComponent->GetLocationAtDistanceAlongSpline( SplineDistance, ESplineCoordinateSpace::World );
+    const auto current_location = FollowedSplineComponent->GetLocationAtDistanceAlongSpline( DistanceOnSpline, ESplineCoordinateSpace::World );
     const auto actor_location = MovementComponent->GetActorFeetLocation();
     auto desired_movement = Destination - current_location;
 

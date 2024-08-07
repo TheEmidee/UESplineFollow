@@ -20,6 +20,12 @@ public:
     UFUNCTION( BlueprintCallable )
     void FollowSpline( const FSFFollowSplineInfos & spline_infos );
 
+    UFUNCTION( BlueprintPure )
+    float GetDistanceOnSpline() const;
+
+    UFUNCTION( BlueprintPure )
+    float GetNormalizedDistanceOnSpline() const;
+
     void BeginPlay() override;
     void TickComponent( float delta_time, ELevelTick tick_type, FActorComponentTickFunction * this_tick_function ) override;
 
@@ -37,7 +43,7 @@ private:
     TObjectPtr< USplineComponent > FollowedSplineComponent;
 
     UPROPERTY( BlueprintReadOnly, meta = ( AllowPrivateAccess = true ) )
-    float SplineDistance;
+    float DistanceOnSpline;
 
     UPROPERTY( EditAnywhere, meta = ( ClampMin = "1", ClampMax = "25", UIMin = "1", UIMax = "25" ) )
     int32 MaxSimulationIterations;
@@ -51,3 +57,8 @@ private:
     FVector Destination;
     float DestinationDistance;
 };
+
+FORCEINLINE float USFSplineFollowingComponent::GetDistanceOnSpline() const
+{
+    return DistanceOnSpline;
+}
