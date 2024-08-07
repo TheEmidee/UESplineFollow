@@ -27,6 +27,8 @@ private:
     void UpdateDestination( float delta_time );
     void FollowDestination() const;
     bool HasReachedDestination();
+    bool HasStoppedSimulation() const;
+    float GetSimulationTimeStep( float remaining_time, const int32 iterations ) const;
 
     UPROPERTY()
     TObjectPtr< UCharacterMovementComponent > MovementComponent;
@@ -36,6 +38,12 @@ private:
 
     UPROPERTY( BlueprintReadOnly, meta = ( AllowPrivateAccess = true ) )
     float SplineDistance;
+
+    UPROPERTY( EditAnywhere, meta = ( ClampMin = "1", ClampMax = "25", UIMin = "1", UIMax = "25" ) )
+    int32 MaxSimulationIterations;
+
+    UPROPERTY( EditAnywhere, meta = ( ClampMin = "0.0166", ClampMax = "0.50", UIMin = "0.0166", UIMax = "0.50" ) )
+    float MaxSimulationTimeStep;
 
     FVector Destination;
     float DestinationDistance;
