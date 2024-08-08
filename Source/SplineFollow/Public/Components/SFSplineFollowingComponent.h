@@ -1,5 +1,7 @@
 #pragma once
 
+#include "SFSplineFollowingInterface.h"
+
 #include <Components/ActorComponent.h>
 #include <CoreMinimal.h>
 
@@ -10,7 +12,7 @@ class USplineComponent;
 class UCharacterMovementComponent;
 
 UCLASS( ClassGroup = ( Custom ), meta = ( BlueprintSpawnableComponent ) )
-class SPLINEFOLLOW_API USFSplineFollowingComponent : public UActorComponent
+class SPLINEFOLLOW_API USFSplineFollowingComponent : public UActorComponent, public ISFSplineFollowingInterface
 {
     GENERATED_BODY()
 
@@ -20,11 +22,10 @@ public:
     UFUNCTION( BlueprintCallable )
     void FollowSpline( const FSFFollowSplineInfos & spline_infos );
 
-    UFUNCTION( BlueprintPure )
-    float GetDistanceOnSpline() const;
-
-    UFUNCTION( BlueprintPure )
-    float GetNormalizedDistanceOnSpline() const;
+    float GetDistanceOnSpline() const override;
+    float GetNormalizedDistanceOnSpline() const override;
+    void ToggleSplineMovement( bool enable ) override;
+    void SetDistanceOnSpline( float new_distance ) override;
 
     void BeginPlay() override;
     void TickComponent( float delta_time, ELevelTick tick_type, FActorComponentTickFunction * this_tick_function ) override;

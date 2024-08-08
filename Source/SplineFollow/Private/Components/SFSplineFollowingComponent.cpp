@@ -42,6 +42,14 @@ float USFSplineFollowingComponent::GetNormalizedDistanceOnSpline() const
     return DistanceOnSpline / FollowedSplineComponent->GetSplineLength();
 }
 
+void USFSplineFollowingComponent::ToggleSplineMovement( bool enable )
+{
+}
+
+void USFSplineFollowingComponent::SetDistanceOnSpline( float new_distance )
+{
+}
+
 void USFSplineFollowingComponent::BeginPlay()
 {
     Super::BeginPlay();
