@@ -12,6 +12,7 @@ USFSplineFollowingComponent::USFSplineFollowingComponent() :
     DistanceOnSpline( 0.0f ),
     MaxSimulationIterations( 4 ),
     MaxSimulationTimeStep( 0.05f ),
+    SplineSnapMultiplier( 0.01f ),
     Destination( FVector::ZeroVector ),
     DestinationDistance( 0.0f )
 {
@@ -27,6 +28,8 @@ void USFSplineFollowingComponent::FollowSpline( const FSFFollowSplineInfos & spl
     const auto actor_location = MovementComponent->GetActorLocation();
     GetOwner()->SetActorLocationAndRotation( transform.GetLocation() + actor_location - feet_location, transform.GetRotation() );
     DistanceOnSpline = 0.0f;
+    DestinationDistance = 0.0f;
+    Destination = FollowedSplineComponent->GetLocationAtDistanceAlongSpline( DestinationDistance, ESplineCoordinateSpace::World );
 }
 
 float USFSplineFollowingComponent::GetNormalizedDistanceOnSpline() const
@@ -123,13 +126,13 @@ bool USFSplineFollowingComponent::HasReachedDestination()
         return false;
     }
 
-    const auto current_direction = GetOwner()->GetActorForwardVector();
+    const auto current_direction = MovementComponent->Velocity.GetSafeNormal();
     const auto current_location = MovementComponent->GetActorFeetLocation();
 
     // check if moved too far
-    const auto to_target = ( Destination - MovementComponent->GetActorFeetLocation() ).GetSafeNormal();
+    const auto to_target = ( Destination - current_location ).GetSafeNormal();
     const auto segment_dot = FVector::DotProduct( to_target, current_direction );
-    if ( segment_dot > 0.0f )
+    if ( segment_dot < 0.0f )
     {
         return true;
     }
