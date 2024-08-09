@@ -15,6 +15,9 @@ USFSplineFollowingComponent::USFSplineFollowingComponent() :
     SplineSnapMultiplier( 0.01f ),
     InitialPosition( 0.0f ),
     bStartsMovementDuringBeginPlay( false ),
+    bLoops( 0 ),
+    LoopCount( 0 ),
+    bResetLoopCountWhenStopped( 0 ),
     Destination( FVector::ZeroVector ),
     DestinationDistance( 0.0f )
 {
@@ -34,7 +37,7 @@ bool USFSplineFollowingComponent::FollowSpline( const FSFFollowSplineInfos & fol
     }
 
     FollowedSplineComponent = follow_spline_infos.SplineComponent;
-    LastProcessedMarkerIndex = INDEX_NONE;
+    SplineMarkerProcessor.Initialize( FollowedSplineComponent );
     LoopCount = 0;
 
     if ( follow_spline_infos.bAttachToSpline )
@@ -87,8 +90,17 @@ void USFSplineFollowingComponent::ToggleSplineMovement( const bool it_is_active 
     SetComponentTickEnabled( it_is_enabled );
 }
 
-void USFSplineFollowingComponent::SetDistanceOnSpline( float new_distance )
+void USFSplineFollowingComponent::SetDistanceOnSpline( float distance_on_spline )
 {
+    auto new_location = FVector::Zero();
+    auto new_rotation = FRotator::ZeroRotator;
+
+    SetDistanceOnSplineInternal( new_location, new_rotation, distance_on_spline );
+    GetOwner()->SetActorLocation( new_location );
+    GetOwner()->SetActorRotation( new_rotation );
+
+    MovementComponent->StopActiveMovement();
+    SplineMarkerProcessor.UpdateLastProcessedMarker( GetNormalizedDistanceOnSpline(), MovementComponent->Velocity.Length() );
 }
 
 void USFSplineFollowingComponent::SetNormalizedDistanceOnSpline( const float normalized_distance_on_spline )
@@ -274,4 +286,21 @@ float USFSplineFollowingComponent::GetSimulationTimeStep( float remaining_time, 
 
     // no less than MIN_TICK_TIME (to avoid potential divide-by-zero during simulation).
     return FMath::Max( min_tick_time, remaining_time );
+}
+
+void USFSplineFollowingComponent::SetDistanceOnSplineInternal( FVector & updated_location, FRotator & updated_rotation, float distance_on_spline )
+{
+    if ( FollowedSplineComponent == nullptr || MovementComponent == nullptr )
+    {
+        return;
+    }
+
+    updated_location = FollowedSplineComponent->GetLocationAtDistanceAlongSpline( distance_on_spline, ESplineCoordinateSpace::World );
+
+    if ( MovementComponent->bOrientRotationToMovement )
+    {
+        updated_rotation = FollowedSplineComponent->GetRotationAtDistanceAlongSpline( distance_on_spline, ESplineCoordinateSpace::World );
+    }
+
+    DistanceOnSpline = distance_on_spline;
 }

@@ -81,3 +81,24 @@ struct SPLINEFOLLOW_API FSFFollowSplineInfos
     UPROPERTY( EditAnywhere, BlueprintReadWrite )
     float RotationSpeedOverride;
 };
+
+USTRUCT()
+struct FSFSplineMarkerProcessor
+{
+    GENERATED_BODY()
+
+public:
+    FSFSplineMarkerProcessor();
+
+    void Initialize( USplineComponent * spline_component );
+
+    void ProcessSplineMarkers( float distance_on_spline, float current_speed, AActor * owner );
+    void TryUpdateLastProcessedMarker( const float distance_on_spline, const float current_speed );
+    void UpdateLastProcessedMarker( const float distance_on_spline, const float current_speed );
+    void Reset();
+
+private:
+    TObjectPtr< USplineComponent > SplineComponent;
+    int LastProcessedMarkerIndex;
+    uint8 bUpdateLastProcessedMarker : 1;
+};

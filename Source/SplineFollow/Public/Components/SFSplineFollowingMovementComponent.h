@@ -2,6 +2,7 @@
 
 #include "GameFramework/MovementComponent.h"
 #include "SFSplineFollowingInterface.h"
+#include "SFSplineFollowingTypes.h"
 
 #include <Curves/CurveVector.h>
 
@@ -10,9 +11,7 @@
 enum class ESFSplineOffsetType : uint8;
 class USFSplineOffsetData;
 class USFSplineFollowingMovementComponent;
-class USplineComponent;
 class UCurveFloat;
-class USFSplineSpeedProvider;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam( FSFOnSplineOffsetFinishedDelegate, USFSplineOffsetData *, offset_data );
 
@@ -128,14 +127,12 @@ private:
     bool CheckStillInWorld();
     float GetSimulationTimeStep( float remaining_time, int32 iterations ) const;
     void UpdateInitialPosition();
-    void ProcessSplineMarkers( float distance_on_spline );
     void SetDistanceOnSplineInternal( FVector & updated_location, FRotator & updated_rotation, float distance_on_spline );
     void RefreshComponents();
     void UpdateCurrentSpeed( float delta_time );
     void ProcessPositionObservers( float distance_on_spline );
     void ResetPositionObservers();
     void ConstrainRotation( FRotator & rotation ) const;
-    void UpdateLastProcessedMarker();
     void ApplyOffsetData( FTransform & transform, float delta_time );
 
     UPROPERTY( BlueprintAssignable )
@@ -226,8 +223,7 @@ private:
 
     TArray< FSFSplineOffsetInfo > SplineOffsetDatas;
     TArray< FPositionObserver > PositionObservers;
-    int LastProcessedMarkerIndex;
-    uint8 bUpdateLastProcessedMarker : 1;
+    FSFSplineMarkerProcessor SplineMarkerProcessor;
 };
 
 FORCEINLINE USplineComponent * USFSplineFollowingMovementComponent::GetFollowedSpline() const

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "SFSplineFollowingInterface.h"
+#include "SFSplineFollowingTypes.h"
 
 #include <Components/ActorComponent.h>
 #include <CoreMinimal.h>
@@ -24,7 +25,7 @@ public:
 
     float GetNormalizedDistanceOnSpline() const override;
     void ToggleSplineMovement( bool it_is_active ) override;
-    void SetDistanceOnSpline( float new_distance ) override;
+    void SetDistanceOnSpline( float distance_on_spline ) override;
     void SetNormalizedDistanceOnSpline( float normalized_distance_on_spline ) override;
 
     void InitializeComponent() override;
@@ -38,6 +39,7 @@ private:
     bool HasReachedDestination();
     bool HasStoppedSimulation() const;
     float GetSimulationTimeStep( float remaining_time, const int32 iterations ) const;
+    void SetDistanceOnSplineInternal( FVector & updated_location, FRotator & updated_rotation, float distance_on_spline );
 
     UPROPERTY()
     TObjectPtr< UCharacterMovementComponent > MovementComponent;
@@ -74,7 +76,7 @@ private:
 
     FVector Destination;
     float DestinationDistance;
-    int LastProcessedMarkerIndex;
+    FSFSplineMarkerProcessor SplineMarkerProcessor;
 };
 
 FORCEINLINE float USFSplineFollowingComponent::GetDistanceOnSpline() const
