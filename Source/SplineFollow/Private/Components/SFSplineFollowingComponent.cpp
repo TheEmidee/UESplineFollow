@@ -1,6 +1,6 @@
 #include "Components/SFSplineFollowingComponent.h"
 
-#include "Components/SFSplineFollowingMovementComponent.h"
+#include "Components/SFSplineFollowingTypes.h"
 #include "Components/SplineComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
@@ -19,7 +19,7 @@ USFSplineFollowingComponent::USFSplineFollowingComponent() :
     PrimaryComponentTick.bCanEverTick = true;
 }
 
-void USFSplineFollowingComponent::FollowSpline( const FSFFollowSplineInfos & spline_infos )
+bool USFSplineFollowingComponent::FollowSpline( const FSFFollowSplineInfos & spline_infos )
 {
     FollowedSplineComponent = spline_infos.SplineComponent;
 
@@ -30,6 +30,8 @@ void USFSplineFollowingComponent::FollowSpline( const FSFFollowSplineInfos & spl
     DistanceOnSpline = 0.0f;
     DestinationDistance = 0.0f;
     Destination = FollowedSplineComponent->GetLocationAtDistanceAlongSpline( DestinationDistance, ESplineCoordinateSpace::World );
+
+    return true;
 }
 
 float USFSplineFollowingComponent::GetNormalizedDistanceOnSpline() const
@@ -42,8 +44,16 @@ float USFSplineFollowingComponent::GetNormalizedDistanceOnSpline() const
     return DistanceOnSpline / FollowedSplineComponent->GetSplineLength();
 }
 
-void USFSplineFollowingComponent::ToggleSplineMovement( bool enable )
+void USFSplineFollowingComponent::ToggleSplineMovement( const bool it_is_active )
 {
+    const auto it_is_enabled = it_is_active && FollowedSplineComponent;
+
+    // if ( it_is_enabled && bResetLoopCountWhenStopped )
+    // {
+    // LoopCount = 0;
+    // }
+
+    SetComponentTickEnabled( it_is_enabled );
 }
 
 void USFSplineFollowingComponent::SetDistanceOnSpline( float new_distance )

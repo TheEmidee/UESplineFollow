@@ -5,6 +5,8 @@
 
 #include "SFSplineFollowingInterface.generated.h"
 
+struct FSFFollowSplineInfos;
+
 UINTERFACE( MinimalAPI, NotBlueprintable )
 class USFSplineFollowingInterface : public UInterface
 {
@@ -23,8 +25,11 @@ public:
     virtual float GetNormalizedDistanceOnSpline() const = 0;
 
     UFUNCTION( BlueprintCallable )
-    virtual void ToggleSplineMovement( bool enable ) = 0;
+    virtual void ToggleSplineMovement( bool it_is_active ) = 0;
 
     UFUNCTION( BlueprintCallable )
     virtual void SetDistanceOnSpline( float new_distance ) = 0;
+
+    UFUNCTION( BlueprintCallable )
+    virtual bool FollowSpline( const FSFFollowSplineInfos & follow_spline_infos ) = 0;
 };

@@ -7,7 +7,6 @@
 
 #include "SFSplineFollowingComponent.generated.h"
 
-struct FSFFollowSplineInfos;
 class USplineComponent;
 class UCharacterMovementComponent;
 
@@ -19,12 +18,12 @@ class SPLINEFOLLOW_API USFSplineFollowingComponent : public UActorComponent, pub
 public:
     USFSplineFollowingComponent();
 
-    UFUNCTION( BlueprintCallable )
-    void FollowSpline( const FSFFollowSplineInfos & spline_infos );
-
     float GetDistanceOnSpline() const override;
+
+    bool FollowSpline( const FSFFollowSplineInfos & spline_infos ) override;
+
     float GetNormalizedDistanceOnSpline() const override;
-    void ToggleSplineMovement( bool enable ) override;
+    void ToggleSplineMovement( bool it_is_active ) override;
     void SetDistanceOnSpline( float new_distance ) override;
 
     void BeginPlay() override;
