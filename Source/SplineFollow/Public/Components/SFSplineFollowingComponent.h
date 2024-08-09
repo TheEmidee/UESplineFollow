@@ -20,16 +20,19 @@ public:
 
     float GetDistanceOnSpline() const override;
 
-    bool FollowSpline( const FSFFollowSplineInfos & spline_infos ) override;
+    bool FollowSpline( const FSFFollowSplineInfos & follow_spline_infos ) override;
 
     float GetNormalizedDistanceOnSpline() const override;
     void ToggleSplineMovement( bool it_is_active ) override;
     void SetDistanceOnSpline( float new_distance ) override;
+    void SetNormalizedDistanceOnSpline( float normalized_distance_on_spline ) override;
 
+    void InitializeComponent() override;
     void BeginPlay() override;
     void TickComponent( float delta_time, ELevelTick tick_type, FActorComponentTickFunction * this_tick_function ) override;
 
 private:
+    void UpdateInitialPosition();
     void UpdateDestination( float delta_time );
     void FollowDestination() const;
     bool HasReachedDestination();
@@ -54,8 +57,24 @@ private:
     UPROPERTY( EditDefaultsOnly )
     float SplineSnapMultiplier;
 
+    UPROPERTY( EditAnywhere, BlueprintReadOnly, meta = ( AllowPrivateAccess = true, ClampMin = "0.0", ClampMax = "1.0", UIMin = "0.0", UIMax = "1.0" ) )
+    float InitialPosition;
+
+    UPROPERTY( EditAnywhere, BlueprintReadWrite, meta = ( AllowPrivateAccess = true ) )
+    uint8 bStartsMovementDuringBeginPlay : 1;
+
+    UPROPERTY( EditAnywhere, BlueprintReadWrite, meta = ( AllowPrivateAccess = true ) )
+    uint8 bLoops : 1;
+
+    UPROPERTY( VisibleInstanceOnly, BlueprintReadOnly, meta = ( AllowPrivateAccess = true ) )
+    int LoopCount;
+
+    UPROPERTY( EditAnywhere, BlueprintReadWrite, meta = ( AllowPrivateAccess = true, EditCondition = "bLoops" ) )
+    uint8 bResetLoopCountWhenStopped : 1;
+
     FVector Destination;
     float DestinationDistance;
+    int LastProcessedMarkerIndex;
 };
 
 FORCEINLINE float USFSplineFollowingComponent::GetDistanceOnSpline() const

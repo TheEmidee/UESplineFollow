@@ -2,6 +2,15 @@
 
 #include <Components/SplineComponent.h>
 
+void USFSplineSpeedProvider::Setup_Implementation( USplineComponent * followed_spline_component, USFSplineFollowingMovementComponent * spline_following_movement_component )
+{
+}
+
+float USFSplineSpeedProvider::GetSpeed_Implementation( float normalized_position_on_spline, USplineComponent * followed_spline_component, USFSplineFollowingMovementComponent * /* spline_following_movement_component */, float delta_time )
+{
+    return 0.0f;
+}
+
 USFSplineSpeedProvider_Constant::USFSplineSpeedProvider_Constant() :
     Speed( 100.0f )
 {

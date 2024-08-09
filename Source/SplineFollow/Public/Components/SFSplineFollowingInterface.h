@@ -31,5 +31,8 @@ public:
     virtual void SetDistanceOnSpline( float new_distance ) = 0;
 
     UFUNCTION( BlueprintCallable )
+    virtual void SetNormalizedDistanceOnSpline( float normalized_distance_on_spline ) = 0;
+
+    UFUNCTION( BlueprintCallable )
     virtual bool FollowSpline( const FSFFollowSplineInfos & follow_spline_infos ) = 0;
 };

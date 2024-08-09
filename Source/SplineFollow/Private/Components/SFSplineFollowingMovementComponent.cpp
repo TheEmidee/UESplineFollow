@@ -11,15 +11,6 @@
 // Minimum delta time considered when ticking. Delta times below this are not considered. This is a very small non-zero positive value to avoid potential divide-by-zero in simulation code.
 static constexpr float MinTickTime = 1e-6f;
 
-void USFSplineSpeedProvider::Setup_Implementation( USplineComponent * followed_spline_component, USFSplineFollowingMovementComponent * spline_following_movement_component )
-{
-}
-
-float USFSplineSpeedProvider::GetSpeed_Implementation( float normalized_position_on_spline, USplineComponent * followed_spline_component, USFSplineFollowingMovementComponent * /* spline_following_movement_component */, float delta_time )
-{
-    return 0.0f;
-}
-
 USFSplineFollowingMovementComponent::FSFSplineOffsetInfo::FSFSplineOffsetInfo() :
     OffsetType( ESFSplineOffsetType::Location ),
     bResetOnEnd( true ),

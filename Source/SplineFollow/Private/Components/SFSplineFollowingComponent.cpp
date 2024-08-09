@@ -13,23 +13,54 @@ USFSplineFollowingComponent::USFSplineFollowingComponent() :
     MaxSimulationIterations( 4 ),
     MaxSimulationTimeStep( 0.05f ),
     SplineSnapMultiplier( 0.01f ),
+    InitialPosition( 0.0f ),
+    bStartsMovementDuringBeginPlay( false ),
     Destination( FVector::ZeroVector ),
     DestinationDistance( 0.0f )
 {
     PrimaryComponentTick.bCanEverTick = true;
 }
 
-bool USFSplineFollowingComponent::FollowSpline( const FSFFollowSplineInfos & spline_infos )
+bool USFSplineFollowingComponent::FollowSpline( const FSFFollowSplineInfos & follow_spline_infos )
 {
-    FollowedSplineComponent = spline_infos.SplineComponent;
+    if ( !ensureAlwaysMsgf( follow_spline_infos.SplineComponent != nullptr, TEXT( "Invalid spline to follow" ) ) )
+    {
+        return false;
+    }
 
-    const auto & transform = FollowedSplineComponent->GetTransformAtDistanceAlongSpline( 0.0f, ESplineCoordinateSpace::World );
-    const auto feet_location = MovementComponent->GetActorFeetLocation();
-    const auto actor_location = MovementComponent->GetActorLocation();
-    GetOwner()->SetActorLocationAndRotation( transform.GetLocation() + actor_location - feet_location, transform.GetRotation() );
-    DistanceOnSpline = 0.0f;
-    DestinationDistance = 0.0f;
-    Destination = FollowedSplineComponent->GetLocationAtDistanceAlongSpline( DestinationDistance, ESplineCoordinateSpace::World );
+    if ( follow_spline_infos.SplineComponent == FollowedSplineComponent )
+    {
+        return false;
+    }
+
+    FollowedSplineComponent = follow_spline_infos.SplineComponent;
+    LastProcessedMarkerIndex = INDEX_NONE;
+    LoopCount = 0;
+
+    if ( follow_spline_infos.bAttachToSpline )
+    {
+        GetOwner()->AttachToComponent( FollowedSplineComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale );
+    }
+
+    bLoops = follow_spline_infos.bLoops;
+
+    MovementComponent->StopActiveMovement();
+
+    if ( follow_spline_infos.bOverrideRotationSpeed )
+    {
+        MovementComponent->RotationRate.Yaw = follow_spline_infos.RotationSpeedOverride;
+    }
+
+    SetNormalizedDistanceOnSpline( follow_spline_infos.NormalizedDistanceOnSpline );
+    ToggleSplineMovement( follow_spline_infos.bEnableMovement );
+
+    // const auto & transform = FollowedSplineComponent->GetTransformAtDistanceAlongSpline( 0.0f, ESplineCoordinateSpace::World );
+    // const auto feet_location = MovementComponent->GetActorFeetLocation();
+    // const auto actor_location = MovementComponent->GetActorLocation();
+    // GetOwner()->SetActorLocationAndRotation( transform.GetLocation() + actor_location - feet_location, transform.GetRotation() );
+    // DistanceOnSpline = 0.0f;
+    // DestinationDistance = 0.0f;
+    // Destination = FollowedSplineComponent->GetLocationAtDistanceAlongSpline( DestinationDistance, ESplineCoordinateSpace::World );
 
     return true;
 }
@@ -48,10 +79,10 @@ void USFSplineFollowingComponent::ToggleSplineMovement( const bool it_is_active 
 {
     const auto it_is_enabled = it_is_active && FollowedSplineComponent;
 
-    // if ( it_is_enabled && bResetLoopCountWhenStopped )
-    // {
-    // LoopCount = 0;
-    // }
+    if ( it_is_enabled && bResetLoopCountWhenStopped )
+    {
+        LoopCount = 0;
+    }
 
     SetComponentTickEnabled( it_is_enabled );
 }
@@ -60,16 +91,52 @@ void USFSplineFollowingComponent::SetDistanceOnSpline( float new_distance )
 {
 }
 
+void USFSplineFollowingComponent::SetNormalizedDistanceOnSpline( const float normalized_distance_on_spline )
+{
+    if ( FollowedSplineComponent == nullptr )
+    {
+        return;
+    }
+
+    const auto distance_on_spline = normalized_distance_on_spline * FollowedSplineComponent->GetSplineLength();
+
+    SetDistanceOnSpline( distance_on_spline );
+}
+
+void USFSplineFollowingComponent::InitializeComponent()
+{
+    Super::InitializeComponent();
+
+    SetComponentTickEnabled( false );
+    MovementComponent = GetOwner()->GetComponentByClass< UCharacterMovementComponent >();
+}
+
 void USFSplineFollowingComponent::BeginPlay()
 {
     Super::BeginPlay();
 
-    MovementComponent = GetOwner()->GetComponentByClass< UCharacterMovementComponent >();
+    UpdateInitialPosition();
+    ToggleSplineMovement( bStartsMovementDuringBeginPlay );
 }
 
 void USFSplineFollowingComponent::TickComponent( const float delta_time, const ELevelTick tick_type, FActorComponentTickFunction * this_tick_function )
 {
+    if ( HasStoppedSimulation() )
+    {
+        return;
+    }
+
     Super::TickComponent( delta_time, tick_type, this_tick_function );
+
+    if ( MovementComponent == nullptr )
+    {
+        return;
+    }
+
+    if ( FollowedSplineComponent == nullptr )
+    {
+        return;
+    }
 
     if ( MovementComponent->HasAnimRootMotion() || MovementComponent->CurrentRootMotion.HasOverrideVelocity() )
     {
@@ -88,6 +155,14 @@ void USFSplineFollowingComponent::TickComponent( const float delta_time, const E
 
         UpdateDestination( time_tick );
         FollowDestination();
+    }
+}
+
+void USFSplineFollowingComponent::UpdateInitialPosition()
+{
+    if ( FollowedSplineComponent != nullptr && MovementComponent != nullptr )
+    {
+        SetNormalizedDistanceOnSpline( InitialPosition );
     }
 }
 
@@ -183,8 +258,7 @@ bool USFSplineFollowingComponent::HasReachedDestination()
 
 bool USFSplineFollowingComponent::HasStoppedSimulation() const
 {
-    return false;
-    // return MovementComponent == nullptr || IsActive() == false;
+    return MovementComponent == nullptr || IsActive() == false;
 }
 
 float USFSplineFollowingComponent::GetSimulationTimeStep( float remaining_time, const int32 iterations ) const
@@ -195,21 +269,6 @@ float USFSplineFollowingComponent::GetSimulationTimeStep( float remaining_time, 
         {
             // Subdivide moves to be no longer than MaxSimulationTimeStep seconds
             remaining_time = FMath::Min( MaxSimulationTimeStep, remaining_time * 0.5f );
-        }
-        else
-        {
-            // If this is the last iteration, just use all the remaining time. This is better than cutting things short, as the simulation won't move far enough otherwise.
-            // Print a throttled warning.
-#if !( UE_BUILD_SHIPPING || UE_BUILD_TEST )
-            if ( const auto * const world = GetWorld() )
-            {
-                // Don't report during long hitches, we're more concerned about normal behavior just to make sure we have reasonable simulation settings.
-                if ( world->DeltaTimeSeconds < 0.20f )
-                {
-                    static uint32 warning_count = 0;
-                }
-            }
-#endif
         }
     }
 
