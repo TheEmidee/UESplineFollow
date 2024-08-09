@@ -365,7 +365,7 @@ void USFSplineFollowingMovementComponent::SetDistanceOnSpline( const float dista
     UpdatedComponent->SetWorldRotation( new_rotation );
 
     UpdateCurrentSpeed( 0.0f );
-    SplineMarkerProcessor.UpdateLastProcessedMarker( NormalizedDistanceOnSpline, CurrentSpeed );
+    SplineMarkerProcessor.UpdateLastProcessedMarker( DistanceOnSpline, CurrentSpeed );
 }
 
 void USFSplineFollowingMovementComponent::SetNormalizedDistanceOnSpline( const float normalized_distance_on_spline )
@@ -578,7 +578,7 @@ void USFSplineFollowingMovementComponent::UpdateCurrentSpeed( float delta_time )
         CurrentSpeed *= -1.0f;
     }
 
-    SplineMarkerProcessor.TryUpdateLastProcessedMarker( NormalizedDistanceOnSpline, CurrentSpeed );
+    SplineMarkerProcessor.TryUpdateLastProcessedMarker( DistanceOnSpline, CurrentSpeed );
 }
 
 void USFSplineFollowingMovementComponent::ProcessPositionObservers( float distance_on_spline )

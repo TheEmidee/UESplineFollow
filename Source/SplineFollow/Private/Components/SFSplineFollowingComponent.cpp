@@ -197,6 +197,29 @@ void USFSplineFollowingComponent::UpdateDestination( const float delta_time )
 
     DistanceOnSpline = DestinationDistance;
     DestinationDistance = DistanceOnSpline + MovementComponent->GetMaxSpeed() * delta_time;
+
+    const auto spline_length = FollowedSplineComponent->GetSplineLength();
+
+    if ( DestinationDistance >= spline_length )
+    {
+        if ( bLoops )
+        {
+            SplineMarkerProcessor.ProcessSplineMarkers( spline_length, MovementComponent->Velocity.Length(), GetOwner() );
+            SplineMarkerProcessor.Reset();
+            DestinationDistance -= spline_length;
+
+            ++LoopCount;
+        }
+        else
+        {
+            DestinationDistance = spline_length;
+        }
+    }
+    else
+    {
+        SplineMarkerProcessor.ProcessSplineMarkers( DistanceOnSpline, MovementComponent->Velocity.Length(), GetOwner() );
+    }
+
     Destination = FollowedSplineComponent->GetLocationAtDistanceAlongSpline( DestinationDistance, ESplineCoordinateSpace::World );
 }
 
