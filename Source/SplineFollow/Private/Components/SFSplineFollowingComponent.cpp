@@ -1,8 +1,9 @@
 #include "Components/SFSplineFollowingComponent.h"
 
 #include "Components/SFSplineFollowingTypes.h"
-#include "Components/SplineComponent.h"
-#include "GameFramework/CharacterMovementComponent.h"
+
+#include <Components/SplineComponent.h>
+#include <GameFramework/CharacterMovementComponent.h>
 
 // Minimum delta time considered when ticking. Delta times below this are not considered. This is a very small non-zero positive value to avoid potential divide-by-zero in simulation code.
 static constexpr float min_tick_time = 1e-6f;
@@ -22,50 +23,6 @@ USFSplineFollowingComponent::USFSplineFollowingComponent() :
     DestinationDistance( 0.0f )
 {
     PrimaryComponentTick.bCanEverTick = true;
-}
-
-bool USFSplineFollowingComponent::FollowSpline( const FSFFollowSplineInfos & follow_spline_infos )
-{
-    if ( !ensureAlwaysMsgf( follow_spline_infos.SplineComponent != nullptr, TEXT( "Invalid spline to follow" ) ) )
-    {
-        return false;
-    }
-
-    if ( follow_spline_infos.SplineComponent == FollowedSplineComponent )
-    {
-        return false;
-    }
-
-    FollowedSplineComponent = follow_spline_infos.SplineComponent;
-    SplineMarkerProcessor.Initialize( FollowedSplineComponent );
-    LoopCount = 0;
-
-    if ( follow_spline_infos.bAttachToSpline )
-    {
-        GetOwner()->AttachToComponent( FollowedSplineComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale );
-    }
-
-    bLoops = follow_spline_infos.bLoops;
-
-    MovementComponent->StopActiveMovement();
-
-    if ( follow_spline_infos.bOverrideRotationSpeed )
-    {
-        MovementComponent->RotationRate.Yaw = follow_spline_infos.RotationSpeedOverride;
-    }
-
-    SetNormalizedDistanceOnSpline( follow_spline_infos.NormalizedDistanceOnSpline );
-    ToggleSplineMovement( follow_spline_infos.bEnableMovement );
-
-    // const auto & transform = FollowedSplineComponent->GetTransformAtDistanceAlongSpline( 0.0f, ESplineCoordinateSpace::World );
-    // const auto feet_location = MovementComponent->GetActorFeetLocation();
-    // const auto actor_location = MovementComponent->GetActorLocation();
-    // GetOwner()->SetActorLocationAndRotation( transform.GetLocation() + actor_location - feet_location, transform.GetRotation() );
-    // DistanceOnSpline = 0.0f;
-    // DestinationDistance = 0.0f;
-    // Destination = FollowedSplineComponent->GetLocationAtDistanceAlongSpline( DestinationDistance, ESplineCoordinateSpace::World );
-
-    return true;
 }
 
 float USFSplineFollowingComponent::GetNormalizedDistanceOnSpline() const
@@ -115,12 +72,81 @@ void USFSplineFollowingComponent::SetNormalizedDistanceOnSpline( const float nor
     SetDistanceOnSpline( distance_on_spline );
 }
 
+bool USFSplineFollowingComponent::FollowSpline( const FSFFollowSplineInfos & follow_spline_infos )
+{
+    if ( !ensureAlwaysMsgf( follow_spline_infos.SplineComponent != nullptr, TEXT( "Invalid spline to follow" ) ) )
+    {
+        return false;
+    }
+
+    if ( follow_spline_infos.SplineComponent == FollowedSplineComponent )
+    {
+        return false;
+    }
+
+    FollowedSplineComponent = follow_spline_infos.SplineComponent;
+    SplineMarkerProcessor.Initialize( FollowedSplineComponent );
+    LoopCount = 0;
+
+    if ( follow_spline_infos.bAttachToSpline )
+    {
+        GetOwner()->AttachToComponent( FollowedSplineComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale );
+    }
+
+    bLoops = follow_spline_infos.bLoops;
+
+    MovementComponent->StopActiveMovement();
+
+    if ( follow_spline_infos.bOverrideRotationSpeed )
+    {
+        MovementComponent->RotationRate.Yaw = follow_spline_infos.RotationSpeedOverride;
+    }
+
+    SetNormalizedDistanceOnSpline( follow_spline_infos.NormalizedDistanceOnSpline );
+    ToggleSplineMovement( follow_spline_infos.bEnableMovement );
+
+    return true;
+}
+
+void USFSplineFollowingComponent::UnFollowSpline()
+{
+    if ( FollowedSplineComponent == nullptr )
+    {
+        return;
+    }
+
+    ToggleSplineMovement( false );
+
+    FollowedSplineComponent = nullptr;
+
+    GetOwner()->DetachFromActor( FDetachmentTransformRules::KeepWorldTransform );
+}
+
+bool USFSplineFollowingComponent::IsFollowingSpline() const
+{
+    return FollowedSplineComponent != nullptr && IsComponentTickEnabled();
+}
+
 void USFSplineFollowingComponent::InitializeComponent()
 {
     Super::InitializeComponent();
 
     SetComponentTickEnabled( false );
-    MovementComponent = GetOwner()->GetComponentByClass< UCharacterMovementComponent >();
+
+    if ( MovementComponent == nullptr )
+    {
+        SetMovementComponent();
+    }
+}
+
+void USFSplineFollowingComponent::OnRegister()
+{
+    Super::OnRegister();
+
+    if ( MovementComponent == nullptr )
+    {
+        SetMovementComponent();
+    }
 }
 
 void USFSplineFollowingComponent::BeginPlay()
@@ -247,7 +273,7 @@ void USFSplineFollowingComponent::FollowDestination() const
     MovementComponent->AddInputVector( move_input );
 }
 
-bool USFSplineFollowingComponent::HasReachedDestination()
+bool USFSplineFollowingComponent::HasReachedDestination() const
 {
     if ( MovementComponent == nullptr )
     {
@@ -326,4 +352,9 @@ void USFSplineFollowingComponent::SetDistanceOnSplineInternal( FVector & updated
     }
 
     DistanceOnSpline = distance_on_spline;
+}
+
+void USFSplineFollowingComponent::SetMovementComponent()
+{
+    MovementComponent = GetOwner()->GetComponentByClass< UCharacterMovementComponent >();
 }

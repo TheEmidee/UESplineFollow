@@ -1,16 +1,15 @@
 #pragma once
 
-#include "GameFramework/MovementComponent.h"
 #include "SFSplineFollowingInterface.h"
 #include "SFSplineFollowingTypes.h"
 
 #include <Curves/CurveVector.h>
+#include <GameFramework/MovementComponent.h>
 
 #include "SFSplineFollowingMovementComponent.generated.h"
 
 enum class ESFSplineOffsetType : uint8;
 class USFSplineOffsetData;
-class USFSplineFollowingMovementComponent;
 class UCurveFloat;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam( FSFOnSplineOffsetFinishedDelegate, USFSplineOffsetData *, offset_data );
@@ -59,9 +58,7 @@ public:
     bool FollowSpline( const FSFFollowSplineInfos & follow_spline_infos ) override;
 
     void ToggleSplineMovement( bool it_is_active ) override;
-
-    UFUNCTION( BlueprintCallable )
-    void UnFollowSpline();
+    void UnFollowSpline() override;
 
     /*
      * Sets the distance on the spline with 0.0f being the beginning of the spline and the end of the spline being returned by GetSplineLength()
@@ -73,13 +70,11 @@ public:
      * Sets the distance on the spline with 0.0f being the beginning of the spline and 1.0f being the end.
      * The marker actions are not executed
      */
-    UFUNCTION( BlueprintCallable )
-    void SetNormalizedDistanceOnSpline( float normalized_distance_on_spline );
+    void SetNormalizedDistanceOnSpline( float normalized_distance_on_spline ) override;
 
     float GetNormalizedDistanceOnSpline() const override;
 
-    UFUNCTION( BlueprintPure )
-    bool IsFollowingSpline() const;
+    bool IsFollowingSpline() const override;
 
     UFUNCTION( BlueprintCallable )
     float AddSplineOffsetData( USFSplineOffsetData * offset_data );
@@ -241,12 +236,12 @@ FORCEINLINE void USFSplineFollowingMovementComponent::SetOrientRotationToMovemen
     bOrientRotationToMovement = it_follows_spline_rotation;
 }
 
-FORCEINLINE bool USFSplineFollowingMovementComponent::ShouldUseSubStepping() const
-{
-    return bForceSubStepping;
-}
-
 FORCEINLINE float USFSplineFollowingMovementComponent::GetDistanceOnSpline() const
 {
     return DistanceOnSpline;
+}
+
+FORCEINLINE bool USFSplineFollowingMovementComponent::ShouldUseSubStepping() const
+{
+    return bForceSubStepping;
 }

@@ -35,4 +35,10 @@ public:
 
     UFUNCTION( BlueprintCallable )
     virtual bool FollowSpline( const FSFFollowSplineInfos & follow_spline_infos ) = 0;
+
+    UFUNCTION( BlueprintCallable )
+    virtual void UnFollowSpline() = 0;
+
+    UFUNCTION( BlueprintCallable )
+    virtual bool IsFollowingSpline() const = 0;
 };

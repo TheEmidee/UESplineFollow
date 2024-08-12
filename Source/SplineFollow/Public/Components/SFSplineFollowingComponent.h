@@ -21,14 +21,16 @@ public:
 
     float GetDistanceOnSpline() const override;
 
-    bool FollowSpline( const FSFFollowSplineInfos & follow_spline_infos ) override;
-
     float GetNormalizedDistanceOnSpline() const override;
     void ToggleSplineMovement( bool it_is_active ) override;
     void SetDistanceOnSpline( float distance_on_spline ) override;
     void SetNormalizedDistanceOnSpline( float normalized_distance_on_spline ) override;
+    bool FollowSpline( const FSFFollowSplineInfos & follow_spline_infos ) override;
+    void UnFollowSpline() override;
+    bool IsFollowingSpline() const override;
 
     void InitializeComponent() override;
+    void OnRegister() override;
     void BeginPlay() override;
     void TickComponent( float delta_time, ELevelTick tick_type, FActorComponentTickFunction * this_tick_function ) override;
 
@@ -36,10 +38,11 @@ private:
     void UpdateInitialPosition();
     void UpdateDestination( float delta_time );
     void FollowDestination() const;
-    bool HasReachedDestination();
+    bool HasReachedDestination() const;
     bool HasStoppedSimulation() const;
     float GetSimulationTimeStep( float remaining_time, const int32 iterations ) const;
     void SetDistanceOnSplineInternal( FVector & updated_location, FRotator & updated_rotation, float distance_on_spline );
+    void SetMovementComponent();
 
     UPROPERTY()
     TObjectPtr< UCharacterMovementComponent > MovementComponent;
