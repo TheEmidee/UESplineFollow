@@ -37,6 +37,7 @@ public:
 private:
     void UpdateInitialPosition();
     void UpdateDestination( float delta_time );
+    void UpdateDestinationInternal( float delta_time );
     void FollowDestination() const;
     bool HasReachedDestination() const;
     bool HasStoppedSimulation() const;

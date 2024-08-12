@@ -225,6 +225,12 @@ void USFSplineFollowingComponent::UpdateDestination( const float delta_time )
     }
 
     DistanceOnSpline = DestinationDistance;
+
+    UpdateDestinationInternal( delta_time );
+}
+
+void USFSplineFollowingComponent::UpdateDestinationInternal( const float delta_time )
+{
     DestinationDistance = DistanceOnSpline + MovementComponent->GetMaxSpeed() * delta_time;
 
     const auto spline_length = FollowedSplineComponent->GetSplineLength();
@@ -266,10 +272,7 @@ void USFSplineFollowingComponent::FollowDestination() const
     if ( !MovementComponent->CurrentRootMotion.HasAdditiveVelocity() )
     {
         const auto spline_offset = actor_location - current_location;
-        const auto spline_offset_dir = spline_offset.GetSafeNormal();
-        const auto spline_offset_distance = spline_offset.SquaredLength();
-
-        desired_movement -= spline_offset_dir * spline_offset_distance * SplineSnapMultiplier;
+        desired_movement -= spline_offset * SplineSnapMultiplier;
     }
 
     const auto move_input = desired_movement.GetSafeNormal();
@@ -340,7 +343,7 @@ float USFSplineFollowingComponent::GetSimulationTimeStep( float remaining_time, 
     return FMath::Max( min_tick_time, remaining_time );
 }
 
-void USFSplineFollowingComponent::SetDistanceOnSplineInternal( FVector & updated_location, FRotator & updated_rotation, float distance_on_spline )
+void USFSplineFollowingComponent::SetDistanceOnSplineInternal( FVector & updated_location, FRotator & updated_rotation, const float distance_on_spline )
 {
     if ( FollowedSplineComponent == nullptr || MovementComponent == nullptr )
     {
@@ -355,6 +358,8 @@ void USFSplineFollowingComponent::SetDistanceOnSplineInternal( FVector & updated
     }
 
     DistanceOnSpline = distance_on_spline;
+
+    UpdateDestinationInternal( GetWorld()->GetDeltaSeconds() );
 }
 
 void USFSplineFollowingComponent::SetMovementComponent()
