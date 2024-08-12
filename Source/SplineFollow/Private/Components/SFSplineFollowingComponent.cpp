@@ -15,14 +15,17 @@ USFSplineFollowingComponent::USFSplineFollowingComponent() :
     MaxSimulationTimeStep( 0.05f ),
     SplineSnapMultiplier( 0.01f ),
     InitialPosition( 0.0f ),
-    bStartsMovementDuringBeginPlay( false ),
-    bLoops( 0 ),
+    bStartsMovementDuringBeginPlay( true ),
+    bLoops( false ),
     LoopCount( 0 ),
-    bResetLoopCountWhenStopped( 0 ),
+    bResetLoopCountWhenStopped( true ),
     Destination( FVector::ZeroVector ),
     DestinationDistance( 0.0f )
 {
     PrimaryComponentTick.bCanEverTick = true;
+    PrimaryComponentTick.bStartWithTickEnabled = false;
+
+    bAutoActivate = true;
 }
 
 float USFSplineFollowingComponent::GetNormalizedDistanceOnSpline() const
@@ -47,7 +50,7 @@ void USFSplineFollowingComponent::ToggleSplineMovement( const bool it_is_active 
     SetComponentTickEnabled( it_is_enabled );
 }
 
-void USFSplineFollowingComponent::SetDistanceOnSpline( float distance_on_spline )
+void USFSplineFollowingComponent::SetDistanceOnSpline( const float distance_on_spline )
 {
     auto new_location = FVector::Zero();
     auto new_rotation = FRotator::ZeroRotator;
