@@ -5,6 +5,7 @@
 
 #include "SFSplineFollowingInterface.generated.h"
 
+class USplineComponent;
 struct FSFFollowSplineInfos;
 
 UINTERFACE( MinimalAPI, NotBlueprintable )
@@ -44,4 +45,7 @@ public:
 
     UFUNCTION( BlueprintCallable )
     virtual float GetCurrentSpeed() const = 0;
+
+    UFUNCTION( BlueprintCallable )
+    virtual USplineComponent * GetFollowedSplineComponent() const = 0;
 };

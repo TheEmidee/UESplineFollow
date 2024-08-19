@@ -47,6 +47,7 @@ public:
     float GetCurrentSpeed() const override;
     void SetOrientRotationToMovement( bool it_follows_spline_rotation );
     float GetDistanceOnSpline() const override;
+    USplineComponent * GetFollowedSplineComponent() const override;
 
     void InitializeComponent() override;
     void BeginPlay() override;
@@ -239,6 +240,11 @@ FORCEINLINE void USFSplineFollowingMovementComponent::SetOrientRotationToMovemen
 FORCEINLINE float USFSplineFollowingMovementComponent::GetDistanceOnSpline() const
 {
     return DistanceOnSpline;
+}
+
+FORCEINLINE USplineComponent * USFSplineFollowingMovementComponent::GetFollowedSplineComponent() const
+{
+    return FollowedSplineComponent;
 }
 
 FORCEINLINE bool USFSplineFollowingMovementComponent::ShouldUseSubStepping() const

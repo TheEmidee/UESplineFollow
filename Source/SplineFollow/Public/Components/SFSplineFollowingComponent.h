@@ -20,6 +20,7 @@ public:
     USFSplineFollowingComponent();
 
     float GetDistanceOnSpline() const override;
+    USplineComponent * GetFollowedSplineComponent() const override;
 
     float GetNormalizedDistanceOnSpline() const override;
     void ToggleSplineMovement( bool it_is_active ) override;
@@ -87,4 +88,9 @@ private:
 FORCEINLINE float USFSplineFollowingComponent::GetDistanceOnSpline() const
 {
     return DistanceOnSpline;
+}
+
+FORCEINLINE USplineComponent * USFSplineFollowingComponent::GetFollowedSplineComponent() const
+{
+    return FollowedSplineComponent;
 }
