@@ -41,4 +41,7 @@ public:
 
     UFUNCTION( BlueprintCallable )
     virtual bool IsFollowingSpline() const = 0;
+
+    UFUNCTION( BlueprintCallable )
+    virtual float GetCurrentSpeed() const = 0;
 };

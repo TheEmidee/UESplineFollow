@@ -44,7 +44,7 @@ public:
     USFSplineFollowingMovementComponent();
 
     USplineComponent * GetFollowedSpline() const;
-    float GetCurrentSpeed() const;
+    float GetCurrentSpeed() const override;
     void SetOrientRotationToMovement( bool it_follows_spline_rotation );
     float GetDistanceOnSpline() const override;
 

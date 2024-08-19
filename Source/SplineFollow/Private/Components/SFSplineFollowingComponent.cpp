@@ -130,6 +130,16 @@ bool USFSplineFollowingComponent::IsFollowingSpline() const
     return FollowedSplineComponent != nullptr && IsComponentTickEnabled();
 }
 
+float USFSplineFollowingComponent::GetCurrentSpeed() const
+{
+    if ( MovementComponent == nullptr )
+    {
+        return 0.0f;
+    }
+
+    return MovementComponent->Velocity.Size();
+}
+
 void USFSplineFollowingComponent::InitializeComponent()
 {
     Super::InitializeComponent();

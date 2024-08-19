@@ -28,6 +28,7 @@ public:
     bool FollowSpline( const FSFFollowSplineInfos & follow_spline_infos ) override;
     void UnFollowSpline() override;
     bool IsFollowingSpline() const override;
+    float GetCurrentSpeed() const override;
 
     void InitializeComponent() override;
     void OnRegister() override;
