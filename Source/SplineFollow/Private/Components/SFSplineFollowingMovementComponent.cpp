@@ -63,7 +63,7 @@ bool USFSplineFollowingMovementComponent::FSFSplineOffsetInfo::ApplyOffsetToTran
         break;
         case ESFSplineOffsetType::Rotation:
         {
-            auto offset_rotation = FRotator( offset.X, offset.Y, offset.Z ).Quaternion();
+            const auto offset_rotation = FRotator( offset.Y, offset.Z, offset.X ).Quaternion();
             transform.SetRotation( transform.GetRotation() * offset_rotation );
         }
         break;
@@ -670,7 +670,14 @@ void USFSplineFollowingMovementComponent::ApplyOffsetData( FTransform & transfor
     const auto rotation = FollowedSplineComponent->GetRotationAtDistanceAlongSpline( DistanceOnSpline, ESplineCoordinateSpace::World ).Quaternion();
     const auto location_offset = UKismetMathLibrary::Quat_RotateVector( rotation, offset_transform.GetLocation() );
 
+    auto result_rotation = transform.GetRotation();
+
+    if ( bOrientRotationToMovement )
+    {
+        result_rotation = rotation;
+    }
+
     transform.SetLocation( transform.GetLocation() + location_offset );
-    transform.SetRotation( transform.GetRotation() * offset_transform.GetRotation() );
+    transform.SetRotation( result_rotation * offset_transform.GetRotation() );
     transform.SetScale3D( offset_transform.GetScale3D() );
 }
