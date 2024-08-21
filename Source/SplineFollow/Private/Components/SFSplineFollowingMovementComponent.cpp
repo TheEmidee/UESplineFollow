@@ -245,7 +245,7 @@ void USFSplineFollowingMovementComponent::TickComponent( const float delta_time,
 
         if ( bOrientRotationToMovement )
         {
-            new_rotation = FMath::RInterpTo( current_world_rotation, new_rotation, delta_time, RotationSpeed );
+            new_rotation = FMath::RInterpTo( current_world_rotation, new_rotation, time_tick, RotationSpeed );
         }
     }
 
