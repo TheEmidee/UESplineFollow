@@ -56,7 +56,13 @@ void USFSplineFollowingComponent::SetDistanceOnSpline( const float distance_on_s
     auto new_rotation = FRotator::ZeroRotator;
 
     SetDistanceOnSplineInternal( new_location, new_rotation, distance_on_spline );
-    GetOwner()->SetActorLocationAndRotation( new_location, new_rotation );
+
+    FHitResult hit_result;
+    MovementComponent->SafeMoveUpdatedComponent( new_location - GetOwner()->GetActorLocation(), new_rotation, false, hit_result );
+
+    MovementComponent->FindFloor( GetOwner()->GetActorLocation(), MovementComponent->CurrentFloor, false );
+    MovementComponent->AdjustFloorHeight();
+    MovementComponent->SetBaseFromFloor( MovementComponent->CurrentFloor );
 
     MovementComponent->StopActiveMovement();
     SplineMarkerProcessor.UpdateLastProcessedMarker( GetNormalizedDistanceOnSpline(), MovementComponent->Velocity.Length() );
@@ -364,6 +370,12 @@ void USFSplineFollowingComponent::SetDistanceOnSplineInternal( FVector & updated
     if ( MovementComponent->bOrientRotationToMovement )
     {
         updated_rotation = FollowedSplineComponent->GetRotationAtDistanceAlongSpline( distance_on_spline, ESplineCoordinateSpace::World );
+
+        if ( MovementComponent->ShouldRemainVertical() )
+        {
+            updated_rotation.Pitch = 0.0f;
+            updated_rotation.Roll = 0.0f;
+        }
     }
 
     DistanceOnSpline = distance_on_spline;
