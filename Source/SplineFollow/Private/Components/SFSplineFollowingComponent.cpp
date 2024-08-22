@@ -64,7 +64,8 @@ void USFSplineFollowingComponent::SetDistanceOnSpline( const float distance_on_s
     MovementComponent->AdjustFloorHeight();
     MovementComponent->SetBaseFromFloor( MovementComponent->CurrentFloor );
 
-    MovementComponent->StopActiveMovement();
+    MovementComponent->StopMovementImmediately();
+
     SplineMarkerProcessor.UpdateLastProcessedMarker( GetNormalizedDistanceOnSpline(), MovementComponent->Velocity.Length() );
 }
 
