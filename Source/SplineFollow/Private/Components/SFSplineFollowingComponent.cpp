@@ -56,8 +56,7 @@ void USFSplineFollowingComponent::SetDistanceOnSpline( const float distance_on_s
     auto new_rotation = FRotator::ZeroRotator;
 
     SetDistanceOnSplineInternal( new_location, new_rotation, distance_on_spline );
-    GetOwner()->SetActorLocation( new_location );
-    GetOwner()->SetActorRotation( new_rotation );
+    GetOwner()->SetActorLocationAndRotation( new_location, new_rotation );
 
     MovementComponent->StopActiveMovement();
     SplineMarkerProcessor.UpdateLastProcessedMarker( GetNormalizedDistanceOnSpline(), MovementComponent->Velocity.Length() );
