@@ -1,95 +1,18 @@
 #pragma once
 
-#include "GameFramework/MovementComponent.h"
+#include "SFSplineFollowingInterface.h"
+#include "SFSplineFollowingTypes.h"
 
 #include <Curves/CurveVector.h>
+#include <GameFramework/MovementComponent.h>
 
 #include "SFSplineFollowingMovementComponent.generated.h"
 
 enum class ESFSplineOffsetType : uint8;
 class USFSplineOffsetData;
-class USFSplineFollowingMovementComponent;
-class USplineComponent;
 class UCurveFloat;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam( FSFOnSplineOffsetFinishedDelegate, USFSplineOffsetData *, offset_data );
-
-UCLASS( Abstract, HideDropdown, BlueprintType, Blueprintable )
-class USFSplineSpeedProvider : public UObject
-{
-    GENERATED_BODY()
-
-public:
-    UFUNCTION( BlueprintNativeEvent )
-    void Setup( USplineComponent * followed_spline_component, USFSplineFollowingMovementComponent * spline_following_movement_component );
-
-    UFUNCTION( BlueprintNativeEvent, BlueprintPure )
-    float GetSpeed( float normalized_position_on_spline, USplineComponent * followed_spline_component, USFSplineFollowingMovementComponent * spline_following_movement_component, float delta_time );
-};
-
-UCLASS( Abstract )
-class USFSplineSpeedProvider_Constant final : public USFSplineSpeedProvider
-{
-    GENERATED_BODY()
-
-public:
-    USFSplineSpeedProvider_Constant();
-
-    float GetSpeed_Implementation( float normalized_position_on_spline, USplineComponent * followed_spline_component, USFSplineFollowingMovementComponent * spline_following_movement_component, float delta_time ) override;
-
-private:
-    UPROPERTY( EditAnywhere )
-    float Speed;
-};
-
-UCLASS( Abstract )
-class USFSplineSpeedProvider_CurveFloat final : public USFSplineSpeedProvider
-{
-    GENERATED_BODY()
-
-public:
-    float GetSpeed_Implementation( float normalized_position_on_spline, USplineComponent * followed_spline_component, USFSplineFollowingMovementComponent * spline_following_movement_component, float delta_time ) override;
-
-private:
-    UPROPERTY( EditAnywhere )
-    UCurveFloat * CurveFloat;
-};
-
-USTRUCT( BlueprintType )
-struct SPLINEFOLLOW_API FSFFollowSplineInfos
-{
-    GENERATED_BODY()
-
-    FSFFollowSplineInfos();
-    FSFFollowSplineInfos( const AActor * actor, float normalized_distance_on_spline, bool it_enables_movement, bool loops, TSubclassOf< USFSplineSpeedProvider > speed_provider_class_override, bool it_attaches_to_spline, bool it_overrides_rotation_speed, float rotation_speed_override );
-    FSFFollowSplineInfos( USplineComponent * spline_component, float normalized_distance_on_spline, bool it_enables_movement, bool loops, TSubclassOf< USFSplineSpeedProvider > speed_provider_class_override, bool it_attaches_to_spline, bool it_overrides_rotation_speed, float rotation_speed_override );
-
-    bool NetSerialize( FArchive & archive, UPackageMap * package_map, bool & success );
-
-    UPROPERTY( EditAnywhere, BlueprintReadWrite )
-    USplineComponent * SplineComponent;
-
-    UPROPERTY( EditAnywhere, BlueprintReadWrite )
-    float NormalizedDistanceOnSpline;
-
-    UPROPERTY( EditAnywhere, BlueprintReadWrite )
-    uint8 bEnableMovement : 1;
-
-    UPROPERTY( EditAnywhere, BlueprintReadWrite )
-    uint8 bLoops : 1;
-
-    UPROPERTY( EditAnywhere, BlueprintReadWrite )
-    TSubclassOf< USFSplineSpeedProvider > SpeedProviderClassOverride;
-
-    UPROPERTY( EditAnywhere, BlueprintReadWrite )
-    uint8 bAttachToSpline : 1;
-
-    UPROPERTY( EditAnywhere, BlueprintReadWrite )
-    uint8 bOverrideRotationSpeed : 1;
-
-    UPROPERTY( EditAnywhere, BlueprintReadWrite )
-    float RotationSpeedOverride;
-};
 
 USTRUCT( BlueprintType )
 struct FSFRotationConstraints
@@ -113,7 +36,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam( FSWOnSplineFollowingLoopedDelegate,
 DECLARE_DELEGATE_OneParam( FSWOnSplineFollowingReachedPositionDelegate, float );
 
 UCLASS( ClassGroup = ( "Custom" ), meta = ( BlueprintSpawnableComponent ) )
-class SPLINEFOLLOW_API USFSplineFollowingMovementComponent final : public UMovementComponent
+class SPLINEFOLLOW_API USFSplineFollowingMovementComponent final : public UMovementComponent, public ISFSplineFollowingInterface
 {
     GENERATED_BODY()
 
@@ -121,8 +44,10 @@ public:
     USFSplineFollowingMovementComponent();
 
     USplineComponent * GetFollowedSpline() const;
-    float GetCurrentSpeed() const;
+    float GetCurrentSpeed() const override;
     void SetOrientRotationToMovement( bool it_follows_spline_rotation );
+    float GetDistanceOnSpline() const override;
+    USplineComponent * GetFollowedSplineComponent() const override;
 
     void InitializeComponent() override;
     void BeginPlay() override;
@@ -131,34 +56,26 @@ public:
     void SetUpdatedComponent( USceneComponent * new_updated_component ) override;
     void OnRegister() override;
 
-    UFUNCTION( BlueprintCallable )
-    bool FollowSpline( const FSFFollowSplineInfos & follow_spline_infos );
+    bool FollowSpline( const FSFFollowSplineInfos & follow_spline_infos ) override;
 
-    UFUNCTION( BlueprintCallable )
-    void ToggleSplineMovement( bool it_is_active );
-
-    UFUNCTION( BlueprintCallable )
-    void UnFollowSpline();
+    void ToggleSplineMovement( bool it_is_active ) override;
+    void UnFollowSpline() override;
 
     /*
      * Sets the distance on the spline with 0.0f being the beginning of the spline and the end of the spline being returned by GetSplineLength()
      * The marker actions are not executed
      */
-    UFUNCTION( BlueprintCallable )
-    void SetDistanceOnSpline( float distance_on_spline );
+    void SetDistanceOnSpline( float distance_on_spline ) override;
 
     /*
      * Sets the distance on the spline with 0.0f being the beginning of the spline and 1.0f being the end.
      * The marker actions are not executed
      */
-    UFUNCTION( BlueprintCallable )
-    void SetNormalizedDistanceOnSpline( float normalized_distance_on_spline );
+    void SetNormalizedDistanceOnSpline( float normalized_distance_on_spline ) override;
 
-    UFUNCTION( BlueprintPure )
-    float GetNormalizedDistanceOnSpline() const;
+    float GetNormalizedDistanceOnSpline() const override;
 
-    UFUNCTION( BlueprintPure )
-    bool IsFollowingSpline() const;
+    bool IsFollowingSpline() const override;
 
     UFUNCTION( BlueprintCallable )
     float AddSplineOffsetData( USFSplineOffsetData * offset_data );
@@ -200,19 +117,18 @@ private:
         float MaxTime;
     };
 
+    bool ShouldUseSubStepping() const;
+
     bool HasStoppedSimulation() const;
     bool CheckStillInWorld();
-    bool ShouldUseSubStepping() const;
     float GetSimulationTimeStep( float remaining_time, int32 iterations ) const;
     void UpdateInitialPosition();
-    void ProcessSplineMarkers( float distance_on_spline );
     void SetDistanceOnSplineInternal( FVector & updated_location, FRotator & updated_rotation, float distance_on_spline );
     void RefreshComponents();
     void UpdateCurrentSpeed( float delta_time );
     void ProcessPositionObservers( float distance_on_spline );
     void ResetPositionObservers();
     void ConstrainRotation( FRotator & rotation ) const;
-    void UpdateLastProcessedMarker();
     void ApplyOffsetData( FTransform & transform, float delta_time );
 
     UPROPERTY( BlueprintAssignable )
@@ -303,8 +219,7 @@ private:
 
     TArray< FSFSplineOffsetInfo > SplineOffsetDatas;
     TArray< FPositionObserver > PositionObservers;
-    int LastProcessedMarkerIndex;
-    uint8 bUpdateLastProcessedMarker : 1;
+    FSFSplineMarkerProcessor SplineMarkerProcessor;
 };
 
 FORCEINLINE USplineComponent * USFSplineFollowingMovementComponent::GetFollowedSpline() const
@@ -320,6 +235,16 @@ FORCEINLINE float USFSplineFollowingMovementComponent::GetCurrentSpeed() const
 FORCEINLINE void USFSplineFollowingMovementComponent::SetOrientRotationToMovement( const bool it_follows_spline_rotation )
 {
     bOrientRotationToMovement = it_follows_spline_rotation;
+}
+
+FORCEINLINE float USFSplineFollowingMovementComponent::GetDistanceOnSpline() const
+{
+    return DistanceOnSpline;
+}
+
+FORCEINLINE USplineComponent * USFSplineFollowingMovementComponent::GetFollowedSplineComponent() const
+{
+    return FollowedSplineComponent;
 }
 
 FORCEINLINE bool USFSplineFollowingMovementComponent::ShouldUseSubStepping() const

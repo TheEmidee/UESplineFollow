@@ -1,7 +1,5 @@
 #include "Components/SFSplineFollowingMovementComponent.h"
 
-#include "Components/SFSplineComponent.h"
-#include "Components/SFSplineMarkers.h"
 #include "Components/SFSplineOffsetData.h"
 
 #include <Components/SplineComponent.h>
@@ -9,15 +7,6 @@
 
 // Minimum delta time considered when ticking. Delta times below this are not considered. This is a very small non-zero positive value to avoid potential divide-by-zero in simulation code.
 static constexpr float MinTickTime = 1e-6f;
-
-void USFSplineSpeedProvider::Setup_Implementation( USplineComponent * followed_spline_component, USFSplineFollowingMovementComponent * spline_following_movement_component )
-{
-}
-
-float USFSplineSpeedProvider::GetSpeed_Implementation( float normalized_position_on_spline, USplineComponent * followed_spline_component, USFSplineFollowingMovementComponent * /* spline_following_movement_component */, float delta_time )
-{
-    return 0.0f;
-}
 
 USFSplineFollowingMovementComponent::FSFSplineOffsetInfo::FSFSplineOffsetInfo() :
     OffsetType( ESFSplineOffsetType::Location ),
@@ -99,82 +88,6 @@ bool USFSplineFollowingMovementComponent::FSFSplineOffsetInfo::ApplyOffsetToTran
     return true;
 }
 
-USFSplineSpeedProvider_Constant::USFSplineSpeedProvider_Constant() :
-    Speed( 100.0f )
-{
-}
-
-float USFSplineSpeedProvider_Constant::GetSpeed_Implementation( float /*normalized_position_on_spline*/, USplineComponent * /*followed_spline_component*/, USFSplineFollowingMovementComponent * /* spline_following_movement_component */, float /*delta_time*/ )
-{
-    return Speed;
-}
-
-float USFSplineSpeedProvider_CurveFloat::GetSpeed_Implementation( const float normalized_position_on_spline, USplineComponent * /*followed_spline_component*/, USFSplineFollowingMovementComponent * /* spline_following_movement_component */, float /*delta_time*/ )
-{
-    if ( CurveFloat == nullptr )
-    {
-        return 0.0f;
-    }
-
-    return CurveFloat->GetFloatValue( normalized_position_on_spline );
-}
-
-FSFFollowSplineInfos::FSFFollowSplineInfos()
-{
-    SplineComponent = nullptr;
-    NormalizedDistanceOnSpline = 0.0f;
-    bEnableMovement = false;
-    bLoops = false;
-    SpeedProviderClassOverride = nullptr;
-    bAttachToSpline = true;
-    bOverrideRotationSpeed = false;
-    RotationSpeedOverride = 0.0f;
-}
-
-FSFFollowSplineInfos::FSFFollowSplineInfos( const AActor * actor, const float normalized_distance_on_spline, const bool it_enables_movement, const bool loops, TSubclassOf< USFSplineSpeedProvider > speed_provider_class_override, const bool it_attaches_to_spline, const bool it_overrides_rotation_speed, const float rotation_speed_override ) :
-    SplineComponent( actor->GetComponentByClass< USplineComponent >() ),
-    NormalizedDistanceOnSpline( normalized_distance_on_spline ),
-    bEnableMovement( it_enables_movement ),
-    bLoops( loops ),
-    SpeedProviderClassOverride( speed_provider_class_override ),
-    bAttachToSpline( it_attaches_to_spline ),
-    bOverrideRotationSpeed( it_overrides_rotation_speed ),
-    RotationSpeedOverride( rotation_speed_override )
-{}
-
-FSFFollowSplineInfos::FSFFollowSplineInfos( USplineComponent * const spline_component, const float normalized_distance_on_spline, const bool it_enables_movement, const bool loops, TSubclassOf< USFSplineSpeedProvider > speed_provider_class_override, const bool it_attaches_to_spline, const bool it_overrides_rotation_speed, const float rotation_speed_override ) :
-    SplineComponent( spline_component ),
-    NormalizedDistanceOnSpline( normalized_distance_on_spline ),
-    bEnableMovement( it_enables_movement ),
-    bLoops( loops ),
-    SpeedProviderClassOverride( speed_provider_class_override ),
-    bAttachToSpline( it_attaches_to_spline ),
-    bOverrideRotationSpeed( it_overrides_rotation_speed ),
-    RotationSpeedOverride( rotation_speed_override )
-{}
-
-bool FSFFollowSplineInfos::NetSerialize( FArchive & archive, UPackageMap * /* package_map */, bool & success )
-{
-    archive << SplineComponent;
-    archive << NormalizedDistanceOnSpline;
-
-    auto value = bEnableMovement;
-    archive.SerializeBits( &value, 1 );
-
-    archive << SpeedProviderClassOverride;
-
-    value = bAttachToSpline;
-    archive.SerializeBits( &value, 1 );
-
-    value = bOverrideRotationSpeed;
-    archive.SerializeBits( &value, 1 );
-
-    archive << RotationSpeedOverride;
-
-    success = true;
-    return true;
-}
-
 FSFRotationConstraints::FSFRotationConstraints() :
     bConstrainX( false ),
     bConstrainY( false ),
@@ -196,8 +109,6 @@ USFSplineFollowingMovementComponent::USFSplineFollowingMovementComponent() :
     CurrentSpeed = 0.0f;
     bInvertSpeed = false;
     InitialPosition = 0.0f;
-    LastProcessedMarkerIndex = INDEX_NONE;
-    bUpdateLastProcessedMarker = false;
     bStartsMovementDuringBeginPlay = true;
     bOrientRotationToMovement = false;
     bLoops = false;
@@ -282,7 +193,7 @@ void USFSplineFollowingMovementComponent::TickComponent( const float delta_time,
 
         const auto set_distance_on_spline = [ & ]( const float distance ) {
             SetDistanceOnSplineInternal( new_location, new_rotation, distance );
-            ProcessSplineMarkers( distance );
+            SplineMarkerProcessor.ProcessSplineMarkers( distance, CurrentSpeed, GetOwner() );
             ProcessPositionObservers( distance );
         };
 
@@ -304,7 +215,7 @@ void USFSplineFollowingMovementComponent::TickComponent( const float delta_time,
         {
             // First process up to the end of the spline (or the beginning if going in reverse)
             const auto clamped_distance = CurrentSpeed > 0.0f ? spline_length : 0.0f;
-            ProcessSplineMarkers( clamped_distance );
+            SplineMarkerProcessor.ProcessSplineMarkers( clamped_distance, CurrentSpeed, GetOwner() );
             ProcessPositionObservers( clamped_distance );
 
             if ( followed_spline != FollowedSplineComponent )
@@ -319,7 +230,7 @@ void USFSplineFollowingMovementComponent::TickComponent( const float delta_time,
             distance_on_spline = CurrentSpeed > 0.0f
                                      ? FMath::Fmod( distance_on_spline, spline_length )
                                      : spline_length - FMath::Abs( distance_on_spline );
-            LastProcessedMarkerIndex = INDEX_NONE;
+            SplineMarkerProcessor.Reset();
 
             set_distance_on_spline( distance_on_spline );
 
@@ -334,7 +245,7 @@ void USFSplineFollowingMovementComponent::TickComponent( const float delta_time,
 
         if ( bOrientRotationToMovement )
         {
-            new_rotation = FMath::RInterpTo( current_world_rotation, new_rotation, delta_time, RotationSpeed );
+            new_rotation = FMath::RInterpTo( current_world_rotation, new_rotation, time_tick, RotationSpeed );
         }
     }
 
@@ -382,7 +293,7 @@ bool USFSplineFollowingMovementComponent::FollowSpline( const FSFFollowSplineInf
     }
 
     FollowedSplineComponent = follow_spline_infos.SplineComponent;
-    LastProcessedMarkerIndex = INDEX_NONE;
+    SplineMarkerProcessor.Initialize( FollowedSplineComponent );
     LoopCount = 0;
 
     if ( follow_spline_infos.bAttachToSpline )
@@ -454,7 +365,7 @@ void USFSplineFollowingMovementComponent::SetDistanceOnSpline( const float dista
     UpdatedComponent->SetWorldRotation( new_rotation );
 
     UpdateCurrentSpeed( 0.0f );
-    UpdateLastProcessedMarker();
+    SplineMarkerProcessor.UpdateLastProcessedMarker( DistanceOnSpline, CurrentSpeed );
 }
 
 void USFSplineFollowingMovementComponent::SetNormalizedDistanceOnSpline( const float normalized_distance_on_spline )
@@ -618,54 +529,6 @@ void USFSplineFollowingMovementComponent::UpdateInitialPosition()
     }
 }
 
-void USFSplineFollowingMovementComponent::ProcessSplineMarkers( const float distance_on_spline )
-{
-    if ( const auto * spline_component = Cast< USFSplineComponent >( FollowedSplineComponent ) )
-    {
-        const auto & spline_marker_proxies = spline_component->GetSplineMarkerProxies();
-        const auto spline_length = spline_component->GetSplineLength();
-
-        if ( CurrentSpeed > 0.0f )
-        {
-            const auto first_index = LastProcessedMarkerIndex == INDEX_NONE
-                                         ? 0
-                                         : LastProcessedMarkerIndex + 1;
-
-            for ( auto index = first_index; index < spline_marker_proxies.Num(); ++index )
-            {
-                const auto & marker_proxy = spline_marker_proxies[ index ];
-                const auto marker_distance = spline_length * marker_proxy.SplineNormalizedDistance;
-
-                if ( distance_on_spline >= marker_distance )
-                {
-                    // Call the function after as it may attach the actor on another spline. this would reset LastProcessedMarkerIndex, but we would override the value after
-                    LastProcessedMarkerIndex = index;
-                    marker_proxy.Function( GetOwner() );
-                }
-            }
-        }
-        else
-        {
-            const auto first_index = LastProcessedMarkerIndex == INDEX_NONE
-                                         ? spline_marker_proxies.Num() - 1
-                                         : LastProcessedMarkerIndex - 1;
-
-            for ( auto index = first_index; index >= 0; --index )
-            {
-                const auto & marker_proxy = spline_marker_proxies[ index ];
-                const auto marker_distance = spline_length * marker_proxy.SplineNormalizedDistance;
-
-                if ( distance_on_spline <= marker_distance )
-                {
-                    // Call the function after as it may attach the actor on another spline. this would reset LastProcessedMarkerIndex, but we would override the value after
-                    LastProcessedMarkerIndex = index;
-                    marker_proxy.Function( GetOwner() );
-                }
-            }
-        }
-    }
-}
-
 void USFSplineFollowingMovementComponent::SetDistanceOnSplineInternal( FVector & updated_location, FRotator & updated_rotation, const float distance_on_spline )
 {
     if ( FollowedSplineComponent == nullptr || UpdatedComponent == nullptr )
@@ -715,11 +578,7 @@ void USFSplineFollowingMovementComponent::UpdateCurrentSpeed( float delta_time )
         CurrentSpeed *= -1.0f;
     }
 
-    if ( bUpdateLastProcessedMarker && CurrentSpeed != 0.0f )
-    {
-        UpdateLastProcessedMarker();
-        bUpdateLastProcessedMarker = false;
-    }
+    SplineMarkerProcessor.TryUpdateLastProcessedMarker( DistanceOnSpline, CurrentSpeed );
 }
 
 void USFSplineFollowingMovementComponent::ProcessPositionObservers( float distance_on_spline )
@@ -786,35 +645,6 @@ void USFSplineFollowingMovementComponent::ConstrainRotation( FRotator & rotation
         RotationConstraints.bConstrainY ? current_rotator.Pitch : rotation.Pitch,
         RotationConstraints.bConstrainZ ? current_rotator.Yaw : rotation.Yaw,
         RotationConstraints.bConstrainX ? current_rotator.Roll : rotation.Roll );
-}
-
-void USFSplineFollowingMovementComponent::UpdateLastProcessedMarker()
-{
-    if ( CurrentSpeed == 0.0f )
-    {
-        bUpdateLastProcessedMarker = true;
-        return;
-    }
-
-    const auto * spline_component = Cast< USFSplineComponent >( FollowedSplineComponent );
-
-    const auto & spline_marker_proxies = spline_component->GetSplineMarkerProxies();
-    const auto spline_length = spline_component->GetSplineLength();
-
-    const auto check_multiplier = CurrentSpeed > 0.0f ? 1.0f : -1.0f;
-
-    for ( auto index = 0; index < spline_marker_proxies.Num(); ++index )
-    {
-        const auto & marker_proxy = spline_marker_proxies[ index ];
-        const auto marker_distance = spline_length * marker_proxy.SplineNormalizedDistance;
-
-        if ( marker_distance * check_multiplier > DistanceOnSpline * check_multiplier )
-        {
-            break;
-        }
-
-        LastProcessedMarkerIndex = index;
-    }
 }
 
 void USFSplineFollowingMovementComponent::ApplyOffsetData( FTransform & transform, const float delta_time )
