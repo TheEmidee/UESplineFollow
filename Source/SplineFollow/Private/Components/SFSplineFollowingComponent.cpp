@@ -284,14 +284,16 @@ void USFSplineFollowingComponent::FollowDestination() const
 
     const auto current_location = FollowedSplineComponent->GetLocationAtDistanceAlongSpline( DistanceOnSpline, ESplineCoordinateSpace::World );
     const auto actor_location = MovementComponent->GetActorFeetLocation();
-    auto desired_movement = Destination - current_location;
 
     if ( !MovementComponent->CurrentRootMotion.HasAdditiveVelocity() )
     {
-        const auto spline_offset = actor_location - current_location;
-        desired_movement -= spline_offset * SplineSnapMultiplier;
+        const auto spline_offset = current_location - actor_location;
+
+        FHitResult hit_result;
+        MovementComponent->SafeMoveUpdatedComponent( spline_offset * SplineSnapMultiplier, GetOwner()->GetActorRotation(), true, hit_result );
     }
 
+    const auto desired_movement = Destination - current_location;
     const auto move_input = desired_movement.GetSafeNormal();
     MovementComponent->AddInputVector( move_input );
 }
