@@ -56,9 +56,17 @@ void USFSplineFollowingComponent::SetDistanceOnSpline( const float distance_on_s
     auto new_rotation = FRotator::ZeroRotator;
 
     SetDistanceOnSplineInternal( new_location, new_rotation, distance_on_spline );
-    GetOwner()->SetActorLocationAndRotation( new_location, new_rotation );
 
-    MovementComponent->StopActiveMovement();
+    FHitResult hit_result;
+    MovementComponent->SafeMoveUpdatedComponent( new_location - GetOwner()->GetActorLocation(), new_rotation, false, hit_result );
+
+    MovementComponent->FindFloor( GetOwner()->GetActorLocation(), MovementComponent->CurrentFloor, false );
+    MovementComponent->AdjustFloorHeight();
+    MovementComponent->SetBaseFromFloor( MovementComponent->CurrentFloor );
+
+    MovementComponent->StopMovementImmediately();
+    MovementComponent->ConsumeInputVector();
+
     SplineMarkerProcessor.UpdateLastProcessedMarker( GetNormalizedDistanceOnSpline(), MovementComponent->Velocity.Length() );
 }
 
@@ -276,14 +284,16 @@ void USFSplineFollowingComponent::FollowDestination() const
 
     const auto current_location = FollowedSplineComponent->GetLocationAtDistanceAlongSpline( DistanceOnSpline, ESplineCoordinateSpace::World );
     const auto actor_location = MovementComponent->GetActorFeetLocation();
-    auto desired_movement = Destination - current_location;
 
     if ( !MovementComponent->CurrentRootMotion.HasAdditiveVelocity() )
     {
-        const auto spline_offset = actor_location - current_location;
-        desired_movement -= spline_offset * SplineSnapMultiplier;
+        const auto spline_offset = current_location - actor_location;
+
+        FHitResult hit_result;
+        MovementComponent->SafeMoveUpdatedComponent( spline_offset * SplineSnapMultiplier, GetOwner()->GetActorRotation(), true, hit_result );
     }
 
+    const auto desired_movement = Destination - current_location;
     const auto move_input = desired_movement.GetSafeNormal();
     MovementComponent->AddInputVector( move_input );
 }
@@ -364,6 +374,12 @@ void USFSplineFollowingComponent::SetDistanceOnSplineInternal( FVector & updated
     if ( MovementComponent->bOrientRotationToMovement )
     {
         updated_rotation = FollowedSplineComponent->GetRotationAtDistanceAlongSpline( distance_on_spline, ESplineCoordinateSpace::World );
+
+        if ( MovementComponent->ShouldRemainVertical() )
+        {
+            updated_rotation.Pitch = 0.0f;
+            updated_rotation.Roll = 0.0f;
+        }
     }
 
     DistanceOnSpline = distance_on_spline;
