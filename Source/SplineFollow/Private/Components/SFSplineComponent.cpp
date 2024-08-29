@@ -90,7 +90,9 @@ FSFSplineMarker USFSplineComponent::CreateMarkerFromDefault( const FSFSplineMark
         default_marker.Name,
         default_marker.ItIsEnabled,
         default_marker.Infos,
-        NewObject< USFSplineMarkerObject >( this, default_marker.Object->GetClass(), NAME_None, RF_NoFlags, default_marker.Object ) );
+        default_marker.Object != nullptr
+            ? NewObject< USFSplineMarkerObject >( this, default_marker.Object->GetClass(), NAME_None, RF_NoFlags, default_marker.Object )
+            : nullptr );
 }
 
 void USFSplineComponent::SaveSplineMarkers( const TArray< FSFSplineMarker > & markers_to_save )
@@ -99,10 +101,7 @@ void USFSplineComponent::SaveSplineMarkers( const TArray< FSFSplineMarker > & ma
 
     for ( const auto & marker : markers_to_save )
     {
-        if ( marker.Object != nullptr )
-        {
-            SplineMarkers.Emplace( CreateMarkerFromDefault( marker ) );
-        }
+        SplineMarkers.Emplace( CreateMarkerFromDefault( marker ) );
     }
 }
 
