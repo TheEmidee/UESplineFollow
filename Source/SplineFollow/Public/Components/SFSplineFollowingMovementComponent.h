@@ -80,6 +80,9 @@ public:
     UFUNCTION( BlueprintCallable )
     float AddSplineOffsetData( USFSplineOffsetData * offset_data );
 
+    UFUNCTION( BlueprintCallable )
+    void ResetMarkersUsage();
+
     void RegisterPositionObserver( const FSWOnSplineFollowingReachedPositionDelegate & delegate, float normalized_position, bool trigger_once = true );
 
 #if WITH_EDITOR
