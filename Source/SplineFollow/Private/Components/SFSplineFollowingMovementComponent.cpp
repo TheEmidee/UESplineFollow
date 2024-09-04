@@ -406,6 +406,11 @@ float USFSplineFollowingMovementComponent::AddSplineOffsetData( USFSplineOffsetD
     return SplineOffsetDatas[ index ].MaxTime;
 }
 
+void USFSplineFollowingMovementComponent::ResetMarkersUsage()
+{
+    SplineMarkerProcessor.Reset();
+}
+
 void USFSplineFollowingMovementComponent::RegisterPositionObserver( const FSWOnSplineFollowingReachedPositionDelegate & delegate, float normalized_position, bool trigger_once /*= true*/ )
 {
     FPositionObserver observer;
