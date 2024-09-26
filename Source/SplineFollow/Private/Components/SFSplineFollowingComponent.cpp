@@ -8,6 +8,18 @@
 // Minimum delta time considered when ticking. Delta times below this are not considered. This is a very small non-zero positive value to avoid potential divide-by-zero in simulation code.
 static constexpr float min_tick_time = 1e-6f;
 
+FSFSplineSnapAxes::FSFSplineSnapAxes() :
+    bSnapX( true ),
+    bSnapY( true ),
+    bSnapZ( true )
+{
+}
+
+FVector FSFSplineSnapAxes::GetSnapVector() const
+{
+    return FVector( bSnapX, bSnapY, bSnapZ );
+}
+
 USFSplineFollowingComponent::USFSplineFollowingComponent() :
     MovementComponent( nullptr ),
     DistanceOnSpline( 0.0f ),
@@ -284,13 +296,18 @@ void USFSplineFollowingComponent::FollowDestination() const
 
     const auto current_location = FollowedSplineComponent->GetLocationAtDistanceAlongSpline( DistanceOnSpline, ESplineCoordinateSpace::World );
     const auto actor_location = MovementComponent->GetActorFeetLocation();
+    const auto actor_rotation = MovementComponent->GetActorTransform().Rotator();
 
     if ( !MovementComponent->CurrentRootMotion.HasAdditiveVelocity() )
     {
-        const auto spline_offset = current_location - actor_location;
+        const auto snap_vector = SplineSnapAxes.GetSnapVector();
+        auto spline_offset = current_location - actor_location;
+        spline_offset = actor_rotation.UnrotateVector( spline_offset );
+
+        const auto final_offset = actor_rotation.RotateVector( snap_vector * spline_offset );
 
         FHitResult hit_result;
-        MovementComponent->SafeMoveUpdatedComponent( spline_offset * SplineSnapMultiplier, GetOwner()->GetActorRotation(), true, hit_result );
+        MovementComponent->SafeMoveUpdatedComponent( final_offset * SplineSnapMultiplier, GetOwner()->GetActorRotation(), true, hit_result );
     }
 
     const auto desired_movement = Destination - current_location;
