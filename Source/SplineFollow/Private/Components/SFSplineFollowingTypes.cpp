@@ -103,6 +103,11 @@ void FSFSplineMarkerProcessor::Initialize( USplineComponent * spline_component )
 
 void FSFSplineMarkerProcessor::ProcessSplineMarkers( const float distance_on_spline, const float current_speed, AActor * owner )
 {
+    if ( current_speed == 0.0f )
+    {
+        return;
+    }
+
     if ( const auto * spline_component = Cast< USFSplineComponent >( SplineComponent ) )
     {
         const auto & spline_marker_proxies = spline_component->GetSplineMarkerProxies();
