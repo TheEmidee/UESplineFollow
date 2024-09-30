@@ -11,6 +11,25 @@
 class USplineComponent;
 class UCharacterMovementComponent;
 
+USTRUCT( BlueprintType )
+struct FSFSplineSnapAxes
+{
+    GENERATED_BODY()
+
+    FSFSplineSnapAxes();
+
+    FVector GetSnapVector() const;
+
+    UPROPERTY( EditAnywhere, BlueprintReadWrite )
+    uint8 bSnapX : 1;
+
+    UPROPERTY( EditAnywhere, BlueprintReadWrite )
+    uint8 bSnapY : 1;
+
+    UPROPERTY( EditAnywhere, BlueprintReadWrite )
+    uint8 bSnapZ : 1;
+};
+
 UCLASS( ClassGroup = ( Custom ), meta = ( BlueprintSpawnableComponent ) )
 class SPLINEFOLLOW_API USFSplineFollowingComponent : public UActorComponent, public ISFSplineFollowingInterface
 {
@@ -62,8 +81,11 @@ private:
     UPROPERTY( EditAnywhere, meta = ( ClampMin = "0.0166", ClampMax = "0.50", UIMin = "0.0166", UIMax = "0.50" ) )
     float MaxSimulationTimeStep;
 
-    UPROPERTY( EditDefaultsOnly )
+    UPROPERTY( EditAnywhere, BlueprintReadWrite, meta = ( AllowPrivateAccess = true ) )
     float SplineSnapMultiplier;
+
+    UPROPERTY( EditAnywhere, BlueprintReadWrite, meta = ( AllowPrivateAccess = true, EditCondition = "SplineSnapMultiplier > 0.0f" ) )
+    FSFSplineSnapAxes SplineSnapAxes;
 
     UPROPERTY( EditAnywhere, BlueprintReadOnly, meta = ( AllowPrivateAccess = true, ClampMin = "0.0", ClampMax = "1.0", UIMin = "0.0", UIMax = "1.0" ) )
     float InitialPosition;
