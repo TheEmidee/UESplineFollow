@@ -29,7 +29,7 @@ public:
     float GetSpeed_Implementation( float normalized_position_on_spline, USplineComponent * followed_spline_component, USFSplineFollowingMovementComponent * spline_following_movement_component, float delta_time ) override;
 
 private:
-    UPROPERTY( EditAnywhere )
+    UPROPERTY( BlueprintReadWrite, EditAnywhere, meta = ( AllowPrivateAccess = true ) )
     float Speed;
 };
 
