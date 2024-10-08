@@ -174,7 +174,7 @@ void USFSplineFollowingMovementComponent::TickComponent( const float delta_time,
     const auto current_world_rotation = UpdatedComponent->GetComponentRotation();
 
     auto new_location = FVector::Zero();
-    auto new_rotation = FRotator::ZeroRotator;
+    auto new_rotation = current_world_rotation;
 
     while ( remaining_time >= MinTickTime && ( iterations < MaxSimulationIterations ) && IsValid( actor_owner ) && !HasStoppedSimulation() )
     {
@@ -358,7 +358,7 @@ void USFSplineFollowingMovementComponent::UnFollowSpline()
 void USFSplineFollowingMovementComponent::SetDistanceOnSpline( const float distance_on_spline )
 {
     auto new_location = FVector::Zero();
-    auto new_rotation = FRotator::ZeroRotator;
+    auto new_rotation = bOrientRotationToMovement ? FRotator::ZeroRotator : UpdatedComponent->GetComponentRotation();
 
     SetDistanceOnSplineInternal( new_location, new_rotation, distance_on_spline );
     UpdatedComponent->SetWorldLocation( new_location );
