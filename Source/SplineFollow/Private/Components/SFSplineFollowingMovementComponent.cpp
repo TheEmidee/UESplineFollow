@@ -593,6 +593,11 @@ void USFSplineFollowingMovementComponent::ProcessPositionObservers( float distan
         return;
     }
 
+    if ( PositionObservers.IsEmpty() )
+    {
+        return;
+    }
+
     const auto normalized_position_on_spline = distance_on_spline / FollowedSplineComponent->GetSplineLength();
 
     for ( auto index = PositionObservers.Num() - 1; index >= 0; --index )
