@@ -83,6 +83,9 @@ public:
     UFUNCTION( BlueprintCallable )
     void ResetMarkersUsage();
 
+    UFUNCTION( BlueprintCallable )
+    void SetInvertSpeed( bool invert );
+
     void RegisterPositionObserver( const FSWOnSplineFollowingReachedPositionDelegate & delegate, float normalized_position, bool trigger_once = true );
 
 #if WITH_EDITOR
@@ -181,7 +184,7 @@ private:
     UPROPERTY( BlueprintReadOnly, meta = ( AllowPrivateAccess = true ) )
     TObjectPtr< USFSplineSpeedProvider > SpeedProvider;
 
-    UPROPERTY( EditAnywhere, BlueprintReadWrite, meta = ( AllowPrivateAccess = true ) )
+    UPROPERTY( EditAnywhere, BlueprintReadOnly, meta = ( AllowPrivateAccess = true ) )
     uint8 bInvertSpeed : 1;
 
     UPROPERTY( VisibleInstanceOnly, BlueprintReadWrite, meta = ( AllowPrivateAccess = true ) )
