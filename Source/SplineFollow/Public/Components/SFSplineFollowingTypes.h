@@ -96,9 +96,15 @@ public:
     void TryUpdateLastProcessedMarker( const float distance_on_spline, const float current_speed );
     void UpdateLastProcessedMarker( const float distance_on_spline, const float current_speed );
     void Reset();
+    void SetUpdateLastProcessedMarker( bool update );
 
 private:
     TObjectPtr< USplineComponent > SplineComponent;
     int LastProcessedMarkerIndex;
     uint8 bUpdateLastProcessedMarker : 1;
 };
+
+FORCEINLINE void FSFSplineMarkerProcessor::SetUpdateLastProcessedMarker( const bool update )
+{
+    bUpdateLastProcessedMarker = update;
+}
