@@ -310,7 +310,12 @@ bool USFSplineFollowingMovementComponent::FollowSpline( const FSFFollowSplineInf
 
     if ( SpeedProviderClass != nullptr )
     {
-        if ( SpeedProvider = NewObject< USFSplineSpeedProvider >( this, SpeedProviderClass ); SpeedProvider != nullptr )
+        if ( SpeedProvider == nullptr )
+        {
+            SpeedProvider = NewObject< USFSplineSpeedProvider >( this, SpeedProviderClass );
+        }
+
+        if ( SpeedProvider != nullptr )
         {
             SpeedProvider->Setup( FollowedSplineComponent, this );
         }
