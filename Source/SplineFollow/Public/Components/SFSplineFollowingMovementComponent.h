@@ -235,7 +235,7 @@ FORCEINLINE USplineComponent * USFSplineFollowingMovementComponent::GetFollowedS
 
 FORCEINLINE float USFSplineFollowingMovementComponent::GetCurrentSpeed() const
 {
-    return CurrentSpeed;
+    return IsComponentTickEnabled() ? CurrentSpeed : 0.0f;
 }
 
 FORCEINLINE void USFSplineFollowingMovementComponent::SetOrientRotationToMovement( const bool it_follows_spline_rotation )
