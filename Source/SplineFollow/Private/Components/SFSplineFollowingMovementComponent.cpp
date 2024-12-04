@@ -303,7 +303,7 @@ bool USFSplineFollowingMovementComponent::FollowSpline( const FSFFollowSplineInf
 
     bLoops = follow_spline_infos.bLoops;
 
-    bool override_speed_provider_class = follow_spline_infos.SpeedProviderClassOverride != nullptr;
+    const auto override_speed_provider_class = follow_spline_infos.SpeedProviderClassOverride != nullptr;
 
     if ( override_speed_provider_class )
     {
