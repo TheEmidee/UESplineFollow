@@ -16,6 +16,8 @@ public:
 
     UFUNCTION( BlueprintNativeEvent, BlueprintPure )
     float GetSpeed( float normalized_position_on_spline, USplineComponent * followed_spline_component, USFSplineFollowingMovementComponent * spline_following_movement_component, float delta_time );
+
+    UWorld * GetWorld() const override;
 };
 
 UCLASS( Abstract )

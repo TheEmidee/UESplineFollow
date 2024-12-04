@@ -13,6 +13,21 @@ float USFSplineSpeedProvider::GetSpeed_Implementation( float normalized_position
     return 0.0f;
 }
 
+UWorld * USFSplineSpeedProvider::GetWorld() const
+{
+    if ( IsTemplate() )
+    {
+        return nullptr;
+    }
+
+    if ( const auto * outer = GetOuter() )
+    {
+        return outer->GetWorld();
+    }
+
+    return nullptr;
+}
+
 USFSplineSpeedProvider_Constant::USFSplineSpeedProvider_Constant() :
     Speed( 100.0f )
 {
