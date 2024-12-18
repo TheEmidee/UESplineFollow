@@ -158,6 +158,17 @@ float USFSplineFollowingComponent::GetCurrentSpeed() const
 
     return MovementComponent->Velocity.Size();
 }
+void USFSplineFollowingComponent::RegisterPositionObserver( const FSWOnSplineFollowingReachedPositionDelegate & delegate, float normalized_position, bool trigger_once )
+{
+    FPositionObserver observer;
+    observer.Callback = delegate;
+    observer.NormalizedPosition = normalized_position;
+    observer.bTriggerOnce = trigger_once;
+
+    PositionObservers.Emplace( MoveTemp( observer ) );
+
+    ProcessPositionObservers();
+}
 
 void USFSplineFollowingComponent::InitializeComponent()
 {
@@ -224,6 +235,7 @@ void USFSplineFollowingComponent::TickComponent( const float delta_time, const E
         remaining_time -= time_tick;
 
         UpdateDestination( time_tick );
+        ProcessPositionObservers();
         FollowDestination();
     }
 }
@@ -407,4 +419,49 @@ void USFSplineFollowingComponent::SetDistanceOnSplineInternal( FVector & updated
 void USFSplineFollowingComponent::SetMovementComponent()
 {
     MovementComponent = GetOwner()->GetComponentByClass< UCharacterMovementComponent >();
+}
+
+void USFSplineFollowingComponent::ProcessPositionObservers()
+{
+    float currentSpeed = GetCurrentSpeed();
+    
+    if ( currentSpeed == 0.0f )
+    {
+        return;
+    }
+
+    if ( PositionObservers.IsEmpty() )
+    {
+        return;
+    }
+
+    const auto normalized_position_on_spline = GetNormalizedDistanceOnSpline();
+
+    for ( auto index = PositionObservers.Num() - 1; index >= 0; --index )
+    {
+        auto & observer = PositionObservers[ index ];
+
+        if ( observer.bHasBeenTriggered )
+        {
+            continue;
+        }
+
+        if ( normalized_position_on_spline >= observer.NormalizedPosition )
+        {
+            // Create a copy because it can be removed
+            // We need to execute the callback after it has been removed to avoid it being re-triggered again if the callback calls RegisterObserver again
+            const auto observer_copy = observer;
+
+            if ( observer.bTriggerOnce )
+            {
+                PositionObservers.RemoveAt( index );
+            }
+            else
+            {
+                observer.bHasBeenTriggered = true;
+            }
+
+            observer_copy.Callback.ExecuteIfBound( observer.NormalizedPosition );
+        }
+    }
 }

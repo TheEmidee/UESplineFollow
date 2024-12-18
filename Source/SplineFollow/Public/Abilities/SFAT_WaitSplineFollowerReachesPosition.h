@@ -16,14 +16,15 @@ class SPLINEFOLLOW_API USFAT_WaitSplineFollowerReachesPosition final : public UA
 
 public:
     UFUNCTION( BlueprintCallable, Category = "Ability|Tasks", meta = ( HidePin = "owning_ability", DefaultToSelf = "owning_ability", BlueprintInternalUseOnly = "TRUE" ) )
-    static USFAT_WaitSplineFollowerReachesPosition * WaitSplineFollowerReachesPosition( UGameplayAbility * owning_ability, USFSplineFollowingMovementComponent * spline_following_movement_component, float normalized_position, bool trigger_once = true );
+    static USFAT_WaitSplineFollowerReachesPosition * WaitSplineFollowerReachesPosition( UGameplayAbility * owning_ability, TScriptInterface< ISFSplineFollowingInterface > spline_following_interface, float normalized_position, bool trigger_once = true );
+
     void Activate() override;
 
 private:
     void OnSplinePositionReached( float normalized_position );
 
     UPROPERTY()
-    TObjectPtr< USFSplineFollowingMovementComponent > SplineFollowingMovementComponent;
+    TScriptInterface< ISFSplineFollowingInterface > SplineFollowingInterface;
 
     float NormalizedPosition;
     bool bTriggerOnce;
