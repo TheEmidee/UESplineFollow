@@ -15,7 +15,7 @@ void USFAT_WaitSplineFollowerReachesPosition::Activate()
 {
     Super::Activate();
 
-    if (SplineFollowingInterface == nullptr)
+    if ( SplineFollowingInterface == nullptr )
     {
         EndTask();
         return;

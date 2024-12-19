@@ -423,9 +423,9 @@ void USFSplineFollowingComponent::SetMovementComponent()
 
 void USFSplineFollowingComponent::ProcessPositionObservers()
 {
-    float currentSpeed = GetCurrentSpeed();
+    const float current_Speed = GetCurrentSpeed();
     
-    if ( currentSpeed == 0.0f )
+    if ( current_Speed == 0.0f )
     {
         return;
     }
