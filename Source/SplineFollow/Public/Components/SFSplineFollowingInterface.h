@@ -34,7 +34,7 @@ public:
         bool bTriggerOnce;
         bool bHasBeenTriggered;
     };
-    
+
     UFUNCTION( BlueprintCallable )
     virtual float GetDistanceOnSpline() const = 0;
 

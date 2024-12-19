@@ -20,7 +20,7 @@ void USFAT_WaitSplineFollowerReachesPosition::Activate()
         EndTask();
         return;
     }
-    
+
     SplineFollowingInterface->RegisterPositionObserver( FSWOnSplineFollowingReachedPositionDelegate::CreateUObject( this, &ThisClass::OnSplinePositionReached ), NormalizedPosition, bTriggerOnce );
 }
 
