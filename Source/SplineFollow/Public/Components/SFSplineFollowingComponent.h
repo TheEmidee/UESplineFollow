@@ -68,6 +68,9 @@ private:
     void SetMovementComponent();
     void ProcessPositionObservers();
 
+    UPROPERTY( BlueprintAssignable )
+    FSWOnSplineFollowingToggleMovementChangedDelegate OnSplineFollowingToggleMovementChangedDelegate;
+
     UPROPERTY()
     TObjectPtr< UCharacterMovementComponent > MovementComponent;
 

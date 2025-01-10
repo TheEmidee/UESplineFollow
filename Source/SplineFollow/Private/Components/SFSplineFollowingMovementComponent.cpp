@@ -346,6 +346,7 @@ void USFSplineFollowingMovementComponent::ToggleSplineMovement( const bool it_is
     }
 
     SetComponentTickEnabled( it_is_enabled );
+    OnSplineFollowingToggleMovementChangedDelegate.Broadcast( it_is_enabled );
 }
 
 void USFSplineFollowingMovementComponent::UnFollowSpline()

@@ -129,6 +129,9 @@ private:
     FSWOnSplineFollowingLoopedDelegate OnSplineFollowingLoopedDelegate;
 
     UPROPERTY( BlueprintAssignable )
+    FSWOnSplineFollowingToggleMovementChangedDelegate OnSplineFollowingToggleMovementChangedDelegate;
+
+    UPROPERTY( BlueprintAssignable )
     FSFOnSplineOffsetFinishedDelegate OnSplineOffsetFinishedDelegate;
 
     /**

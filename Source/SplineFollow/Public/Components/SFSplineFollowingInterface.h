@@ -9,6 +9,7 @@ class USplineComponent;
 struct FSFFollowSplineInfos;
 
 DECLARE_DELEGATE_OneParam( FSWOnSplineFollowingReachedPositionDelegate, float );
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam( FSWOnSplineFollowingToggleMovementChangedDelegate, bool, enabled );
 
 UINTERFACE( MinimalAPI, NotBlueprintable )
 class USFSplineFollowingInterface : public UInterface
