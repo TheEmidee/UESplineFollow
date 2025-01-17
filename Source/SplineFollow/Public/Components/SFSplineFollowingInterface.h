@@ -8,8 +8,8 @@
 class USplineComponent;
 struct FSFFollowSplineInfos;
 
-DECLARE_DELEGATE_OneParam( FSWOnSplineFollowingReachedPositionDelegate, float );
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam( FSWOnSplineFollowingToggleMovementChangedDelegate, bool, enabled );
+DECLARE_DELEGATE_OneParam( FSFOnSplineFollowingReachedPositionDelegate, float );
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam( FSFOnSplineFollowingToggleMovementChangedDelegate, bool, enabled );
 
 UINTERFACE( MinimalAPI, NotBlueprintable )
 class USFSplineFollowingInterface : public UInterface
@@ -30,7 +30,7 @@ public:
             bHasBeenTriggered( false )
         {}
 
-        FSWOnSplineFollowingReachedPositionDelegate Callback;
+        FSFOnSplineFollowingReachedPositionDelegate Callback;
         float NormalizedPosition;
         bool bTriggerOnce;
         bool bHasBeenTriggered;
@@ -66,5 +66,5 @@ public:
     UFUNCTION( BlueprintCallable )
     virtual USplineComponent * GetFollowedSplineComponent() const = 0;
 
-    virtual void RegisterPositionObserver( const FSWOnSplineFollowingReachedPositionDelegate & delegate, float normalized_position, bool trigger_once = true ) = 0;
+    virtual void RegisterPositionObserver( const FSFOnSplineFollowingReachedPositionDelegate & delegate, float normalized_position, bool trigger_once = true ) = 0;
 };

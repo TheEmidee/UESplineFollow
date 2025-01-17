@@ -425,7 +425,7 @@ void USFSplineFollowingMovementComponent::SetInvertSpeed( bool invert )
     SplineMarkerProcessor.SetUpdateLastProcessedMarker( true );
 }
 
-void USFSplineFollowingMovementComponent::RegisterPositionObserver( const FSWOnSplineFollowingReachedPositionDelegate & delegate, float normalized_position, bool trigger_once /*= true*/ )
+void USFSplineFollowingMovementComponent::RegisterPositionObserver( const FSFOnSplineFollowingReachedPositionDelegate & delegate, float normalized_position, bool trigger_once /*= true*/ )
 {
     FPositionObserver observer;
     observer.Callback = delegate;

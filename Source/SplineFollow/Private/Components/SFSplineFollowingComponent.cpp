@@ -160,7 +160,7 @@ float USFSplineFollowingComponent::GetCurrentSpeed() const
     return MovementComponent->Velocity.Size();
 }
 
-void USFSplineFollowingComponent::RegisterPositionObserver( const FSWOnSplineFollowingReachedPositionDelegate & delegate, float normalized_position, bool trigger_once )
+void USFSplineFollowingComponent::RegisterPositionObserver( const FSFOnSplineFollowingReachedPositionDelegate & delegate, float normalized_position, bool trigger_once )
 {
     FPositionObserver observer;
     observer.Callback = delegate;

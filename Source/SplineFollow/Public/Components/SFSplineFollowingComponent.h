@@ -49,7 +49,7 @@ public:
     void UnFollowSpline() override;
     bool IsFollowingSpline() const override;
     float GetCurrentSpeed() const override;
-    virtual void RegisterPositionObserver( const FSWOnSplineFollowingReachedPositionDelegate & delegate, float normalized_position, bool trigger_once = true ) override;
+    virtual void RegisterPositionObserver( const FSFOnSplineFollowingReachedPositionDelegate & delegate, float normalized_position, bool trigger_once = true ) override;
 
     void InitializeComponent() override;
     void OnRegister() override;
@@ -69,7 +69,7 @@ private:
     void ProcessPositionObservers();
 
     UPROPERTY( BlueprintAssignable )
-    FSWOnSplineFollowingToggleMovementChangedDelegate OnSplineFollowingToggleMovementChangedDelegate;
+    FSFOnSplineFollowingToggleMovementChangedDelegate OnSplineFollowingToggleMovementChangedDelegate;
 
     UPROPERTY()
     TObjectPtr< UCharacterMovementComponent > MovementComponent;
