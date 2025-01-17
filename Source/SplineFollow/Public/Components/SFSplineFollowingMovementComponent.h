@@ -33,7 +33,6 @@ struct FSFRotationConstraints
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam( FSWOnSplineFollowingReachedEndDelegate, AActor *, owner_actor );
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam( FSWOnSplineFollowingLoopedDelegate, int, loop_count );
-DECLARE_DELEGATE_OneParam( FSWOnSplineFollowingReachedPositionDelegate, float );
 
 UCLASS( ClassGroup = ( "Custom" ), meta = ( BlueprintSpawnableComponent ) )
 class SPLINEFOLLOW_API USFSplineFollowingMovementComponent final : public UMovementComponent, public ISFSplineFollowingInterface
@@ -86,27 +85,13 @@ public:
     UFUNCTION( BlueprintCallable )
     void SetInvertSpeed( bool invert );
 
-    void RegisterPositionObserver( const FSWOnSplineFollowingReachedPositionDelegate & delegate, float normalized_position, bool trigger_once = true );
+    void RegisterPositionObserver( const FSWOnSplineFollowingReachedPositionDelegate & delegate, float normalized_position, bool trigger_once = true ) override;
 
 #if WITH_EDITOR
     void PostEditChangeProperty( FPropertyChangedEvent & property_changed_event ) override;
 #endif
 
 private:
-    struct FPositionObserver
-    {
-        FPositionObserver() :
-            NormalizedPosition( 0.0f ),
-            bTriggerOnce( false ),
-            bHasBeenTriggered( false )
-        {}
-
-        FSWOnSplineFollowingReachedPositionDelegate Callback;
-        float NormalizedPosition;
-        bool bTriggerOnce;
-        bool bHasBeenTriggered;
-    };
-
     struct FSFSplineOffsetInfo
     {
         FSFSplineOffsetInfo();

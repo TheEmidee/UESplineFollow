@@ -8,6 +8,8 @@
 class USplineComponent;
 struct FSFFollowSplineInfos;
 
+DECLARE_DELEGATE_OneParam( FSWOnSplineFollowingReachedPositionDelegate, float );
+
 UINTERFACE( MinimalAPI, NotBlueprintable )
 class USFSplineFollowingInterface : public UInterface
 {
@@ -19,6 +21,20 @@ class SPLINEFOLLOW_API ISFSplineFollowingInterface
     GENERATED_BODY()
 
 public:
+    struct FPositionObserver
+    {
+        FPositionObserver() :
+            NormalizedPosition( 0.0f ),
+            bTriggerOnce( false ),
+            bHasBeenTriggered( false )
+        {}
+
+        FSWOnSplineFollowingReachedPositionDelegate Callback;
+        float NormalizedPosition;
+        bool bTriggerOnce;
+        bool bHasBeenTriggered;
+    };
+
     UFUNCTION( BlueprintCallable )
     virtual float GetDistanceOnSpline() const = 0;
 
@@ -48,4 +64,6 @@ public:
 
     UFUNCTION( BlueprintCallable )
     virtual USplineComponent * GetFollowedSplineComponent() const = 0;
+
+    virtual void RegisterPositionObserver( const FSWOnSplineFollowingReachedPositionDelegate & delegate, float normalized_position, bool trigger_once = true ) = 0;
 };

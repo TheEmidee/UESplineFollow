@@ -49,6 +49,7 @@ public:
     void UnFollowSpline() override;
     bool IsFollowingSpline() const override;
     float GetCurrentSpeed() const override;
+    virtual void RegisterPositionObserver( const FSWOnSplineFollowingReachedPositionDelegate & delegate, float normalized_position, bool trigger_once = true ) override;
 
     void InitializeComponent() override;
     void OnRegister() override;
@@ -65,6 +66,7 @@ private:
     float GetSimulationTimeStep( float remaining_time, const int32 iterations ) const;
     void SetDistanceOnSplineInternal( FVector & updated_location, FRotator & updated_rotation, float distance_on_spline );
     void SetMovementComponent();
+    void ProcessPositionObservers();
 
     UPROPERTY()
     TObjectPtr< UCharacterMovementComponent > MovementComponent;
@@ -105,6 +107,7 @@ private:
     FVector Destination;
     float DestinationDistance;
     FSFSplineMarkerProcessor SplineMarkerProcessor;
+    TArray< FPositionObserver > PositionObservers;
 };
 
 FORCEINLINE float USFSplineFollowingComponent::GetDistanceOnSpline() const

@@ -2,10 +2,10 @@
 
 #include "Components/SFSplineFollowingMovementComponent.h"
 
-USFAT_WaitSplineFollowerReachesPosition * USFAT_WaitSplineFollowerReachesPosition::WaitSplineFollowerReachesPosition( UGameplayAbility * owning_ability, USFSplineFollowingMovementComponent * spline_following_movement_component, float normalized_position, bool trigger_once /*= true*/ )
+USFAT_WaitSplineFollowerReachesPosition * USFAT_WaitSplineFollowerReachesPosition::WaitSplineFollowerReachesPosition( UGameplayAbility * owning_ability, TScriptInterface< ISFSplineFollowingInterface > spline_following_interface, float normalized_position, bool trigger_once /*= true*/ )
 {
     auto * task = NewAbilityTask< USFAT_WaitSplineFollowerReachesPosition >( owning_ability );
-    task->SplineFollowingMovementComponent = spline_following_movement_component;
+    task->SplineFollowingInterface = spline_following_interface;
     task->NormalizedPosition = normalized_position;
     task->bTriggerOnce = trigger_once;
     return task;
@@ -15,13 +15,13 @@ void USFAT_WaitSplineFollowerReachesPosition::Activate()
 {
     Super::Activate();
 
-    if ( SplineFollowingMovementComponent == nullptr )
+    if ( SplineFollowingInterface == nullptr )
     {
         EndTask();
         return;
     }
 
-    SplineFollowingMovementComponent->RegisterPositionObserver( FSWOnSplineFollowingReachedPositionDelegate::CreateUObject( this, &ThisClass::OnSplinePositionReached ), NormalizedPosition, bTriggerOnce );
+    SplineFollowingInterface->RegisterPositionObserver( FSWOnSplineFollowingReachedPositionDelegate::CreateUObject( this, &ThisClass::OnSplinePositionReached ), NormalizedPosition, bTriggerOnce );
 }
 
 void USFAT_WaitSplineFollowerReachesPosition::OnSplinePositionReached( float /*normalized_position*/ )
