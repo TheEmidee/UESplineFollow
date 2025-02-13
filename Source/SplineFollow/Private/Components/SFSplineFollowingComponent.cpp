@@ -60,6 +60,7 @@ void USFSplineFollowingComponent::ToggleSplineMovement( const bool it_is_active 
     }
 
     SetComponentTickEnabled( it_is_enabled );
+    OnSplineFollowingToggleMovementChangedDelegate.Broadcast( it_is_enabled );
 }
 
 void USFSplineFollowingComponent::SetDistanceOnSpline( const float distance_on_spline )
@@ -158,7 +159,8 @@ float USFSplineFollowingComponent::GetCurrentSpeed() const
 
     return MovementComponent->Velocity.Size();
 }
-void USFSplineFollowingComponent::RegisterPositionObserver( const FSWOnSplineFollowingReachedPositionDelegate & delegate, float normalized_position, bool trigger_once )
+
+void USFSplineFollowingComponent::RegisterPositionObserver( const FSFOnSplineFollowingReachedPositionDelegate & delegate, float normalized_position, bool trigger_once )
 {
     FPositionObserver observer;
     observer.Callback = delegate;

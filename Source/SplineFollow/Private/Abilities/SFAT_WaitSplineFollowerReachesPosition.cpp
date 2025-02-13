@@ -21,7 +21,7 @@ void USFAT_WaitSplineFollowerReachesPosition::Activate()
         return;
     }
 
-    SplineFollowingInterface->RegisterPositionObserver( FSWOnSplineFollowingReachedPositionDelegate::CreateUObject( this, &ThisClass::OnSplinePositionReached ), NormalizedPosition, bTriggerOnce );
+    SplineFollowingInterface->RegisterPositionObserver( FSFOnSplineFollowingReachedPositionDelegate::CreateUObject( this, &ThisClass::OnSplinePositionReached ), NormalizedPosition, bTriggerOnce );
 }
 
 void USFAT_WaitSplineFollowerReachesPosition::OnSplinePositionReached( float /*normalized_position*/ )

@@ -85,7 +85,7 @@ public:
     UFUNCTION( BlueprintCallable )
     void SetInvertSpeed( bool invert );
 
-    void RegisterPositionObserver( const FSWOnSplineFollowingReachedPositionDelegate & delegate, float normalized_position, bool trigger_once = true ) override;
+    void RegisterPositionObserver( const FSFOnSplineFollowingReachedPositionDelegate & delegate, float normalized_position, bool trigger_once = true ) override;
 
 #if WITH_EDITOR
     void PostEditChangeProperty( FPropertyChangedEvent & property_changed_event ) override;
@@ -127,6 +127,9 @@ private:
 
     UPROPERTY( BlueprintAssignable )
     FSWOnSplineFollowingLoopedDelegate OnSplineFollowingLoopedDelegate;
+
+    UPROPERTY( BlueprintAssignable )
+    FSFOnSplineFollowingToggleMovementChangedDelegate OnSplineFollowingToggleMovementChangedDelegate;
 
     UPROPERTY( BlueprintAssignable )
     FSFOnSplineOffsetFinishedDelegate OnSplineOffsetFinishedDelegate;
