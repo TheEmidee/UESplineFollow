@@ -116,6 +116,7 @@ USFSplineFollowingMovementComponent::USFSplineFollowingMovementComponent() :
     DistanceOnSpline = 0.0f;
     LoopCount = 0;
     RotationSpeed = 100.0f;
+    bSweepMovement = false;
 }
 
 void USFSplineFollowingMovementComponent::InitializeComponent()
@@ -251,7 +252,7 @@ void USFSplineFollowingMovementComponent::TickComponent( const float delta_time,
 
     auto new_transform = FTransform( new_rotation, new_location );
     ApplyOffsetData( new_transform, delta_time );
-    UpdatedComponent->SetWorldTransform( new_transform );
+    UpdatedComponent->SetWorldTransform( new_transform, bSweepMovement );
 }
 
 void USFSplineFollowingMovementComponent::UpdateTickRegistration()
@@ -298,7 +299,7 @@ bool USFSplineFollowingMovementComponent::FollowSpline( const FSFFollowSplineInf
 
     if ( follow_spline_infos.bAttachToSpline )
     {
-        GetOwner()->AttachToComponent( FollowedSplineComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale );
+        GetOwner()->AttachToComponent( FollowedSplineComponent, FAttachmentTransformRules::KeepWorldTransform );
     }
 
     bLoops = follow_spline_infos.bLoops;

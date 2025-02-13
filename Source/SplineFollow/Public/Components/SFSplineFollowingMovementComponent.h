@@ -211,6 +211,9 @@ private:
     UPROPERTY( EditAnywhere, BlueprintReadWrite, meta = ( AllowPrivateAccess = true ) )
     float RotationSpeed;
 
+    UPROPERTY( EditAnywhere, BlueprintReadWrite, meta = ( AllowPrivateAccess = true ) )
+    uint8 bSweepMovement : 1;
+
     TArray< FSFSplineOffsetInfo > SplineOffsetDatas;
     TArray< FPositionObserver > PositionObservers;
     FSFSplineMarkerProcessor SplineMarkerProcessor;
