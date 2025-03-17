@@ -111,21 +111,26 @@ bool USFSplineFollowingComponent::FollowSpline( const FSFFollowSplineInfos & fol
     SplineMarkerProcessor.Initialize( FollowedSplineComponent );
     LoopCount = 0;
 
-    if ( follow_spline_infos.bAttachToSpline )
-    {
-        GetOwner()->AttachToComponent( FollowedSplineComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale );
-    }
-
     bLoops = follow_spline_infos.bLoops;
 
     MovementComponent->StopActiveMovement();
+
+    if ( follow_spline_infos.bAttachToSpline )
+    {
+        GetOwner()->AttachToComponent( FollowedSplineComponent, FAttachmentTransformRules::KeepWorldTransform );
+        SetNormalizedDistanceOnSpline( follow_spline_infos.NormalizedDistanceOnSpline );
+    }
+    else
+    {
+        DistanceOnSpline = DestinationDistance = follow_spline_infos.NormalizedDistanceOnSpline * FollowedSplineComponent->GetSplineLength();
+        SplineMarkerProcessor.UpdateLastProcessedMarker( GetNormalizedDistanceOnSpline(), MovementComponent->Velocity.Length() );
+    }
 
     if ( follow_spline_infos.bOverrideRotationSpeed )
     {
         MovementComponent->RotationRate.Yaw = follow_spline_infos.RotationSpeedOverride;
     }
 
-    SetNormalizedDistanceOnSpline( follow_spline_infos.NormalizedDistanceOnSpline );
     ToggleSplineMovement( follow_spline_infos.bEnableMovement );
 
     return true;
