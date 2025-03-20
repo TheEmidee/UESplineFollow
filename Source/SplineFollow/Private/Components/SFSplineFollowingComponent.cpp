@@ -65,6 +65,11 @@ void USFSplineFollowingComponent::ToggleSplineMovement( const bool it_is_active 
 
 void USFSplineFollowingComponent::SetDistanceOnSpline( const float distance_on_spline )
 {
+    if ( FollowedSplineComponent == nullptr || MovementComponent == nullptr )
+    {
+        return;
+    }
+
     auto new_location = FVector::Zero();
     auto new_rotation = FRotator::ZeroRotator;
 
