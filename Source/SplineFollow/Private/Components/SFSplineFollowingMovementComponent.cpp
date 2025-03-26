@@ -366,6 +366,11 @@ void USFSplineFollowingMovementComponent::UnFollowSpline()
 
 void USFSplineFollowingMovementComponent::SetDistanceOnSpline( const float distance_on_spline )
 {
+    if ( FollowedSplineComponent == nullptr || UpdatedComponent == nullptr )
+    {
+        return;
+    }
+
     auto new_location = FVector::Zero();
     auto new_rotation = bOrientRotationToMovement ? FRotator::ZeroRotator : UpdatedComponent->GetComponentRotation();
 
