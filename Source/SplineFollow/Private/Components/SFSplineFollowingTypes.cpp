@@ -170,13 +170,18 @@ void FSFSplineMarkerProcessor::ProcessSplineMarkers( const float distance_on_spl
 
 void FSFSplineMarkerProcessor::UpdateLastProcessedMarker( const float distance_on_spline, const float current_speed )
 {
+    const auto * spline_component = Cast< USFSplineComponent >( SplineComponent );
+
+    if ( spline_component == nullptr )
+    {
+        return;
+    }
+
     if ( current_speed == 0.0f )
     {
         bUpdateLastProcessedMarker = true;
         return;
     }
-
-    const auto * spline_component = Cast< USFSplineComponent >( SplineComponent );
 
     const auto & spline_marker_proxies = spline_component->GetSplineMarkerProxies();
     const auto spline_length = spline_component->GetSplineLength();
