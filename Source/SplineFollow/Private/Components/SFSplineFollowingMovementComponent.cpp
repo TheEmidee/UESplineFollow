@@ -428,6 +428,13 @@ void USFSplineFollowingMovementComponent::ResetMarkersUsage()
 void USFSplineFollowingMovementComponent::SetInvertSpeed( bool invert )
 {
     bInvertSpeed = invert;
+    CurrentSpeed = FMath::Abs( CurrentSpeed );
+
+    if ( bInvertSpeed )
+    {
+        CurrentSpeed *= -1.0f;
+    }
+
     SplineMarkerProcessor.SetUpdateLastProcessedMarker( true );
 }
 
