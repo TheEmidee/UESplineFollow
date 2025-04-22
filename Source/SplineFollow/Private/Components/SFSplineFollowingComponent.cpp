@@ -107,7 +107,7 @@ bool USFSplineFollowingComponent::FollowSpline( const FSFFollowSplineInfos & fol
         return false;
     }
 
-    if ( follow_spline_infos.SplineComponent == FollowedSplineComponent )
+    if ( !follow_spline_infos.bForce && follow_spline_infos.SplineComponent == FollowedSplineComponent )
     {
         return false;
     }

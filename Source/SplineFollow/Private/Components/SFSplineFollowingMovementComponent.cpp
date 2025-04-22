@@ -288,7 +288,7 @@ bool USFSplineFollowingMovementComponent::FollowSpline( const FSFFollowSplineInf
         return false;
     }
 
-    if ( follow_spline_infos.SplineComponent == FollowedSplineComponent )
+    if ( !follow_spline_infos.bForce && follow_spline_infos.SplineComponent == FollowedSplineComponent )
     {
         return false;
     }
@@ -428,6 +428,13 @@ void USFSplineFollowingMovementComponent::ResetMarkersUsage()
 void USFSplineFollowingMovementComponent::SetInvertSpeed( bool invert )
 {
     bInvertSpeed = invert;
+    CurrentSpeed = FMath::Abs( CurrentSpeed );
+
+    if ( bInvertSpeed )
+    {
+        CurrentSpeed *= -1.0f;
+    }
+
     SplineMarkerProcessor.SetUpdateLastProcessedMarker( true );
 }
 
