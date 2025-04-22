@@ -82,6 +82,10 @@ struct SPLINEFOLLOW_API FSFFollowSplineInfos
 
     UPROPERTY( EditAnywhere, BlueprintReadWrite )
     float RotationSpeedOverride;
+
+    // Force executing all the code in FollowSpline even if the spline to follow is the same
+    UPROPERTY( EditAnywhere, BlueprintReadWrite )
+    uint8 bForce : 1;
 };
 
 USTRUCT()
